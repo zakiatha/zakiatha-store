@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZakiTopup - Store Top-Up Game Tercepat & Terpercaya</title>
+    <meta name="description" content="Platform top up game termurah, teraman, dan tercepat di Indonesia. Menyediakan top up Diamond Mobile Legends, Free Fire, PUBG Mobile UC, Valorant Points, dan lainnya.">
+    <!-- Favicon Mock -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/%3E%3C/svg%3E">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container header-container">
+            <a href="#home" class="logo-link" id="nav-logo">
+                <!-- Logo Icon SVG -->
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#logo-grad)" stroke="#8b5cf6" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="logo-grad" x1="2" y1="2" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#8b5cf6"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">ZakiTopup</span>
+            </a>
+            
+            <nav class="nav-links" id="main-nav-links">
+                <a href="#home" class="nav-btn secondary" id="nav-home-link">
+                    <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#track" class="nav-btn secondary" id="nav-track-link">
+                    <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                    <span>Lacak Pesanan</span>
+                </a>
+                <a href="#admin" class="nav-btn primary" id="nav-admin-link" style="display: none;">
+                    <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+                    <span>Dashboard Admin</span>
+                </a>
+                <div id="auth-nav-container" style="display: flex; gap: 12px; align-items: center;">
+                    <!-- Dynamically populated buttons -->
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container (SPA views inject here) -->
+    <main id="app" class="container">
+        <!-- Views will dynamically render here -->
+        <div style="display: flex; justify-content: center; align-items: center; height: 300px; flex-direction: column; gap: 16px;">
+            <div style="width: 50px; height: 50px; border: 3px solid rgba(139, 92, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            <p style="color: var(--text-secondary); font-weight: 600;">Memuat ZakiTopup...</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-container">
+            <div>
+                <div class="footer-logo">ZakiTopup</div>
+                <p class="footer-desc">ZakiTopup adalah platform penyedia layanan top-up game favorit Anda yang paling murah, aman, dan instan di Indonesia. Proses otomatis 24 jam non-stop.</p>
+            </div>
+            <div>
+                <h4 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">Navigasi Cepat</h4>
+                <div class="footer-links" style="flex-direction: column; gap: 8px;">
+                    <a href="#home">Home</a>
+                    <a href="#track">Lacak Transaksi</a>
+                    <a href="#admin">Dashboard Admin</a>
+                </div>
+            </div>
+            <div>
+                <h4 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">Hubungi Kami</h4>
+                <p style="margin-bottom: 8px;">WhatsApp: +62 812-3456-7890</p>
+                <p>Email: support@zakitopup.com</p>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 12px; color: var(--text-muted);">
+            &copy; 2026 ZakiTopup. Seluruh Hak Cipta Dilindungi. Terinspirasi oleh Lapakgaming & Lapakhuda.
+        </div>
+    </footer>
+
+    <!-- Spin Keyframe Styles for Loading -->
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    <!-- Core Scripts -->
+    <script src="js/db.js"></script>
+    
+    <!-- Views Scripts -->
+    <script src="js/views/home.js"></script>
+    <script src="js/views/auth.js"></script>
+    <script src="js/views/detail.js"></script>
+    <script src="js/views/invoice.js"></script>
+    <script src="js/views/track.js"></script>
+    <script src="js/views/admin.js"></script>
+    
+    <!-- Router & Coordinator Script (Must load last) -->
+    <script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+// js/views/detail.js
+// Game Detail View - Handles dynamic forms, nominals grid, payment calculations, and checkout modal with points integration
+
+const detailView = {
+    // Helper to get help instructions based on game slug
+    getGameInstructions: function(slug) {
+        switch(slug) {
+            case 'mobile-legends':
+                return 'Untuk mengetahui User ID Anda, silakan klik menu profil di bagian pojok kiri atas pada menu utama game. User ID akan terlihat di bawah Nickname Anda. Silakan masukkan User ID dan Zone ID Anda untuk mengisi. Contoh: 12345678 (1234).';
+            case 'free-fire':
+                return 'Untuk menemukan Player ID Anda, ketuk profil Anda di pojok kiri atas menu utama game. Player ID Anda terletak di bawah nama karakter Anda. Silakan masukkan Player ID Anda di sini.';
+            case 'pubg-mobile':
+                return 'Untuk menemukan Character ID PUBG Mobile Anda, buka profil Anda di dalam game. Karakter ID berupa deretan angka yang terletak di bagian atas profil Anda.';
+            case 'valorant':
+                return 'Masukkan Riot ID dan Tagline Anda. Anda dapat menemukannya di klien Riot Games atau di dalam game (arahkan kursor ke nama profil Anda). Formatnya harus berupa Username#Tagline. Contoh: Budi#ID1.';
+            case 'genshin-impact':
+                return 'UID dapat ditemukan di pojok kanan bawah layar game atau di menu Paimon di bawah nama profil Anda. Pastikan Anda memilih server yang benar agar Diamond masuk ke akun Anda.';
+            default:
+                return 'Masukkan detail akun Anda dengan benar. Proses pengisian top-up akan diproses otomatis berdasarkan data yang Anda masukkan.';
+        }
+    },
+
+    // Render function
+    render: function(container, params) {
+        const slug = params.slug;
+        const game = window.dbService.getGameBySlug(slug);
+        
+        if (!game) {
+            container.innerHTML = `
+                <div class="card-glass" style="padding: 48px; text-align: center; max-width: 500px; margin: 40px auto;">
+                    <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: var(--danger); margin-bottom: 16px;"></i>
+                    <h3 style="margin-bottom: 8px;">Game Tidak Ditemukan</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Maaf, game yang Anda cari tidak terdaftar di sistem kami.</p>
+                    <a href="#home" class="btn-grad">Kembali ke Home</a>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+            return;
+        }
+
+        // Fetch products and payment methods from DB
+        const products = window.dbService.getProducts(game.id);
+        const paymentMethods = window.dbService.getPaymentMethods();
+        
+        // State for this view selection
+        let selectedProduct = null;
+        let selectedPayment = null;
+        let usePoints = false;
+        
+        // Render view structure
+        container.innerHTML = `
+            <div class="detail-layout">
+                <!-- Left Column: Game Details & Help Sidebar -->
+                <aside class="detail-game-sidebar">
+                    <div class="card-glass detail-game-card">
+                        <img src="${game.banner}" alt="${game.name}" class="detail-banner">
+                        <h1 class="detail-game-title">${game.name}</h1>
+                        <p class="detail-game-desc">${game.description}</p>
+                        
+                        <div class="help-box">
+                            <h4 class="help-box-title">
+                                <i data-lucide="help-circle" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                                <span>Petunjuk Petunjuk</span>
+                            </h4>
+                            <p class="help-box-content">${this.getGameInstructions(game.slug)}</p>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Right Column: Step by Step Process -->
+                <div class="detail-steps">
+                    
+                    <!-- Step 1: Account Fields -->
+                    <div class="card-glass step-card" id="step-account">
+                        <div class="step-header">
+                            <div class="step-num">1</div>
+                            <h2 class="step-title">Masukkan Data Akun</h2>
+                        </div>
+                        <div class="step-content">
+                            <div id="dynamic-fields-container">
+                                <!-- Dynamically generated fields -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Product Nominal Grid -->
+                    <div class="card-glass step-card" id="step-nominals">
+                        <div class="step-header">
+                            <div class="step-num">2</div>
+                            <h2 class="step-title">Pilih Nominal Top-Up</h2>
+                        </div>
+                        <div class="step-content">
+                            <div class="product-grid" id="product-grid-container">
+                                <!-- Dynamically generated products -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Payment Accordion -->
+                    <div class="card-glass step-card" id="step-payment">
+                        <div class="step-header">
+                            <div class="step-num">3</div>
+                            <h2 class="step-title">Pilih Metode Pembayaran</h2>
+                        </div>
+                        <div class="step-content">
+                            <div id="payment-methods-container">
+                                <p style="color: var(--text-secondary); text-align: center; padding: 20px;">Silakan pilih nominal top-up terlebih dahulu untuk melihat metode pembayaran dan harga.</p>
+                            </div>
+                            <div id="points-usage-container" style="display: none; margin-top: 20px;">
+                                <!-- Points toggle checkbox rendered dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4: Contact & Purchase -->
+                    <div class="card-glass step-card" id="step-purchase">
+                        <div class="step-header">
+                            <div class="step-num">4</div>
+                            <h2 class="step-title">Konfirmasi & Beli</h2>
+                        </div>
+                        <div class="step-content" style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="form-group">
+                                <label for="customer-whatsapp">Nomor WhatsApp</label>
+                                <input type="tel" id="customer-whatsapp" class="form-input" placeholder="Contoh: 081234567890" required>
+                                <p style="font-size: 11px; color: var(--text-muted);">Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.</p>
+                            </div>
+                            
+                            <button id="btn-submit-order" class="btn-grad" style="width: 100%; padding: 16px;" disabled>
+                                <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
+                                <span>Beli Sekarang</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Global Checkout Modal Overlay -->
+            <div id="checkout-modal" class="modal-overlay">
+                <div class="card-glass modal-card">
+                    <button id="btn-modal-close" class="modal-close-btn">
+                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                    </button>
+                    <h3 class="modal-title gradient-text">Detail Pembelian</h3>
+                    
+                    <!-- Verification Loader (Simulated API Check) -->
+                    <div id="modal-loader" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 0; gap: 16px;">
+                        <div style="width: 40px; height: 40px; border: 3px solid rgba(139, 92, 246, 0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="color: var(--text-secondary); font-size: 14px; font-weight: 600;">Memverifikasi Akun/Data...</p>
+                    </div>
+                    
+                    <!-- Modal Details Content (Shown after load) -->
+                    <div id="modal-content" style="display: none;">
+                        <div class="modal-details" id="checkout-details-table">
+                            <!-- Dynamic summary rows -->
+                        </div>
+                        <div class="modal-actions">
+                            <button id="btn-modal-cancel" class="modal-btn-cancel">Batal</button>
+                            <button id="btn-modal-confirm" class="modal-btn-confirm">Konfirmasi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Elements references
+        const fieldsContainer = document.getElementById('dynamic-fields-container');
+        const productsContainer = document.getElementById('product-grid-container');
+        const paymentsContainer = document.getElementById('payment-methods-container');
+        const pointsContainer = document.getElementById('points-usage-container');
+        const whatsappInput = document.getElementById('customer-whatsapp');
+        const submitBtn = document.getElementById('btn-submit-order');
+        
+        // Modal references
+        const modalOverlay = document.getElementById('checkout-modal');
+        const modalLoader = document.getElementById('modal-loader');
+        const modalContent = document.getElementById('modal-content');
+        const modalTable = document.getElementById('checkout-details-table');
+        const modalClose = document.getElementById('btn-modal-close');
+        const modalCancel = document.getElementById('btn-modal-cancel');
+        const modalConfirm = document.getElementById('btn-modal-confirm');
+        
+        // ----------------------------------------------------
+        // 1. DYNAMIC INPUT FIELDS GENERATION
+        // ----------------------------------------------------
+        if (game.slug === 'mobile-legends') {
+            fieldsContainer.innerHTML = `
+                <div class="input-grid-ml">
+                    <div class="form-group">
+                        <label for="input-userId">User ID</label>
+                        <input type="text" id="input-userId" class="form-input game-input" placeholder="Masukkan User ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-zoneId">Zone ID</label>
+                        <input type="text" id="input-zoneId" class="form-input game-input" placeholder="Zone ID" required>
+                    </div>
+                </div>
+            `;
+        } else {
+            fieldsContainer.innerHTML = game.fields.map(field => {
+                if (field.type === 'select') {
+                    return `
+                        <div class="form-group">
+                            <label for="input-${field.id}">${field.label}</label>
+                            <select id="input-${field.id}" class="form-input form-select game-input" required>
+                                <option value="" disabled selected>Pilih ${field.label}</option>
+                                ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="form-group">
+                            <label for="input-${field.id}">${field.label}</label>
+                            <input type="text" id="input-${field.id}" class="form-input game-input" placeholder="${field.placeholder}" required>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+        
+        // ----------------------------------------------------
+        // 2. DYNAMIC NOMINALS GENERATION
+        // ----------------------------------------------------
+        if (products.length === 0) {
+            productsContainer.innerHTML = `<p style="color: var(--text-secondary); padding: 20px; text-align: center;">Tidak ada produk tersedia.</p>`;
+        } else {
+            productsContainer.innerHTML = products.map(prod => {
+                const hasDiscount = prod.originalPrice > prod.price;
+                return `
+                    <div class="product-card" data-id="${prod.id}">
+                        ${prod.isPopular ? `<div class="product-card-badge-container"><span class="badge popular">Populer</span></div>` : ''}
+                        <div class="product-card-title">${prod.name}</div>
+                        <div class="product-card-price-wrapper">
+                            ${hasDiscount ? `<div class="product-card-original-price">${window.formatRupiah(prod.originalPrice)}</div>` : ''}
+                            <div class="product-card-price">${window.formatRupiah(prod.price)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click listeners to product cards
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    
+                    const prodId = card.getAttribute('data-id');
+                    selectedProduct = products.find(p => p.id === prodId);
+                    
+                    renderPayments();
+                    validateForm();
+                });
+            });
+        }
+        
+        // ----------------------------------------------------
+        // 3. DYNAMIC PAYMENTS ACCORDION & PRICE CALCULATION
+        // ----------------------------------------------------
+        const renderPayments = () => {
+            if (!selectedProduct) return;
+
+            // Check logged in user points balance
+            const session = window.getSession();
+            let userPoints = 0;
+            if (session) {
+                const userObj = window.dbService.getUserByUsername(session.username);
+                userPoints = userObj ? userObj.points : 0;
+            }
+            
+            // Render user points box if logged in
+            if (session && userPoints > 0) {
+                pointsContainer.style.display = 'block';
+                pointsContainer.innerHTML = `
+                    <div class="points-use-box">
+                        <div class="points-use-left">
+                            <span class="points-use-title">Gunakan Poin Belanja</span>
+                            <span class="points-use-desc">Poin Anda: <strong>${userPoints.toLocaleString('id-ID')} Pts</strong> (1 Pts = Rp 1)</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="use-points-checkbox" ${usePoints ? 'checked' : ''}>
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+                `;
+                
+                document.getElementById('use-points-checkbox').addEventListener('change', (e) => {
+                    usePoints = e.target.checked;
+                    renderPayments(); // Redraw prices with points calculation
+                });
+            } else {
+                pointsContainer.style.display = 'none';
+            }
+            
+            // Group payment methods
+            const grouped = {
+                'qris': { title: 'Instan QRIS (Rekomendasi)', items: [] },
+                'ewallet': { title: 'E-Wallet (Dana, OVO, dll)', items: [] },
+                'va': { title: 'Virtual Account (Cek Otomatis)', items: [] },
+                'retail': { title: 'Retail Minimarket', items: [] }
+            };
+            
+            paymentMethods.forEach(pm => {
+                if (grouped[pm.type]) {
+                    grouped[pm.type].items.push(pm);
+                }
+            });
+            
+            let accordionHtml = '<div class="payment-accordion">';
+            
+            for (const key in grouped) {
+                const group = grouped[key];
+                if (group.items.length === 0) continue;
+                
+                accordionHtml += `<h3 class="payment-group-header">${group.title}</h3>`;
+                
+                group.items.forEach(pm => {
+                    // Calculate total price with fees
+                    let feeAmount = 0;
+                    if (pm.feeType === 'percent') {
+                        feeAmount = selectedProduct.price * (pm.feeValue / 100);
+                    } else if (pm.feeType === 'flat') {
+                        feeAmount = pm.feeValue;
+                    }
+                    
+                    let baseTotal = selectedProduct.price + feeAmount;
+                    let discountAmount = 0;
+                    
+                    if (usePoints) {
+                        discountAmount = Math.min(userPoints, baseTotal);
+                    }
+                    
+                    const finalPrice = baseTotal - discountAmount;
+                    const isSelected = selectedPayment && selectedPayment.id === pm.id;
+                    
+                    accordionHtml += `
+                        <div class="payment-item ${isSelected ? 'selected' : ''}" data-pm-id="${pm.id}">
+                            <div class="payment-left">
+                                <div class="payment-logo-wrapper">
+                                    <span class="payment-logo-text">${pm.code}</span>
+                                </div>
+                                <div class="payment-info-text">
+                                    <span class="payment-name">${pm.name}</span>
+                                    <span class="payment-meta">${pm.info}</span>
+                                </div>
+                            </div>
+                            <div class="payment-right">
+                                ${discountAmount > 0 ? `<div style="font-size:10px; text-decoration:line-through; color:var(--text-muted);">${window.formatRupiah(baseTotal)}</div>` : ''}
+                                <div class="payment-price">${window.formatRupiah(finalPrice)}</div>
+                                ${discountAmount > 0 ? `<div style="font-size:10px; color:var(--success); font-weight:700;">Potong ${discountAmount.toLocaleString('id-ID')} Pts</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            accordionHtml += '</div>';
+            paymentsContainer.innerHTML = accordionHtml;
+            
+            // Add click listeners to payment items
+            document.querySelectorAll('.payment-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    
+                    const pmId = item.getAttribute('data-pm-id');
+                    selectedPayment = paymentMethods.find(p => p.id === pmId);
+                    
+                    validateForm();
+                });
+            });
+        };
+        
+        // ----------------------------------------------------
+        // 4. FORM VALIDATION
+        // ----------------------------------------------------
+        const validateForm = () => {
+            const gameInputs = document.querySelectorAll('.game-input');
+            let allInputsFilled = true;
+            
+            gameInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    allInputsFilled = false;
+                }
+            });
+            
+            const isWhatsappFilled = whatsappInput.value.trim().length >= 9;
+            const isProductSelected = selectedProduct !== null;
+            const isPaymentSelected = selectedPayment !== null;
+            
+            if (allInputsFilled && isWhatsappFilled && isProductSelected && isPaymentSelected) {
+                submitBtn.removeAttribute('disabled');
+            } else {
+                submitBtn.setAttribute('disabled', 'true');
+            }
+        };
+        
+        fieldsContainer.addEventListener('input', validateForm);
+        fieldsContainer.addEventListener('change', validateForm);
+        whatsappInput.addEventListener('input', validateForm);
+        
+        // ----------------------------------------------------
+        // 5. SUBMIT ORDER & CHECKOUT MODAL
+        // ----------------------------------------------------
+        submitBtn.addEventListener('click', () => {
+            if (!selectedProduct || !selectedPayment) return;
+            
+            // Get session points
+            const session = window.getSession();
+            let userPoints = 0;
+            if (session) {
+                const userObj = window.dbService.getUserByUsername(session.username);
+                userPoints = userObj ? userObj.points : 0;
+            }
+
+            // Collect account input details
+            const accountData = {};
+            game.fields.forEach(f => {
+                const el = document.getElementById(`input-${f.id}`);
+                if (el) {
+                    accountData[f.id] = el.value.trim();
+                }
+            });
+            
+            let accountTargetStr = '';
+            if (game.slug === 'mobile-legends') {
+                accountTargetStr = `${accountData.userId} (${accountData.zoneId})`;
+            } else if (game.slug === 'genshin-impact') {
+                accountTargetStr = `${accountData.userId} [Server: ${accountData.server}]`;
+            } else {
+                accountTargetStr = Object.values(accountData).join(' / ');
+            }
+            
+            // Calculate prices
+            let feeAmount = 0;
+            if (selectedPayment.feeType === 'percent') {
+                feeAmount = selectedProduct.price * (selectedPayment.feeValue / 100);
+            } else if (selectedPayment.feeType === 'flat') {
+                feeAmount = selectedPayment.feeValue;
+            }
+            
+            const baseTotal = selectedProduct.price + feeAmount;
+            const pointsToUse = usePoints ? Math.min(userPoints, baseTotal) : 0;
+            const finalTotal = baseTotal - pointsToUse;
+            
+            // Earn points: 5% of base price
+            const pointsEarned = Math.round(selectedProduct.price * 0.05);
+            
+            // Open modal in LOADING state
+            modalOverlay.classList.add('active');
+            modalLoader.style.display = 'flex';
+            modalContent.style.display = 'none';
+            
+            // Verification check simulator
+            setTimeout(() => {
+                modalLoader.style.display = 'none';
+                modalContent.style.display = 'block';
+                
+                const firstPart = ["Gamer", "Player", "Pro", "Zaki", "Sultan", "Legends", "Fighter"];
+                const secondPart = ["Topup", "Santuy", "GGWP", "Store", "MVP", "Noob", "Gacor"];
+                const mockNickname = `${firstPart[Math.floor(Math.random()*firstPart.length)]}_${secondPart[Math.floor(Math.random()*secondPart.length)]}`;
+                
+                // Show dynamic verification detail based on Category
+                let targetLabel = 'Data Target';
+                if (game.category === 'pulsa') targetLabel = 'Nomor HP';
+                else if (game.category === 'voucher') targetLabel = 'Email Penerima';
+
+                // Populate checkout table
+                modalTable.innerHTML = `
+                    <div class="modal-details-row">
+                        <div class="modal-details-label">Kategori / Item</div>
+                        <div class="modal-details-val">${game.name}</div>
+                    </div>
+                    <div class="modal-details-row">
+                        <div class="modal-details-label">${targetLabel}</div>
+                        <div class="modal-details-val" style="font-family: monospace; color: var(--primary);">${accountTargetStr}</div>
+                    </div>
+                    ${game.category !== 'pulsa' && game.category !== 'voucher' ? `
+                    <div class="modal-details-row" style="background: rgba(16, 185, 129, 0.05);">
+                        <div class="modal-details-label" style="color: var(--success); font-weight:700;">Nickname Akun</div>
+                        <div class="modal-details-val" style="color: var(--success); font-weight:700;">${mockNickname} (Verified)</div>
+                    </div>` : ''}
+                    <div class="modal-details-row">
+                        <div class="modal-details-label">Produk</div>
+                        <div class="modal-details-val">${selectedProduct.name}</div>
+                    </div>
+                    <div class="modal-details-row">
+                        <div class="modal-details-label">Harga</div>
+                        <div class="modal-details-val">${window.formatRupiah(selectedProduct.price)}</div>
+                    </div>
+                    <div class="modal-details-row">
+                        <div class="modal-details-label">Biaya Admin</div>
+                        <div class="modal-details-val">${window.formatRupiah(feeAmount)}</div>
+                    </div>
+                    ${pointsToUse > 0 ? `
+                    <div class="modal-details-row" style="color: var(--success); background: rgba(16, 185, 129, 0.03);">
+                        <div class="modal-details-label">Potongan Poin</div>
+                        <div class="modal-details-val">- ${window.formatRupiah(pointsToUse)}</div>
+                    </div>` : ''}
+                    <div class="modal-details-row modal-details-total">
+                        <div class="modal-details-label" style="color: var(--secondary);">Total Bayar</div>
+                        <div class="modal-details-val">${window.formatRupiah(finalTotal)}</div>
+                    </div>
+                    ${session ? `
+                    <div class="modal-details-row" style="background: rgba(6, 182, 212, 0.05);">
+                        <div class="modal-details-label" style="color: var(--secondary); font-weight:700;">Cashback Didapat</div>
+                        <div class="modal-details-val" style="color: var(--secondary); font-weight:700;">+ ${pointsEarned.toLocaleString('id-ID')} Pts (5%)</div>
+                    </div>` : ''}
+                `;
+                
+                // Confirm action
+                modalConfirm.onclick = () => {
+                    const tx = window.dbService.createTransaction({
+                        gameId: game.id,
+                        gameName: game.name,
+                        accountData: accountData,
+                        productId: selectedProduct.id,
+                        productName: selectedProduct.name,
+                        basePrice: selectedProduct.price,
+                        adminFee: feeAmount,
+                        totalAmount: finalTotal,
+                        pointsUsed: pointsToUse,
+                        pointsEarned: pointsEarned,
+                        username: session ? session.username : null,
+                        paymentMethodId: selectedPayment.id,
+                        paymentMethodName: selectedPayment.name,
+                        paymentMethodCode: selectedPayment.code,
+                        paymentMethodType: selectedPayment.type,
+                        whatsapp: whatsappInput.value.trim()
+                    });
+                    
+                    modalOverlay.classList.remove('active');
+                    window.location.hash = `#invoice/${tx.invoiceId}`;
+                };
+                
+            }, 1200);
+        });
+        
+        const closeModal = () => {
+            modalOverlay.classList.remove('active');
+        };
+        modalClose.addEventListener('click', closeModal);
+        modalCancel.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    }
+};
+
+window.detailView = detailView;
