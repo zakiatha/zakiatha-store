@@ -398,11 +398,52 @@ body, header, .card-glass, .form-input, td, th, .btn-action-small, .hud-panel, f
     color: var(--primary);
 }
 
+
+
 .light-theme .theme-toggle-btn:hover {
     background: rgba(109, 40, 217, 0.14);
     border-color: var(--primary);
 }
 
+/* === LIGHT MODE: Ticker / HUD feed item pills — override hardcoded dark background === */
+.light-theme .hud-feed-item {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(109, 40, 217, 0.2) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.light-theme .hud-feed-item.success {
+    border-color: rgba(5, 150, 105, 0.3) !important;
+}
+
+.light-theme .hud-panel {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(109, 40, 217, 0.15) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* === LIGHT MODE: Hero banner — override inline style from JS template === */
+.light-theme .hero-banner {
+    background: linear-gradient(135deg, rgba(230, 220, 255, 0.6), rgba(200, 235, 255, 0.5)) !important;
+    border-color: rgba(109, 40, 217, 0.2) !important;
+}
+
+.light-theme .hero-bg {
+    opacity: 0.22 !important;
+    filter: brightness(1.1) saturate(0.8);
+}
+
+.light-theme .hero-overlay {
+    background: linear-gradient(135deg, rgba(240, 244, 255, 0.93) 20%, rgba(230, 220, 255, 0.55) 100%) !important;
+}
+
+/* === LIGHT MODE: Search & Category Filter Bar — override inline style from JS template === */
+.light-theme .search-filter-bar {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: rgba(109, 40, 217, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
 
 /* --- Reset & Base Styles --- */
 *, *::before, *::after {
