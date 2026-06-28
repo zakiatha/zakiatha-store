@@ -53,44 +53,356 @@
 
 /* --- Light Theme Variables --- */
 .light-theme {
-    --bg-base: #f8fafc;
+    --bg-base: #f0f4ff;
     --bg-surface: #ffffff;
     --bg-surface-elevated: #e2e8f0;
-    --bg-surface-glass: rgba(255, 255, 255, 0.7);
+    --bg-surface-glass: rgba(255, 255, 255, 0.85);
     --border-color: rgba(0, 0, 0, 0.08);
-    --border-focus: rgba(124, 58, 237, 0.4);
+    --border-focus: rgba(109, 40, 217, 0.4);
     
     --primary: #6d28d9;
-    --primary-glow: rgba(124, 58, 237, 0.15);
+    --primary-glow: rgba(109, 40, 217, 0.2);
     --secondary: #0891b2;
-    --secondary-glow: rgba(6, 182, 212, 0.15);
+    --secondary-glow: rgba(8, 145, 178, 0.2);
     --accent: #4f46e5;
     --warning: #d97706;
     --success: #059669;
-    --success-glow: rgba(5, 150, 105, 0.1);
+    --success-glow: rgba(5, 150, 105, 0.12);
     --danger: #dc2626;
-    --danger-glow: rgba(220, 38, 38, 0.1);
+    --danger-glow: rgba(220, 38, 38, 0.12);
+    --ewallet-accent: #047857;
+    --ewallet-glow: rgba(4, 120, 87, 0.15);
     
     --text-primary: #0f172a;
     --text-secondary: #475569;
     --text-muted: #64748b;
     --text-on-primary: #ffffff;
     
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
-    --shadow-glow: 0 4px 20px rgba(124, 58, 237, 0.15);
-    --shadow-cyan-glow: 0 4px 20px rgba(6, 182, 212, 0.15);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.09);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.13);
+    --shadow-glow: 0 4px 20px rgba(109, 40, 217, 0.18);
+    --shadow-cyan-glow: 0 4px 20px rgba(8, 145, 178, 0.18);
 }
 
+/* === LIGHT MODE: Hide galaxy stars & nebula, add soft gradient bg === */
 .light-theme #galaxy-stars,
 .light-theme #galaxy-nebula {
-    opacity: 0.1;
+    opacity: 0;
+    pointer-events: none;
 }
 
-body, header, .card-glass, .form-input, td, th, .btn-action-small, .hud-panel, footer {
+/* Soft gradient background for light mode */
+.light-theme body {
+    background: linear-gradient(145deg, #f0f4ff 0%, #faf5ff 40%, #f0faf8 100%);
+    background-attachment: fixed;
+}
+
+/* Decorative blobs for light mode background */
+.light-theme body::before {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(109,40,217,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.light-theme body::after {
+    content: '';
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(8,145,178,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* === LIGHT MODE: Header === */
+.light-theme header {
+    background-color: rgba(255, 255, 255, 0.88);
+    border-color: rgba(109, 40, 217, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(109, 40, 217, 0.08);
+}
+
+/* === LIGHT MODE: Logo text - dark gradient instead of white === */
+.light-theme .logo-text {
+    background: linear-gradient(135deg, #1e1b4b 0%, var(--primary) 50%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* === LIGHT MODE: Nav buttons === */
+.light-theme .nav-btn.secondary {
+    background-color: rgba(109, 40, 217, 0.06);
+    border-color: rgba(109, 40, 217, 0.15);
+    color: var(--text-primary);
+}
+
+.light-theme .nav-btn.secondary:hover {
+    background-color: rgba(109, 40, 217, 0.1);
+    border-color: var(--primary);
+}
+
+.light-theme .hamburger-line {
+    background: var(--text-primary);
+}
+
+/* === LIGHT MODE: Mobile nav overlay === */
+.light-theme .mobile-nav-overlay {
+    background: rgba(15, 23, 42, 0.3);
+}
+
+/* === LIGHT MODE: Cards (glassmorphism) === */
+.light-theme .card-glass {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(109, 40, 217, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(109, 40, 217, 0.06);
+}
+
+/* === LIGHT MODE: Form inputs === */
+.light-theme .form-input {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: var(--text-primary);
+}
+
+.light-theme .form-input:focus {
+    background-color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.12);
+}
+
+.light-theme .form-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* === LIGHT MODE: Hero banner overlay === */
+.light-theme .hero-overlay {
+    background: linear-gradient(90deg, rgba(240, 244, 255, 0.95) 10%, rgba(240, 244, 255, 0.75) 50%, rgba(240, 244, 255, 0) 100%);
+}
+
+/* === LIGHT MODE: Game card overlay (gradient over image) === */
+.light-theme .game-card-overlay {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 40%, rgba(15, 23, 42, 0.85) 90%);
+}
+
+.light-theme .game-card {
+    border-color: rgba(109, 40, 217, 0.1);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .game-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 28px rgba(109, 40, 217, 0.2);
+}
+
+/* === LIGHT MODE: Category tabs === */
+.light-theme .tab-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(109, 40, 217, 0.12);
+    color: var(--text-secondary);
+}
+
+.light-theme .tab-btn:hover {
+    background: rgba(109, 40, 217, 0.06);
+    border-color: var(--primary);
+}
+
+/* === LIGHT MODE: Tables === */
+.light-theme th {
+    background: rgba(109, 40, 217, 0.06);
+    color: var(--text-secondary);
+    border-bottom-color: rgba(109, 40, 217, 0.1);
+}
+
+.light-theme td {
+    border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme tr:hover td {
+    background: rgba(109, 40, 217, 0.03);
+}
+
+/* === LIGHT MODE: Admin tabs === */
+.light-theme .admin-tab-btn {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(109, 40, 217, 0.1);
+    color: var(--text-secondary);
+}
+
+.light-theme .admin-tab-btn:hover {
+    background: rgba(109, 40, 217, 0.06);
+    color: var(--text-primary);
+}
+
+.light-theme .admin-tab-btn.active {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #ffffff;
+}
+
+/* === LIGHT MODE: Action buttons === */
+.light-theme .btn-action-small {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary);
+}
+
+.light-theme .btn-action-small:hover {
+    background: rgba(109, 40, 217, 0.08);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.light-theme .btn-action-small.danger {
+    border-color: rgba(220, 38, 38, 0.3);
+    color: var(--danger);
+}
+
+.light-theme .btn-action-small.danger:hover {
+    background: rgba(220, 38, 38, 0.08);
+}
+
+.light-theme .btn-action-small.success {
+    border-color: rgba(5, 150, 105, 0.3);
+    color: var(--success);
+}
+
+/* === LIGHT MODE: HUD panels (stats boxes) === */
+.light-theme .hud-panel {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(109, 40, 217, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+/* === LIGHT MODE: Modal === */
+.light-theme .modal-overlay {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(6px);
+}
+
+.light-theme .modal-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-color: rgba(109, 40, 217, 0.12);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.light-theme .modal-header {
+    border-bottom-color: rgba(0, 0, 0, 0.07);
+}
+
+.light-theme .modal-actions {
+    border-top-color: rgba(0, 0, 0, 0.07);
+}
+
+/* === LIGHT MODE: Product cards (detail page) === */
+.light-theme .product-card {
+    background: #ffffff;
+    border-color: rgba(109, 40, 217, 0.1);
+}
+
+.light-theme .product-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 20px rgba(109, 40, 217, 0.15);
+}
+
+.light-theme .product-card.selected {
+    background: rgba(109, 40, 217, 0.05);
+    border-color: var(--primary);
+}
+
+.light-theme .payment-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .payment-card:hover,
+.light-theme .payment-card.selected {
+    border-color: var(--primary);
+    background: rgba(109, 40, 217, 0.04);
+}
+
+/* === LIGHT MODE: Footer === */
+.light-theme footer {
+    background: rgba(255, 255, 255, 0.85);
+    border-top: 1px solid rgba(109, 40, 217, 0.08);
+}
+
+/* === LIGHT MODE: Gradient text (on light bg, use dark + purple) === */
+.light-theme .gradient-text {
+    background: linear-gradient(135deg, #1e1b4b 30%, var(--primary) 70%, var(--secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* === LIGHT MODE: Neon text (toned down for light bg) === */
+.light-theme .neon-text-purple {
+    text-shadow: none;
+    color: var(--primary);
+}
+
+.light-theme .neon-text-cyan {
+    text-shadow: none;
+    color: var(--secondary);
+}
+
+/* === LIGHT MODE: Scrollbar === */
+.light-theme ::-webkit-scrollbar-track {
+    background: #e8edf5;
+}
+
+.light-theme ::-webkit-scrollbar-thumb {
+    background: #c5cfe0;
+}
+
+.light-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* === LIGHT MODE: Carousel arrows === */
+.light-theme .slide-arrow {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(109, 40, 217, 0.15);
+    color: var(--primary);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .slide-arrow:hover {
+    background: rgba(109, 40, 217, 0.1);
+    border-color: var(--primary);
+}
+
+/* === LIGHT MODE: Invoice/Receipt === */
+.light-theme .invoice-wrapper {
+    background: #ffffff;
+    border-color: rgba(109, 40, 217, 0.1);
+}
+
+/* === TRANSITION for all themed elements === */
+body, header, .card-glass, .form-input, td, th, .btn-action-small, .hud-panel, footer, .game-card, .modal-card, .product-card, .payment-card, .tab-btn, .admin-tab-btn, .slide-arrow {
     transition: background-color var(--transition-normal), color var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
+
+/* === LIGHT MODE: Logo SVG icon — keep purple/cyan colors, no fill change needed === */
+/* Logo SVG uses its own gradient colors so it stays vibrant on both modes */
+
+/* === LIGHT MODE: Theme toggle button === */
+.light-theme .theme-toggle-btn {
+    background: rgba(109, 40, 217, 0.08);
+    border-color: rgba(109, 40, 217, 0.2);
+    color: var(--primary);
+}
+
+.light-theme .theme-toggle-btn:hover {
+    background: rgba(109, 40, 217, 0.14);
+    border-color: var(--primary);
+}
+
 
 /* --- Reset & Base Styles --- */
 *, *::before, *::after {
