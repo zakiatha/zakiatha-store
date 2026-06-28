@@ -21,6 +21,20 @@ function getDB() {
     if (!db.games) db.games = [];
     if (!db.products) db.products = [];
     
+    // Healing: Clean up any invalid/undefined IDs in the existing database
+    db.games.forEach(g => {
+        if (!g.id || g.id === 'undefined') {
+            g.id = 'g-' + Math.random().toString(36).substring(2, 9);
+            hasUpdates = true;
+        }
+    });
+    db.products.forEach(p => {
+        if (!p.id || p.id === 'undefined') {
+            p.id = 'p-' + Math.random().toString(36).substring(2, 9);
+            hasUpdates = true;
+        }
+    });
+    
     defaultDb.games.forEach(defaultGame => {
         const exists = db.games.some(g => g.id === defaultGame.id || g.slug === defaultGame.slug);
         if (!exists) {
@@ -496,7 +510,6 @@ function initDefaultDB() {
         },
         apiLogs: []
     };
-    localStorage.setItem(DB_KEY, JSON.stringify(defaultDB));
     return defaultDB;
 }
 
@@ -638,15 +651,20 @@ const dbService = {
 
     saveGame: function(gameData) {
         const db = getDB();
-        const index = db.games.findIndex(g => g.id === gameData.id);
+        const targetId = gameData.id && gameData.id !== 'undefined' ? gameData.id : null;
+        const index = targetId ? db.games.findIndex(g => g.id === targetId) : -1;
         
         if (index > -1) {
-            db.games[index] = { ...db.games[index], ...gameData };
+            db.games[index] = { 
+                ...db.games[index], 
+                ...gameData,
+                id: targetId // Ensure ID is preserved
+            };
         } else {
             const newGame = {
-                id: 'g-' + Math.random().toString(36).substring(2, 9),
                 isActive: true,
-                ...gameData
+                ...gameData,
+                id: 'g-' + Math.random().toString(36).substring(2, 9) // Set a clean random ID
             };
             db.games.push(newGame);
         }
@@ -688,21 +706,23 @@ const dbService = {
             }
         }
 
-        const index = db.products.findIndex(p => p.id === productData.id);
+        const targetId = productData.id && productData.id !== 'undefined' ? productData.id : null;
+        const index = targetId ? db.products.findIndex(p => p.id === targetId) : -1;
         
         if (index > -1) {
             db.products[index] = { 
                 ...db.products[index], 
                 ...productData,
+                id: targetId, // Ensure ID is preserved
                 originalPrice: Math.round(productData.price * 1.15) // Update original price when price changes
             };
         } else {
             const newProduct = {
-                id: 'p-' + Math.random().toString(36).substring(2, 9),
                 isActive: true,
                 isPopular: false,
-                originalPrice: Math.round(productData.price * 1.15),
-                ...productData
+                ...productData,
+                id: 'p-' + Math.random().toString(36).substring(2, 9), // Set a clean random ID
+                originalPrice: Math.round(productData.price * 1.15)
             };
             db.products.push(newProduct);
         }
