@@ -46,6 +46,35 @@ const detailView = {
         let selectedProduct = null;
         let selectedPayment = null;
         let usePoints = false;
+        let activeVoucher = null;
+        let voucherDiscount = 0;
+        
+        // Helper to recalculate voucher discount when product/payment changes
+        const recalculateVoucherDiscount = () => {
+            if (!activeVoucher || !selectedProduct) {
+                voucherDiscount = 0;
+                return;
+            }
+            let feeAmount = 0;
+            if (selectedPayment) {
+                if (selectedPayment.feeType === 'percent') {
+                    feeAmount = selectedProduct.price * (selectedPayment.feeValue / 100);
+                } else if (selectedPayment.feeType === 'flat') {
+                    feeAmount = selectedPayment.feeValue;
+                }
+            }
+            const baseTotal = selectedProduct.price + feeAmount;
+            if (activeVoucher.type === 'percent') {
+                voucherDiscount = Math.round(baseTotal * (activeVoucher.value / 100));
+            } else {
+                voucherDiscount = Math.min(activeVoucher.value, baseTotal);
+            }
+            
+            const mainVoucherMsg = document.getElementById('detail-voucher-message');
+            if (mainVoucherMsg && mainVoucherMsg.style.display === 'block') {
+                mainVoucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+            }
+        };
         
         // Render view structure
         container.innerHTML = `
@@ -119,6 +148,16 @@ const detailView = {
                             <h2 class="step-title">Konfirmasi & Beli</h2>
                         </div>
                         <div class="step-content" style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Voucher Input Section -->
+                            <div class="form-group" id="detail-voucher-container">
+                                <label for="detail-voucher-input">Kode Voucher (Opsional)</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="detail-voucher-input" class="form-input" placeholder="Contoh: PROMO10" style="text-transform: uppercase;">
+                                    <button id="btn-apply-voucher" class="btn-grad" style="padding: 12px 20px; margin: 0; white-space: nowrap; height: auto;">Gunakan</button>
+                                </div>
+                                <div id="detail-voucher-message" style="font-size: 11px; margin-top: 6px; display: none; font-weight: 600;"></div>
+                            </div>
+
                             <div class="form-group">
                                 <label for="customer-whatsapp">Nomor WhatsApp</label>
                                 <input type="tel" id="customer-whatsapp" class="form-input" placeholder="Contoh: 081234567890" required>
@@ -171,6 +210,10 @@ const detailView = {
         const whatsappInput = document.getElementById('customer-whatsapp');
         const submitBtn = document.getElementById('btn-submit-order');
         
+        const mainVoucherInput = document.getElementById('detail-voucher-input');
+        const mainVoucherApplyBtn = document.getElementById('btn-apply-voucher');
+        const mainVoucherMsg = document.getElementById('detail-voucher-message');
+        
         // Modal references
         const modalOverlay = document.getElementById('checkout-modal');
         const modalLoader = document.getElementById('modal-loader');
@@ -179,6 +222,37 @@ const detailView = {
         const modalClose = document.getElementById('btn-modal-close');
         const modalCancel = document.getElementById('btn-modal-cancel');
         const modalConfirm = document.getElementById('btn-modal-confirm');
+        
+        // Apply voucher handler on main page
+        mainVoucherApplyBtn.onclick = () => {
+            const code = mainVoucherInput.value.trim();
+            if (!code) {
+                mainVoucherMsg.style.display = 'block';
+                mainVoucherMsg.style.color = 'var(--danger)';
+                mainVoucherMsg.textContent = 'Masukkan kode voucher terlebih dahulu!';
+                return;
+            }
+            if (!selectedProduct) {
+                mainVoucherMsg.style.display = 'block';
+                mainVoucherMsg.style.color = 'var(--danger)';
+                mainVoucherMsg.textContent = 'Pilih nominal top-up terlebih dahulu!';
+                return;
+            }
+            
+            const checkResult = window.dbService.checkVoucher(code);
+            if (checkResult.success) {
+                activeVoucher = checkResult.voucher;
+                recalculateVoucherDiscount();
+                mainVoucherMsg.style.display = 'block';
+                mainVoucherMsg.style.color = 'var(--success)';
+            } else {
+                activeVoucher = null;
+                voucherDiscount = 0;
+                mainVoucherMsg.style.display = 'block';
+                mainVoucherMsg.style.color = 'var(--danger)';
+                mainVoucherMsg.textContent = checkResult.message;
+            }
+        };
         
         // ----------------------------------------------------
         // 1. DYNAMIC INPUT FIELDS GENERATION
@@ -248,6 +322,7 @@ const detailView = {
                     const prodId = card.getAttribute('data-id');
                     selectedProduct = products.find(p => p.id === prodId);
                     
+                    recalculateVoucherDiscount();
                     renderPayments();
                     validateForm();
                 });
@@ -278,13 +353,13 @@ const detailView = {
                             <span class="points-use-desc">Poin Anda: <strong>${userPoints.toLocaleString('id-ID')} Pts</strong> (1 Pts = Rp 1)</span>
                         </div>
                         <label class="toggle-switch">
-                            <input type="checkbox" id="use-points-checkbox" ${usePoints ? 'checked' : ''}>
+                            <input type="checkbox" id="toggle-use-points" ${usePoints ? 'checked' : ''}>
                             <span class="slider-switch"></span>
                         </label>
                     </div>
                 `;
                 
-                document.getElementById('use-points-checkbox').addEventListener('change', (e) => {
+                document.getElementById('toggle-use-points').addEventListener('change', (e) => {
                     usePoints = e.target.checked;
                     renderPayments(); // Redraw prices with points calculation
                 });
@@ -292,30 +367,34 @@ const detailView = {
                 pointsContainer.style.display = 'none';
             }
             
-            // Group payment methods
-            const grouped = {
-                'qris': { title: 'Instan QRIS (Rekomendasi)', items: [] },
-                'ewallet': { title: 'E-Wallet (Dana, OVO, dll)', items: [] },
-                'va': { title: 'Virtual Account (Cek Otomatis)', items: [] },
-                'retail': { title: 'Retail Minimarket', items: [] }
+            // Group payment methods by type
+            const groups = {
+                ewallet: { name: 'E-Wallet (OVO, Dana, LinkAja, QRIS)', items: [] },
+                va: { name: 'Virtual Account (Transfer VA Otomatis)', items: [] },
+                retail: { name: 'Gerai Retail (Alfamart / Indomaret)', items: [] }
             };
             
             paymentMethods.forEach(pm => {
-                if (grouped[pm.type]) {
-                    grouped[pm.type].items.push(pm);
+                if (groups[pm.type]) {
+                    groups[pm.type].items.push(pm);
                 }
             });
             
             let accordionHtml = '<div class="payment-accordion">';
             
-            for (const key in grouped) {
-                const group = grouped[key];
+            for (const type in groups) {
+                const group = groups[type];
                 if (group.items.length === 0) continue;
                 
-                accordionHtml += `<h3 class="payment-group-header">${group.title}</h3>`;
+                accordionHtml += `
+                    <div class="payment-group-header">
+                        <span>${group.name}</span>
+                    </div>
+                    <div class="payment-group-content">
+                `;
                 
                 group.items.forEach(pm => {
-                    // Calculate total price with fees
+                    // Calculate price with fee
                     let feeAmount = 0;
                     if (pm.feeType === 'percent') {
                         feeAmount = selectedProduct.price * (pm.feeValue / 100);
@@ -323,35 +402,32 @@ const detailView = {
                         feeAmount = pm.feeValue;
                     }
                     
-                    let baseTotal = selectedProduct.price + feeAmount;
-                    let discountAmount = 0;
+                    const totalPrice = selectedProduct.price + feeAmount;
+                    const discountAmount = usePoints ? Math.min(userPoints, totalPrice) : 0;
+                    const finalPrice = Math.max(0, totalPrice - discountAmount);
                     
-                    if (usePoints) {
-                        discountAmount = Math.min(userPoints, baseTotal);
-                    }
-                    
-                    const finalPrice = baseTotal - discountAmount;
                     const isSelected = selectedPayment && selectedPayment.id === pm.id;
                     
                     accordionHtml += `
-                        <div class="payment-item ${isSelected ? 'selected' : ''}" data-pm-id="${pm.id}">
-                            <div class="payment-left">
-                                <div class="payment-logo-wrapper">
+                        <div class="payment-card payment-item ${isSelected ? 'selected' : ''}" data-pm-id="${pm.id}">
+                            <div class="payment-card-logo-name">
+                                <div class="payment-logo-container">
                                     <span class="payment-logo-text">${pm.code}</span>
                                 </div>
-                                <div class="payment-info-text">
-                                    <span class="payment-name">${pm.name}</span>
-                                    <span class="payment-meta">${pm.info}</span>
+                                <div class="payment-details-info">
+                                    <div class="payment-name">${pm.name}</div>
+                                    <div class="payment-info-text">${pm.info}</div>
                                 </div>
                             </div>
-                            <div class="payment-right">
-                                ${discountAmount > 0 ? `<div style="font-size:10px; text-decoration:line-through; color:var(--text-muted);">${window.formatRupiah(baseTotal)}</div>` : ''}
+                            <div style="text-align: right;">
                                 <div class="payment-price">${window.formatRupiah(finalPrice)}</div>
                                 ${discountAmount > 0 ? `<div style="font-size:10px; color:var(--success); font-weight:700;">Potong ${discountAmount.toLocaleString('id-ID')} Pts</div>` : ''}
                             </div>
                         </div>
                     `;
                 });
+                
+                accordionHtml += '</div>';
             }
             
             accordionHtml += '</div>';
@@ -366,6 +442,7 @@ const detailView = {
                     const pmId = item.getAttribute('data-pm-id');
                     selectedPayment = paymentMethods.find(p => p.id === pmId);
                     
+                    recalculateVoucherDiscount();
                     validateForm();
                 });
             });
@@ -441,7 +518,6 @@ const detailView = {
             
             const baseTotal = selectedProduct.price + feeAmount;
             const pointsToUse = usePoints ? Math.min(userPoints, baseTotal) : 0;
-            let finalTotal = baseTotal - pointsToUse;
             
             // Earn points: 1% of base price
             const pointsEarned = Math.round(selectedProduct.price * 0.01);
@@ -465,9 +541,6 @@ const detailView = {
                 if (game.category === 'pulsa') targetLabel = 'Nomor HP';
                 else if (game.category === 'voucher') targetLabel = 'Email Penerima';
   
-                let activeVoucher = null;
-                let voucherDiscount = 0;
-
                 const updateModalDisplay = () => {
                     const currentFinalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
                     
@@ -551,6 +624,14 @@ const detailView = {
                 const voucherApplyBtn = document.getElementById('modal-voucher-apply-btn');
                 const voucherMsg = document.getElementById('modal-voucher-message');
 
+                // Pre-fill if voucher is already applied on main page
+                if (activeVoucher) {
+                    voucherInput.value = activeVoucher.code;
+                    voucherMsg.style.display = 'block';
+                    voucherMsg.style.color = 'var(--success)';
+                    voucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+                }
+
                 voucherApplyBtn.onclick = () => {
                     const code = voucherInput.value.trim();
                     if (!code) {
@@ -563,15 +644,21 @@ const detailView = {
                     const checkResult = window.dbService.checkVoucher(code);
                     if (checkResult.success) {
                         activeVoucher = checkResult.voucher;
-                        if (activeVoucher.type === 'percent') {
-                            voucherDiscount = Math.round(baseTotal * (activeVoucher.value / 100));
-                        } else {
-                            voucherDiscount = Math.min(activeVoucher.value, baseTotal);
-                        }
+                        recalculateVoucherDiscount();
                         
                         voucherMsg.style.display = 'block';
                         voucherMsg.style.color = 'var(--success)';
                         voucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+                        
+                        // Sync back to main page input
+                        if (mainVoucherInput) {
+                            mainVoucherInput.value = activeVoucher.code;
+                        }
+                        if (mainVoucherMsg) {
+                            mainVoucherMsg.style.display = 'block';
+                            mainVoucherMsg.style.color = 'var(--success)';
+                            mainVoucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+                        }
                         
                         updateModalDisplay();
                     } else {
@@ -580,6 +667,14 @@ const detailView = {
                         voucherMsg.style.display = 'block';
                         voucherMsg.style.color = 'var(--danger)';
                         voucherMsg.textContent = checkResult.message;
+                        
+                        // Sync back to main page input
+                        if (mainVoucherInput) {
+                            mainVoucherInput.value = '';
+                        }
+                        if (mainVoucherMsg) {
+                            mainVoucherMsg.style.display = 'none';
+                        }
                         
                         updateModalDisplay();
                     }
