@@ -61,6 +61,8 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 body {
@@ -69,6 +71,7 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -194,7 +197,7 @@ button {
 /* --- Layout Containers --- */
 .container {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 0 clamp(16px, 4vw, 24px);
 }
@@ -2129,7 +2132,7 @@ input:checked + .slider-switch:before {
     .nav-links {
         position: fixed;
         top: 0;
-        right: -100%;
+        right: 0;
         width: 280px;
         height: 100vh;
         background: var(--bg-surface);
@@ -2138,13 +2141,18 @@ input:checked + .slider-switch:before {
         padding: 88px 24px 24px;
         gap: 12px;
         z-index: 101;
-        transition: right var(--transition-normal);
+        transform: translateX(100%);
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform var(--transition-normal), visibility var(--transition-normal);
         overflow-y: auto;
         box-shadow: -10px 0 30px rgba(0,0,0,0.5);
     }
 
     .nav-links.open {
-        right: 0;
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
     }
 
     .mobile-nav-overlay {

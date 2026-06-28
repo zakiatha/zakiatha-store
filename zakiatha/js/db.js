@@ -842,7 +842,7 @@ const dbService = {
                 if (tx.username) {
                     const userIndex = db.users.findIndex(u => u.username.toLowerCase() === tx.username.toLowerCase());
                     if (userIndex > -1) {
-                        // Tambahkan poin reward 5%
+                        // Tambahkan poin reward 1%
                         db.users[userIndex].points += tx.pointsEarned;
                     }
                 }

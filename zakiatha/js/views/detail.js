@@ -443,8 +443,8 @@ const detailView = {
             const pointsToUse = usePoints ? Math.min(userPoints, baseTotal) : 0;
             const finalTotal = baseTotal - pointsToUse;
             
-            // Earn points: 5% of base price
-            const pointsEarned = Math.round(selectedProduct.price * 0.05);
+            // Earn points: 1% of base price
+            const pointsEarned = Math.round(selectedProduct.price * 0.01);
             
             // Open modal in LOADING state
             modalOverlay.classList.add('active');
@@ -464,7 +464,7 @@ const detailView = {
                 let targetLabel = 'Data Target';
                 if (game.category === 'pulsa') targetLabel = 'Nomor HP';
                 else if (game.category === 'voucher') targetLabel = 'Email Penerima';
-
+ 
                 // Populate checkout table
                 modalTable.innerHTML = `
                     <div class="modal-details-row">
@@ -504,7 +504,7 @@ const detailView = {
                     ${session ? `
                     <div class="modal-details-row" style="background: rgba(6, 182, 212, 0.05);">
                         <div class="modal-details-label" style="color: var(--secondary); font-weight:700;">Cashback Didapat</div>
-                        <div class="modal-details-val" style="color: var(--secondary); font-weight:700;">+ ${pointsEarned.toLocaleString('id-ID')} Pts (5%)</div>
+                        <div class="modal-details-val" style="color: var(--secondary); font-weight:700;">+ ${pointsEarned.toLocaleString('id-ID')} Pts (1%)</div>
                     </div>` : ''}
                 `;
                 

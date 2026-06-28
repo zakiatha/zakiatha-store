@@ -91,7 +91,7 @@ function refreshAuthHeader() {
             <div class="user-profile-badge">
                 <i data-lucide="user" style="width: 14px; height: 14px; color: var(--primary);"></i>
                 <span>${session.username}</span>
-                <div class="user-points-badge" id="nav-points-badge" title="Poin Belanja Anda (5% Cashback)">
+                <div class="user-points-badge" id="nav-points-badge" title="Poin Belanja Anda (1% Cashback)">
                     <i data-lucide="award" style="width: 12px; height: 12px;"></i>
                     <span>${points.toLocaleString('id-ID')} Pts</span>
                 </div>

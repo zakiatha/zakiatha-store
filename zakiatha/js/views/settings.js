@@ -114,7 +114,7 @@ const settingsView = {
                         <i data-lucide="coins" style="width: 40px; height: 40px; color: var(--success); opacity: 0.5;"></i>
                     </div>
                     <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                        Setiap transaksi sukses memberikan cashback <strong style="color: var(--success);">5%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.
+                        Setiap transaksi sukses memberikan cashback <strong style="color: var(--success);">1%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.
                     </p>
                 </div>
 
@@ -143,6 +143,59 @@ const settingsView = {
                             <i data-lucide="search" style="width: 16px; height: 16px;"></i>
                             <span>Lacak Semua Transaksi</span>
                         </a>
+                    </div>
+                </div>
+
+                <!-- Order History Section -->
+                <div class="card-glass settings-section" style="grid-column: 1 / -1; width: 100%;">
+                    <div class="settings-section-title">
+                        <i data-lucide="history" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                        Riwayat Pesanan Saya
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Invoice ID</th>
+                                    <th>Tanggal</th>
+                                    <th>Game</th>
+                                    <th>Produk</th>
+                                    <th>Total Bayar</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${userTx.length === 0 ? `
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                                            Belum ada riwayat pesanan.
+                                        </td>
+                                    </tr>
+                                ` : userTx.map(tx => {
+                                    const txDate = new Date(tx.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                                    let statusBadge = '';
+                                    if (tx.status === 'PENDING') {
+                                        statusBadge = '<span class="badge status-pending">PENDING</span>';
+                                    } else if (tx.status === 'SUCCESS') {
+                                        statusBadge = '<span class="badge status-success">SUCCESS</span>';
+                                    } else {
+                                        statusBadge = '<span class="badge status-failed">FAILED</span>';
+                                    }
+                                    return `
+                                        <tr>
+                                            <td style="font-weight: 700; font-family: monospace;">
+                                                <a href="#invoice/${tx.invoiceId}" style="color: var(--secondary);">${tx.invoiceId}</a>
+                                            </td>
+                                            <td>${txDate}</td>
+                                            <td style="font-weight: 600;">${tx.gameName}</td>
+                                            <td>${tx.productName}</td>
+                                            <td style="font-weight: 800; color: var(--secondary);">${window.formatRupiah(tx.totalAmount)}</td>
+                                            <td>${statusBadge}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
