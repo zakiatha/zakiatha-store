@@ -20,6 +20,10 @@ function getDB() {
     
     if (!db.games) db.games = [];
     if (!db.products) db.products = [];
+    if (!db.vouchers) {
+        db.vouchers = defaultDb.vouchers || [];
+        hasUpdates = true;
+    }
     
     // Healing: Clean up any invalid/undefined IDs in the existing database
     db.games.forEach(g => {
@@ -34,12 +38,27 @@ function getDB() {
             hasUpdates = true;
         }
     });
+    db.vouchers.forEach(v => {
+        if (!v.id || v.id === 'undefined') {
+            v.id = 'v-' + Math.random().toString(36).substring(2, 9);
+            hasUpdates = true;
+        }
+    });
     
+    // Sync default game properties (like logos) to existing games
     defaultDb.games.forEach(defaultGame => {
-        const exists = db.games.some(g => g.id === defaultGame.id || g.slug === defaultGame.slug);
-        if (!exists) {
+        const index = db.games.findIndex(g => g.id === defaultGame.id);
+        if (index === -1) {
             db.games.push(defaultGame);
             hasUpdates = true;
+        } else {
+            // Update logo, banner, and other static details for default games
+            if (db.games[index].logo !== defaultGame.logo || db.games[index].banner !== defaultGame.banner) {
+                db.games[index].logo = defaultGame.logo;
+                db.games[index].banner = defaultGame.banner;
+                db.games[index].description = defaultGame.description;
+                hasUpdates = true;
+            }
         }
     });
     
@@ -97,7 +116,7 @@ function initDefaultDB() {
                 name: 'Mobile Legends',
                 slug: 'mobile-legends',
                 category: 'mobile',
-                logo: 'mobile-legends.svg',
+                logo: 'mobilelgendsbangbang.jpg',
                 banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up Diamond Mobile Legends: Bang Bang instan, murah, dan aman. Masukkan data akun Anda, pilih nominal, selesaikan pembayaran, dan Diamond akan langsung masuk ke akun Anda!',
                 fields: [
@@ -111,7 +130,7 @@ function initDefaultDB() {
                 name: 'Free Fire',
                 slug: 'free-fire',
                 category: 'mobile',
-                logo: 'free-fire.svg',
+                logo: 'freefire.jpg',
                 banner: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up Diamond Free Fire instan, murah, dan terpercaya. Cukup masukkan Player ID Free Fire Anda, pilih nominal Diamond, dan selesaikan pembayaran.',
                 fields: [
@@ -124,7 +143,7 @@ function initDefaultDB() {
                 name: 'PUBG Mobile',
                 slug: 'pubg-mobile',
                 category: 'mobile',
-                logo: 'pubg-mobile.svg',
+                logo: 'PUBGM.jpg',
                 banner: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up Unknown Cash (UC) PUBG Mobile instan dan murah. Masukkan Character ID Anda, pilih jumlah UC yang diinginkan, dan bayar dengan metode pembayaran favorit Anda.',
                 fields: [
@@ -137,7 +156,7 @@ function initDefaultDB() {
                 name: 'Genshin Impact',
                 slug: 'genshin-impact',
                 category: 'mobile',
-                logo: 'genshin-impact.svg',
+                logo: 'gensinimpact.jpg',
                 banner: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up Genesis Crystals atau Welkin Moon Genshin Impact instan. Masukkan UID dan pilih Server yang sesuai dengan akun Genshin Impact Anda.',
                 fields: [
@@ -157,7 +176,7 @@ function initDefaultDB() {
                 name: 'Valorant',
                 slug: 'valorant',
                 category: 'pc',
-                logo: 'valorant.svg',
+                logo: 'valorant.jpg',
                 banner: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up Valorant Points (VP) murah dan cepat. Masukkan Riot ID + Tagline Anda (contoh: Username#1234), pilih nominal VP, dan VP akan segera masuk.',
                 fields: [
@@ -170,7 +189,7 @@ function initDefaultDB() {
                 name: 'Steam Wallet IDR',
                 slug: 'steam-wallet',
                 category: 'voucher',
-                logo: 'steam.svg',
+                logo: 'steam.jpg',
                 banner: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=600&auto=format&fit=crop',
                 description: 'Beli Steam Wallet Code Rupiah instan untuk mengisi saldo akun Steam Anda. Masukkan Username akun Steam Anda (hanya untuk verifikasi) dan pilih nominal voucher.',
                 fields: [
@@ -184,7 +203,7 @@ function initDefaultDB() {
                 name: 'Pulsa XL Axiata',
                 slug: 'xl',
                 category: 'pulsa',
-                logo: 'xl.svg',
+                logo: 'XL.png',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa XL murah, cepat, dan otomatis 24 jam. Cukup masukkan nomor handphone XL Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
@@ -197,7 +216,7 @@ function initDefaultDB() {
                 name: 'Pulsa Axis',
                 slug: 'axis',
                 category: 'pulsa',
-                logo: 'axis.svg',
+                logo: 'axis.png',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa Axis murah, cepat, dan otomatis. Masukkan nomor handphone Axis Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
@@ -210,7 +229,7 @@ function initDefaultDB() {
                 name: 'Pulsa By.U',
                 slug: 'byu',
                 category: 'pulsa',
-                logo: 'byu.svg',
+                logo: 'by-u.png',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa by.U instan 24 jam. Masukkan nomor handphone by.U Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
@@ -223,7 +242,7 @@ function initDefaultDB() {
                 name: 'Pulsa Telkomsel',
                 slug: 'telkomsel',
                 category: 'pulsa',
-                logo: 'telkomsel.svg',
+                logo: 'telkomsel.jpg',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa Telkomsel murah, cepat, dan terpercaya. Masukkan nomor handphone Telkomsel Anda.',
                 fields: [
@@ -236,7 +255,7 @@ function initDefaultDB() {
                 name: 'Pulsa Smartfren',
                 slug: 'smartfren',
                 category: 'pulsa',
-                logo: 'smartfren.svg',
+                logo: 'smartfren.jpg',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa Smartfren murah dan cepat. Masukkan nomor HP Smartfren Anda.',
                 fields: [
@@ -249,7 +268,7 @@ function initDefaultDB() {
                 name: 'Pulsa Indosat IM3',
                 slug: 'indosat',
                 category: 'pulsa',
-                logo: 'indosat.svg',
+                logo: 'indoosat.png',
                 banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
                 description: 'Isi ulang pulsa Indosat Ooredoo murah dan cepat. Masukkan nomor HP Indosat Anda.',
                 fields: [
@@ -263,7 +282,7 @@ function initDefaultDB() {
                 name: 'Google Play Voucher',
                 slug: 'google-play',
                 category: 'voucher',
-                logo: 'googleplay.svg',
+                logo: 'googleplay.png',
                 banner: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=600&auto=format&fit=crop',
                 description: 'Beli Google Play Gift Card instan. Kode voucher Google Play akan dikirimkan langsung ke email Anda.',
                 fields: [
@@ -277,7 +296,7 @@ function initDefaultDB() {
                 name: 'ShopeePay',
                 slug: 'shopeepay',
                 category: 'ewallet',
-                logo: 'shopeepay.svg',
+                logo: 'shoopepay.png',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo ShopeePay instan. Masukkan nomor HP yang terdaftar di akun Shopee Anda, pilih nominal, dan saldo akan langsung masuk.',
                 fields: [
@@ -290,7 +309,7 @@ function initDefaultDB() {
                 name: 'DANA',
                 slug: 'dana',
                 category: 'ewallet',
-                logo: 'dana.svg',
+                logo: 'dana.jpg',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo DANA instan dan murah. Masukkan nomor HP terdaftar di DANA Anda.',
                 fields: [
@@ -303,7 +322,7 @@ function initDefaultDB() {
                 name: 'GoPay',
                 slug: 'gopay',
                 category: 'ewallet',
-                logo: 'gopay.svg',
+                logo: 'gopay.jpg',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo GoPay instan. Masukkan nomor HP yang terdaftar di akun Gojek Anda.',
                 fields: [
@@ -316,7 +335,7 @@ function initDefaultDB() {
                 name: 'OVO',
                 slug: 'ovo',
                 category: 'ewallet',
-                logo: 'ovo.svg',
+                logo: 'ovo.jpg',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo OVO instan dan terpercaya. Masukkan nomor HP yang terdaftar di OVO Anda.',
                 fields: [
@@ -329,7 +348,7 @@ function initDefaultDB() {
                 name: 'GrabPay',
                 slug: 'grabpay',
                 category: 'ewallet',
-                logo: 'grabpay.svg',
+                logo: 'grabpay.png',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo GrabPay / OVO (via Grab) instan. Masukkan nomor HP terdaftar di Grab Anda.',
                 fields: [
@@ -342,7 +361,7 @@ function initDefaultDB() {
                 name: 'SakuKu',
                 slug: 'sakuku',
                 category: 'ewallet',
-                logo: 'sakuku.svg',
+                logo: 'sakuku.jpg',
                 banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
                 description: 'Top up saldo SakuKu (BCA) instan. Masukkan nomor HP terdaftar di SakuKu Anda.',
                 fields: [
@@ -497,6 +516,10 @@ function initDefaultDB() {
             { id: 'pm-indomaret', name: 'Indomaret', code: 'INDOMARET', type: 'retail', feeType: 'flat', feeValue: 2500, isActive: true, info: 'Bayar di kasir Indomaret terdekat' }
         ],
         transactions: [],
+        vouchers: [
+            { id: 'v-promo10', code: 'PROMO10', type: 'percent', value: 10, maxUsage: 100, usageCount: 0, isActive: true },
+            { id: 'v-coba5k', code: 'COBA5K', type: 'flat', value: 5000, maxUsage: 50, usageCount: 0, isActive: true }
+        ],
         apiConfig: {
             // Digiflazz API Configuration
             apiUrl: 'https://api.digiflazz.com/v1',
@@ -792,9 +815,11 @@ const dbService = {
             productName: txData.productName,
             basePrice: txData.basePrice,
             adminFee: txData.adminFee,
-            totalAmount: txData.totalAmount, // Ini total tagihan setelah dikurangi poin (jika ada)
+            totalAmount: txData.totalAmount, // Ini total tagihan setelah dikurangi poin & voucher (jika ada)
             pointsUsed: txData.pointsUsed || 0,
             pointsEarned: txData.pointsEarned || 0,
+            voucherCode: txData.voucherCode || null,
+            discountAmount: txData.discountAmount || 0,
             username: txData.username || null, // Catat user pembeli (null jika guest)
             paymentMethodId: txData.paymentMethodId,
             paymentMethodName: txData.paymentMethodName,
@@ -803,7 +828,11 @@ const dbService = {
             whatsapp: txData.whatsapp,
             status: 'PENDING',
             createdAt: now.toISOString(),
-            expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
+            expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+            purchaseNote: '',
+            statusHistory: [
+                { status: 'PENDING', date: now.toISOString(), note: 'Pesanan dibuat. Menunggu pembayaran.' }
+            ]
         };
 
         // Jika transaksi menggunakan poin, potong poin langsung dari user saat ini
@@ -857,7 +886,7 @@ const dbService = {
         return newTx;
     },
 
-    updateTransactionStatus: function(id, status) {
+    updateTransactionStatus: function(id, status, noteText = '') {
         const db = getDB();
         const index = db.transactions.findIndex(t => t.id === id || t.invoiceId === id);
         
@@ -865,6 +894,20 @@ const dbService = {
             const tx = db.transactions[index];
             const oldStatus = tx.status;
             tx.status = status;
+
+            // Ensure statusHistory exists
+            if (!tx.statusHistory) {
+                tx.statusHistory = [
+                    { status: 'PENDING', date: tx.createdAt, note: 'Pesanan dibuat. Menunggu pembayaran.' }
+                ];
+            }
+
+            // Append status history
+            tx.statusHistory.push({
+                status: status,
+                date: new Date().toISOString(),
+                note: noteText || (status === 'SUCCESS' ? 'Transaksi sukses diproses.' : status === 'FAILED' ? 'Transaksi gagal/dibatalkan.' : 'Status diperbarui.')
+            });
 
             // Log callback webhook dari API 3rd party (Digiflazz Webhook)
             const product = db.products.find(p => p.id === tx.productId);
@@ -924,6 +967,83 @@ const dbService = {
             return tx;
         }
         return null;
+    },
+
+    updateTransactionNote: function(id, note) {
+        const db = getDB();
+        const index = db.transactions.findIndex(t => t.id === id || t.invoiceId === id);
+        if (index > -1) {
+            db.transactions[index].purchaseNote = note;
+            saveDB(db);
+            return db.transactions[index];
+        }
+        return null;
+    },
+
+    // --- VOUCHER OPERATIONS ---
+    getVouchers: function() {
+        const db = getDB();
+        return db.vouchers || [];
+    },
+
+    saveVoucher: function(voucherData) {
+        const db = getDB();
+        
+        // Uniqueness validation for voucher code
+        const targetCode = String(voucherData.code).trim().toUpperCase();
+        const duplicate = db.vouchers.find(v => 
+            v.id !== voucherData.id && 
+            String(v.code).trim().toUpperCase() === targetCode
+        );
+        if (duplicate) {
+            return { success: false, message: `Kode voucher "${voucherData.code}" sudah digunakan!` };
+        }
+
+        const targetId = voucherData.id && voucherData.id !== 'undefined' ? voucherData.id : null;
+        const index = targetId ? db.vouchers.findIndex(v => v.id === targetId) : -1;
+
+        const updatedVoucher = {
+            id: targetId || 'v-' + Math.random().toString(36).substring(2, 9),
+            code: targetCode,
+            type: voucherData.type,
+            value: parseInt(voucherData.value) || 0,
+            maxUsage: parseInt(voucherData.maxUsage) || 0,
+            usageCount: voucherData.usageCount !== undefined ? parseInt(voucherData.usageCount) : 0,
+            isActive: voucherData.isActive !== undefined ? voucherData.isActive : true
+        };
+
+        if (index > -1) {
+            db.vouchers[index] = updatedVoucher;
+        } else {
+            db.vouchers.push(updatedVoucher);
+        }
+        saveDB(db);
+        return { success: true, voucher: updatedVoucher };
+    },
+
+    deleteVoucher: function(id) {
+        const db = getDB();
+        db.vouchers = db.vouchers.filter(v => v.id !== id);
+        saveDB(db);
+        return true;
+    },
+
+    checkVoucher: function(code) {
+        const db = getDB();
+        const targetCode = String(code).trim().toUpperCase();
+        const voucher = db.vouchers.find(v => String(v.code).trim().toUpperCase() === targetCode);
+        
+        if (!voucher) {
+            return { success: false, message: 'Kode voucher tidak ditemukan!' };
+        }
+        if (!voucher.isActive) {
+            return { success: false, message: 'Voucher sudah tidak aktif!' };
+        }
+        if (voucher.usageCount >= voucher.maxUsage) {
+            return { success: false, message: 'Voucher sudah melebihi batas penggunaan!' };
+        }
+        
+        return { success: true, voucher: voucher };
     },
 
     searchTransactions: function(query) {

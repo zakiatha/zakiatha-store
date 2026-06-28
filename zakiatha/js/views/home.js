@@ -385,38 +385,51 @@ const homeView = {
                 // Create header and grid container
                 const section = document.createElement('div');
                 section.className = 'category-section';
-                section.style.marginBottom = '48px';
 
                 section.innerHTML = `
                     <div style="margin-bottom: 20px;">
                         <h2 class="game-grid-section-title gradient-text">${group.title}</h2>
                         <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; padding-left: 12px;">${group.desc}</p>
                     </div>
-                    <div class="game-grid">
-                        ${matchedGames.map(game => {
-                            const logoSvg = this.logos[game.logo] || `<div style="width:48px; height:48px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">${game.name.substring(0,2)}</div>`;
-                            return `
-                                <div class="game-card-wrapper">
-                                    <div class="game-card" data-slug="${game.slug}">
-                                        <div class="game-card-img-wrapper">
-                                            <img src="${game.banner}" alt="${game.name}" class="game-card-img" loading="lazy">
-                                        </div>
-                                        <div class="game-card-overlay"></div>
-                                        
-                                        <!-- Cyber Glow Floating Logo -->
-                                        <div style="position: absolute; top: 16px; left: 16px; z-index: 3; background: rgba(15, 19, 34, 0.9); backdrop-filter: blur(8px); padding: 8px; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow);">
-                                            ${logoSvg}
-                                        </div>
-                                        
-                                        <div class="game-card-info">
-                                            <h3 class="game-card-title">${game.name}</h3>
-                                            <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
+                    <div class="game-grid-container">
+                        <button class="slide-arrow prev disabled" data-category="${group.key}" aria-label="Sebelumnya">
+                            <i data-lucide="chevron-left" style="width: 24px; height: 24px;"></i>
+                        </button>
+                        <div class="game-grid" id="grid-${group.key}">
+                            ${matchedGames.map(game => {
+                                let logoHtml = '';
+                                if (game.logo && (game.logo.endsWith('.jpg') || game.logo.endsWith('.png') || game.logo.endsWith('.jpeg') || game.logo.endsWith('.webp'))) {
+                                    logoHtml = `<img src="img/${game.logo}" alt="${game.name}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; display:block;">`;
+                                } else {
+                                    logoHtml = this.logos[game.logo] || `<div style="width:48px; height:48px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">${game.name.substring(0,2)}</div>`;
+                                }
+                                return `
+                                    <div class="game-card-wrapper">
+                                        <div class="game-card" data-slug="${game.slug}">
+                                            <div class="game-card-img-wrapper">
+                                                <img src="${game.banner}" alt="${game.name}" class="game-card-img" loading="lazy">
+                                            </div>
+                                            <div class="game-card-overlay"></div>
+                                            
+                                            <!-- Cyber Glow Floating Logo -->
+                                            <div style="position: absolute; top: 16px; left: 16px; z-index: 3; background: rgba(15, 19, 34, 0.9); backdrop-filter: blur(8px); padding: 8px; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); width: 64px; height: 64px;">
+                                                ${logoHtml}
+                                            </div>
+                                            
+                                            <div class="game-card-info">
+                                                <h3 class="game-card-title">${game.name}</h3>
+                                                <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
-                        }).join('')}
+                                `;
+                            }).join('')}
+                        </div>
+                        <button class="slide-arrow next" data-category="${group.key}" aria-label="Selanjutnya">
+                            <i data-lucide="chevron-right" style="width: 24px; height: 24px;"></i>
+                        </button>
                     </div>
+                    <div class="slider-dots" id="dots-${group.key}"></div>
                 `;
 
                 gamesCategoriesContainer.appendChild(section);
@@ -436,8 +449,106 @@ const homeView = {
                 });
             });
 
+            // Initialize sliders
+            initSliders();
+
             // Initialize 3D dynamic tilt interaction
             this.init3DTilt();
+        };
+
+        // Carousel Controller logic
+        const initSliders = () => {
+            const containers = document.querySelectorAll('.game-grid-container');
+            containers.forEach(container => {
+                const grid = container.querySelector('.game-grid');
+                const btnPrev = container.querySelector('.slide-arrow.prev');
+                const btnNext = container.querySelector('.slide-arrow.next');
+                const catKey = btnPrev.getAttribute('data-category');
+                const dotsContainer = document.getElementById(`dots-${catKey}`);
+                
+                if (!grid || !btnPrev || !btnNext || !dotsContainer) return;
+                
+                // Calculate dots and buttons state
+                const updateSliderUI = () => {
+                    const scrollLeft = grid.scrollLeft;
+                    const maxScrollLeft = grid.scrollWidth - grid.clientWidth;
+                    
+                    // Update buttons
+                    if (scrollLeft <= 5) {
+                        btnPrev.classList.add('disabled');
+                    } else {
+                        btnPrev.classList.remove('disabled');
+                    }
+                    
+                    if (scrollLeft >= maxScrollLeft - 5) {
+                        btnNext.classList.add('disabled');
+                    } else {
+                        btnNext.classList.remove('disabled');
+                    }
+                    
+                    // Update dots
+                    const cardWidth = grid.querySelector('.game-card-wrapper')?.clientWidth || 1;
+                    const activeIndex = Math.round(scrollLeft / cardWidth);
+                    
+                    dotsContainer.querySelectorAll('.slider-dot').forEach((dot, idx) => {
+                        if (idx === activeIndex) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
+                };
+
+                // Generate dots dynamically
+                const cards = grid.querySelectorAll('.game-card-wrapper');
+                const cardsPerView = Math.round(grid.clientWidth / (cards[0]?.clientWidth || 1)) || 1;
+                const dotsCount = Math.max(1, cards.length - cardsPerView + 1);
+                
+                dotsContainer.innerHTML = '';
+                // Only show dots if there are items to scroll
+                if (cards.length > cardsPerView) {
+                    for (let i = 0; i < dotsCount; i++) {
+                        const dot = document.createElement('div');
+                        dot.className = `slider-dot ${i === 0 ? 'active' : ''}`;
+                        dot.addEventListener('click', () => {
+                            const cardWidth = cards[0].clientWidth;
+                            grid.scrollTo({
+                                left: i * cardWidth,
+                                behavior: 'smooth'
+                            });
+                        });
+                        dotsContainer.appendChild(dot);
+                    }
+                } else {
+                    // Hide arrows if not scrollable
+                    btnPrev.style.display = 'none';
+                    btnNext.style.display = 'none';
+                }
+                
+                // Click handlers
+                btnPrev.addEventListener('click', () => {
+                    const cardWidth = grid.querySelector('.game-card-wrapper')?.clientWidth || 200;
+                    grid.scrollBy({
+                        left: -cardWidth,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                btnNext.addEventListener('click', () => {
+                    const cardWidth = grid.querySelector('.game-card-wrapper')?.clientWidth || 200;
+                    grid.scrollBy({
+                        left: cardWidth,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                // Scroll handler
+                grid.removeEventListener('scroll', updateSliderUI);
+                grid.addEventListener('scroll', updateSliderUI);
+                
+                // Initial call
+                updateSliderUI();
+            });
         };
 
         // Event listeners for search & tabs

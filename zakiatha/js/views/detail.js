@@ -441,7 +441,7 @@ const detailView = {
             
             const baseTotal = selectedProduct.price + feeAmount;
             const pointsToUse = usePoints ? Math.min(userPoints, baseTotal) : 0;
-            const finalTotal = baseTotal - pointsToUse;
+            let finalTotal = baseTotal - pointsToUse;
             
             // Earn points: 1% of base price
             const pointsEarned = Math.round(selectedProduct.price * 0.01);
@@ -464,52 +464,137 @@ const detailView = {
                 let targetLabel = 'Data Target';
                 if (game.category === 'pulsa') targetLabel = 'Nomor HP';
                 else if (game.category === 'voucher') targetLabel = 'Email Penerima';
- 
-                // Populate checkout table
-                modalTable.innerHTML = `
-                    <div class="modal-details-row">
-                        <div class="modal-details-label">Kategori / Item</div>
-                        <div class="modal-details-val">${game.name}</div>
-                    </div>
-                    <div class="modal-details-row">
-                        <div class="modal-details-label">${targetLabel}</div>
-                        <div class="modal-details-val" style="font-family: monospace; color: var(--primary);">${accountTargetStr}</div>
-                    </div>
-                    ${game.category !== 'pulsa' && game.category !== 'voucher' ? `
-                    <div class="modal-details-row" style="background: rgba(16, 185, 129, 0.05);">
-                        <div class="modal-details-label" style="color: var(--success); font-weight:700;">Nickname Akun</div>
-                        <div class="modal-details-val" style="color: var(--success); font-weight:700;">${mockNickname} (Verified)</div>
-                    </div>` : ''}
-                    <div class="modal-details-row">
-                        <div class="modal-details-label">Produk</div>
-                        <div class="modal-details-val">${selectedProduct.name}</div>
-                    </div>
-                    <div class="modal-details-row">
-                        <div class="modal-details-label">Harga</div>
-                        <div class="modal-details-val">${window.formatRupiah(selectedProduct.price)}</div>
-                    </div>
-                    <div class="modal-details-row">
-                        <div class="modal-details-label">Biaya Admin</div>
-                        <div class="modal-details-val">${window.formatRupiah(feeAmount)}</div>
-                    </div>
-                    ${pointsToUse > 0 ? `
-                    <div class="modal-details-row" style="color: var(--success); background: rgba(16, 185, 129, 0.03);">
-                        <div class="modal-details-label">Potongan Poin</div>
-                        <div class="modal-details-val">- ${window.formatRupiah(pointsToUse)}</div>
-                    </div>` : ''}
-                    <div class="modal-details-row modal-details-total">
-                        <div class="modal-details-label" style="color: var(--secondary);">Total Bayar</div>
-                        <div class="modal-details-val">${window.formatRupiah(finalTotal)}</div>
-                    </div>
-                    ${session ? `
-                    <div class="modal-details-row" style="background: rgba(6, 182, 212, 0.05);">
-                        <div class="modal-details-label" style="color: var(--secondary); font-weight:700;">Cashback Didapat</div>
-                        <div class="modal-details-val" style="color: var(--secondary); font-weight:700;">+ ${pointsEarned.toLocaleString('id-ID')} Pts (1%)</div>
-                    </div>` : ''}
-                `;
+  
+                let activeVoucher = null;
+                let voucherDiscount = 0;
+
+                const updateModalDisplay = () => {
+                    const currentFinalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
+                    
+                    modalTable.innerHTML = `
+                        <div class="modal-details-row">
+                            <div class="modal-details-label">Kategori / Item</div>
+                            <div class="modal-details-val">${game.name}</div>
+                        </div>
+                        <div class="modal-details-row">
+                            <div class="modal-details-label">${targetLabel}</div>
+                            <div class="modal-details-val" style="font-family: monospace; color: var(--primary);">${accountTargetStr}</div>
+                        </div>
+                        ${game.category !== 'pulsa' && game.category !== 'voucher' ? `
+                        <div class="modal-details-row" style="background: rgba(16, 185, 129, 0.05);">
+                            <div class="modal-details-label" style="color: var(--success); font-weight:700;">Nickname Akun</div>
+                            <div class="modal-details-val" style="color: var(--success); font-weight:700;">${mockNickname} (Verified)</div>
+                        </div>` : ''}
+                        <div class="modal-details-row">
+                            <div class="modal-details-label">Produk</div>
+                            <div class="modal-details-val">${selectedProduct.name}</div>
+                        </div>
+                        <div class="modal-details-row">
+                            <div class="modal-details-label">Harga</div>
+                            <div class="modal-details-val">${window.formatRupiah(selectedProduct.price)}</div>
+                        </div>
+                        <div class="modal-details-row">
+                            <div class="modal-details-label">Biaya Admin</div>
+                            <div class="modal-details-val">${window.formatRupiah(feeAmount)}</div>
+                        </div>
+                        ${pointsToUse > 0 ? `
+                        <div class="modal-details-row" style="color: var(--success); background: rgba(16, 185, 129, 0.03);">
+                            <div class="modal-details-label">Potongan Poin</div>
+                            <div class="modal-details-val">- ${window.formatRupiah(pointsToUse)}</div>
+                        </div>` : ''}
+                        ${activeVoucher ? `
+                        <div class="modal-details-row" style="color: var(--success); background: rgba(16, 185, 129, 0.05);">
+                            <div class="modal-details-label">Voucher (${activeVoucher.code})</div>
+                            <div class="modal-details-val">- ${window.formatRupiah(voucherDiscount)}</div>
+                        </div>` : ''}
+                        <div class="modal-details-row modal-details-total">
+                            <div class="modal-details-label" style="color: var(--secondary);">Total Bayar</div>
+                            <div class="modal-details-val">${window.formatRupiah(currentFinalTotal)}</div>
+                        </div>
+                        ${session ? `
+                        <div class="modal-details-row" style="background: rgba(6, 182, 212, 0.05);">
+                            <div class="modal-details-label" style="color: var(--secondary); font-weight:700;">Cashback Didapat</div>
+                            <div class="modal-details-val" style="color: var(--secondary); font-weight:700;">+ ${pointsEarned.toLocaleString('id-ID')} Pts (1%)</div>
+                        </div>` : ''}
+                    `;
+                };
+
+                // Populate checkout table initial
+                updateModalDisplay();
                 
+                // Add voucher section to modal if not already present
+                let voucherSection = modalContent.querySelector('.modal-voucher-box');
+                if (!voucherSection) {
+                    voucherSection = document.createElement('div');
+                    voucherSection.className = 'modal-voucher-box';
+                    voucherSection.style.marginTop = '16px';
+                    voucherSection.style.padding = '12px';
+                    voucherSection.style.border = '1px solid var(--border-color)';
+                    voucherSection.style.borderRadius = 'var(--radius-md)';
+                    voucherSection.style.background = 'rgba(255, 255, 255, 0.02)';
+                    
+                    // Insert before the button container
+                    const btnContainer = modalContent.querySelector('.modal-actions');
+                    modalContent.insertBefore(voucherSection, btnContainer);
+                }
+
+                voucherSection.innerHTML = `
+                    <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Punya Kode Voucher?</div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="modal-voucher-input" class="form-input" placeholder="Masukkan kode voucher" style="padding: 8px 12px; font-size: 13px; text-transform: uppercase; border-color: rgba(139, 92, 246, 0.3);">
+                        <button id="modal-voucher-apply-btn" class="btn-grad" style="padding: 8px 16px; font-size: 13px; margin: 0; white-space: nowrap; height: auto;">Pakai</button>
+                    </div>
+                    <div id="modal-voucher-message" style="font-size: 11px; margin-top: 6px; display: none; font-weight: 600;"></div>
+                `;
+
+                const voucherInput = document.getElementById('modal-voucher-input');
+                const voucherApplyBtn = document.getElementById('modal-voucher-apply-btn');
+                const voucherMsg = document.getElementById('modal-voucher-message');
+
+                voucherApplyBtn.onclick = () => {
+                    const code = voucherInput.value.trim();
+                    if (!code) {
+                        voucherMsg.style.display = 'block';
+                        voucherMsg.style.color = 'var(--danger)';
+                        voucherMsg.textContent = 'Masukkan kode voucher terlebih dahulu!';
+                        return;
+                    }
+
+                    const checkResult = window.dbService.checkVoucher(code);
+                    if (checkResult.success) {
+                        activeVoucher = checkResult.voucher;
+                        if (activeVoucher.type === 'percent') {
+                            voucherDiscount = Math.round(baseTotal * (activeVoucher.value / 100));
+                        } else {
+                            voucherDiscount = Math.min(activeVoucher.value, baseTotal);
+                        }
+                        
+                        voucherMsg.style.display = 'block';
+                        voucherMsg.style.color = 'var(--success)';
+                        voucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+                        
+                        updateModalDisplay();
+                    } else {
+                        activeVoucher = null;
+                        voucherDiscount = 0;
+                        voucherMsg.style.display = 'block';
+                        voucherMsg.style.color = 'var(--danger)';
+                        voucherMsg.textContent = checkResult.message;
+                        
+                        updateModalDisplay();
+                    }
+                };
+
                 // Confirm action
                 modalConfirm.onclick = () => {
+                    const currentFinalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
+                    
+                    // Increment voucher usage in DB
+                    if (activeVoucher) {
+                        activeVoucher.usageCount += 1;
+                        window.dbService.saveVoucher(activeVoucher);
+                    }
+
                     const tx = window.dbService.createTransaction({
                         gameId: game.id,
                         gameName: game.name,
@@ -518,9 +603,11 @@ const detailView = {
                         productName: selectedProduct.name,
                         basePrice: selectedProduct.price,
                         adminFee: feeAmount,
-                        totalAmount: finalTotal,
+                        totalAmount: currentFinalTotal,
                         pointsUsed: pointsToUse,
                         pointsEarned: pointsEarned,
+                        voucherCode: activeVoucher ? activeVoucher.code : null,
+                        discountAmount: voucherDiscount,
                         username: session ? session.username : null,
                         paymentMethodId: selectedPayment.id,
                         paymentMethodName: selectedPayment.name,

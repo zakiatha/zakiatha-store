@@ -311,6 +311,49 @@ function renderError(container, message) {
     `;
 }
 
+// Theme Initialization & Toggle Logic
+function initTheme() {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    if (!themeToggleBtn || !themeIcon) return;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('topup_store_theme');
+    
+    // Default to dark theme unless saved as light
+    const isLightTheme = savedTheme === 'light';
+    
+    if (isLightTheme) {
+        document.documentElement.classList.add('light-theme');
+        themeIcon.setAttribute('data-lucide', 'moon');
+    } else {
+        document.documentElement.classList.remove('light-theme');
+        themeIcon.setAttribute('data-lucide', 'sun');
+    }
+    
+    // Render the initial icon
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        const isCurrentLight = document.documentElement.classList.contains('light-theme');
+        if (isCurrentLight) {
+            document.documentElement.classList.remove('light-theme');
+            localStorage.setItem('topup_store_theme', 'dark');
+            themeIcon.setAttribute('data-lucide', 'sun');
+        } else {
+            document.documentElement.classList.add('light-theme');
+            localStorage.setItem('topup_store_theme', 'light');
+            themeIcon.setAttribute('data-lucide', 'moon');
+        }
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    });
+}
+
 // Application Initialization
 function init() {
     // Set global helper on window so views can access it
@@ -320,6 +363,9 @@ function init() {
     
     // Initialize hamburger menu
     initHamburger();
+    
+    // Initialize theme
+    initTheme();
     
     // Listen for hash changes
     window.addEventListener('hashchange', router);

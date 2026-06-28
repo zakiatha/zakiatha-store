@@ -182,7 +182,7 @@ const settingsView = {
                                         statusBadge = '<span class="badge status-failed">FAILED</span>';
                                     }
                                     return `
-                                        <tr>
+                                        <tr class="tx-row" data-tx-id="${tx.id}" style="cursor: pointer;" title="Klik untuk melihat detail status & nota">
                                             <td style="font-weight: 700; font-family: monospace;">
                                                 <a href="#invoice/${tx.invoiceId}" style="color: var(--secondary);">${tx.invoiceId}</a>
                                             </td>
@@ -239,6 +239,22 @@ const settingsView = {
                         <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                         Hapus Akun Saya
                     </button>
+                </div>
+            </div>
+
+            <!-- Modal Detail Transaksi -->
+            <div class="modal-overlay" id="tx-detail-modal" style="z-index: 1100;">
+                <div class="modal-card card-glass" style="max-width: 600px; width: 90%;">
+                    <div class="modal-header">
+                        <h3 class="gradient-text">Detail Pesanan</h3>
+                        <button class="modal-close" id="tx-detail-close">&times;</button>
+                    </div>
+                    <div class="modal-body" id="tx-detail-body" style="max-height: 65vh; overflow-y: auto; padding-right: 8px;">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="modal-actions" style="justify-content: flex-end; padding-top: 12px; border-top: 1px solid var(--border-color);">
+                        <button class="btn-grad" id="tx-detail-ok-btn" style="margin: 0; padding: 10px 24px;">Tutup</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -341,17 +357,157 @@ const settingsView = {
             }
         });
 
-        // Delete Account
-        document.getElementById('btn-delete-account').addEventListener('click', () => {
-            if (confirm('⚠️ PERINGATAN: Apakah Anda yakin ingin menghapus akun Anda? Tindakan ini tidak dapat dibatalkan!')) {
-                if (confirm('Ini adalah konfirmasi terakhir. Ketik "OK" untuk melanjutkan.')) {
-                    window.dbService.deleteAccount(session.username);
-                    localStorage.removeItem('topup_store_session');
-                    window.dispatchEvent(new CustomEvent('sessionUpdated'));
-                    alert('Akun Anda telah dihapus.');
-                    window.location.hash = '#home';
-                }
+        // --- Transaction Detail Modal Logic ---
+        const txDetailModal = document.getElementById('tx-detail-modal');
+        const txDetailClose = document.getElementById('tx-detail-close');
+        const txDetailOkBtn = document.getElementById('tx-detail-ok-btn');
+        const txDetailBody = document.getElementById('tx-detail-body');
+
+        const closeTxModal = () => {
+            if (txDetailModal) txDetailModal.classList.remove('active');
+        };
+
+        if (txDetailClose) txDetailClose.addEventListener('click', closeTxModal);
+        if (txDetailOkBtn) txDetailOkBtn.addEventListener('click', closeTxModal);
+        if (txDetailModal) {
+            txDetailModal.addEventListener('click', (e) => {
+                if (e.target === txDetailModal) closeTxModal();
+            });
+        }
+
+        const showTxDetail = (tx) => {
+            if (!txDetailModal || !txDetailBody) return;
+
+            const txDate = new Date(tx.createdAt).toLocaleString('id-ID', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+
+            let statusBadge = '';
+            let statusClass = 'status-pending';
+            if (tx.status === 'PENDING') {
+                statusBadge = '<span class="badge status-pending">PENDING</span>';
+                statusClass = 'status-pending';
+            } else if (tx.status === 'SUCCESS') {
+                statusBadge = '<span class="badge status-success">SUCCESS</span>';
+                statusClass = 'status-success';
+            } else {
+                statusBadge = '<span class="badge status-failed">FAILED</span>';
+                statusClass = 'status-failed';
             }
+
+            let targetDetails = '';
+            if (tx.accountData) {
+                targetDetails = Object.entries(tx.accountData)
+                    .map(([key, val]) => `<div style="font-size: 13px; color: var(--text-secondary);"><strong style="text-transform: capitalize;">${key}:</strong> ${val}</div>`)
+                    .join('');
+            }
+
+            txDetailBody.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Invoice Info -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Invoice ID</div>
+                            <div style="font-weight: 800; font-family: monospace; font-size: 16px; color: var(--secondary);">${tx.invoiceId}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); text-align: right;">Status</div>
+                            <div style="text-align: right;">${statusBadge}</div>
+                        </div>
+                    </div>
+
+                    <!-- Order Info -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(255,255,255,0.01); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Layanan</div>
+                            <div style="font-weight: 700; font-size: 14px;">${tx.gameName}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Produk</div>
+                            <div style="font-weight: 700; font-size: 14px;">${tx.productName}</div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Data Akun Tujuan</div>
+                            ${targetDetails}
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Metode Pembayaran</div>
+                            <div style="font-size: 13px;">${tx.paymentMethodName}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Total Pembayaran</div>
+                            <div style="font-weight: 800; color: var(--secondary); font-size: 14px;">${window.formatRupiah(tx.totalAmount)}</div>
+                        </div>
+                        ${tx.voucherCode ? `
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Kupon Diskon</div>
+                            <div style="font-size: 13px; color: var(--success); font-weight: 700;">${tx.voucherCode} (-${window.formatRupiah(tx.discountAmount)})</div>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- Timeline Status -->
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Log Status Transaksi</h4>
+                        <div style="display: flex; flex-direction: column; gap: 16px; border-left: 2px solid var(--border-color); padding-left: 16px; margin-left: 8px;">
+                            ${(tx.statusHistory || [
+                                { status: 'PENDING', date: tx.createdAt, note: 'Pesanan dibuat. Menunggu pembayaran.' }
+                            ]).map(history => {
+                                const hDate = new Date(history.date).toLocaleString('id-ID', { 
+                                    day: 'numeric', 
+                                    month: 'short', 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                });
+                                let dotClass = 'status-pending';
+                                if (history.status === 'SUCCESS') dotClass = 'status-success';
+                                if (history.status === 'FAILED') dotClass = 'status-failed';
+                                return `
+                                    <div style="position: relative;">
+                                        <div class="timeline-dot ${dotClass}" style="position: absolute; left: -21px; top: 6px; width: 8px; height: 8px; border-radius: 50%;"></div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">${hDate}</div>
+                                        <div style="font-weight: 700; font-size: 13px; color: var(--text-primary);">
+                                            Status: <span class="badge ${dotClass}" style="font-size: 9px; padding: 1px 4px; font-weight: 800;">${history.status}</span>
+                                        </div>
+                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${history.note || ''}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Purchase Note / Nota Pembelian -->
+                    ${tx.purchaseNote ? `
+                    <div style="padding: 16px; background: rgba(6, 182, 212, 0.05); border: 1px solid var(--secondary); border-radius: var(--radius-md); margin-top: 8px;">
+                        <h4 style="color: var(--secondary); margin-bottom: 8px; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                            Nota Pembelian / Token / SN
+                        </h4>
+                        <div style="font-family: monospace; font-size: 14px; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,0.2); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.03);">${tx.purchaseNote}</div>
+                    </div>` : ''}
+                </div>
+            `;
+            
+            txDetailModal.classList.add('active');
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // Attach click listener to table rows
+        const txRows = document.querySelectorAll('.tx-row');
+        txRows.forEach(row => {
+            row.addEventListener('click', (e) => {
+                // If they clicked on the Invoice ID link specifically, let the default routing handle it
+                if (e.target.tagName === 'A') return;
+                
+                const txId = row.getAttribute('data-tx-id');
+                const tx = window.dbService.getTransactionById(txId);
+                if (tx) {
+                    showTxDetail(tx);
+                }
+            });
         });
     }
 };

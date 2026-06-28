@@ -3,7 +3,7 @@
 
 const adminView = {
     // Active tab in admin dashboard
-    activeTab: 'transactions', // transactions, games, products, payments, users, apiconfig
+    activeTab: 'transactions', // transactions, games, products, payments, users, vouchers, apiconfig
     selectedGameId: '', // For product management tab
     
     render: function(container) {
@@ -64,6 +64,7 @@ const adminView = {
                         <button class="admin-tab-btn ${this.activeTab === 'products' ? 'active' : ''}" data-tab="products">Kelola Produk</button>
                         <button class="admin-tab-btn ${this.activeTab === 'payments' ? 'active' : ''}" data-tab="payments">Kelola Pembayaran</button>
                         <button class="admin-tab-btn ${this.activeTab === 'users' ? 'active' : ''}" data-tab="users">Kelola User & Poin</button>
+                        <button class="admin-tab-btn ${this.activeTab === 'vouchers' ? 'active' : ''}" data-tab="vouchers">Kelola Voucher</button>
                         <button class="admin-tab-btn ${this.activeTab === 'apiconfig' ? 'active' : ''}" data-tab="apiconfig">API Reseller 3rd Party</button>
                     </div>
                     
@@ -276,7 +277,76 @@ const adminView = {
                             </div>
                         </div>
 
-                        <!-- 6. THIRD-PARTY API CONFIG PANEL (NEW) -->
+                        <!-- 6. VOUCHERS PANEL (NEW) -->
+                        <div class="admin-panel ${this.activeTab === 'vouchers' ? 'active' : ''}" id="panel-vouchers">
+                            <div class="panel-header-actions">
+                                <h3 class="panel-title">Pengelolaan Voucher Diskon</h3>
+                                <button class="btn-grad" id="btn-admin-add-voucher" style="padding: 8px 16px; font-size: 13px; margin: 0;">
+                                    <i data-lucide="plus" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:4px;"></i>
+                                    Tambah Voucher Baru
+                                </button>
+                            </div>
+                            
+                            <!-- Add/Edit Voucher Form (Hidden by default) -->
+                            <div id="admin-voucher-form-container" class="card-glass" style="padding: 24px; margin-bottom: 24px; display: none; background: rgba(7, 10, 19, 0.4);">
+                                <h4 id="voucher-form-title" style="margin-bottom: 16px; font-size: 16px;" class="gradient-text">Tambah Voucher Baru</h4>
+                                <form id="admin-voucher-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <input type="hidden" id="form-voucher-id">
+                                    <div class="form-group">
+                                        <label for="form-voucher-code">Kode Voucher</label>
+                                        <input type="text" id="form-voucher-code" class="form-input" placeholder="Contoh: DISKON10" required style="text-transform: uppercase;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form-voucher-type">Tipe Potongan</label>
+                                        <select id="form-voucher-type" class="form-input form-select" required>
+                                            <option value="percent">Persentase (%)</option>
+                                            <option value="flat">Nominal Rupiah (Rp)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form-voucher-value">Nilai Potongan</label>
+                                        <input type="number" id="form-voucher-value" class="form-input" placeholder="Contoh: 10 atau 5000" required min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form-voucher-max-usage">Batas Maksimal Pemakaian</label>
+                                        <input type="number" id="form-voucher-max-usage" class="form-input" placeholder="Contoh: 100" required min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="form-voucher-active">Status Keaktifan</label>
+                                        <select id="form-voucher-active" class="form-input form-select" required>
+                                            <option value="true">Aktif</option>
+                                            <option value="false">Tidak Aktif</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div style="grid-column: span 2; display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px;">
+                                        <button type="button" class="btn-action-small" id="btn-voucher-form-cancel" style="padding: 10px 20px;">Batal</button>
+                                        <button type="submit" class="btn-grad" style="padding: 10px 20px; box-shadow: none;">Simpan Voucher</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Kode Voucher</th>
+                                            <th>Tipe</th>
+                                            <th>Nilai Potongan</th>
+                                            <th>Batas Pakai</th>
+                                            <th>Terpakai</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-voucher-table-body">
+                                        <!-- Inject vouchers list -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 7. THIRD-PARTY API CONFIG PANEL (NEW) -->
                         <div class="admin-panel ${this.activeTab === 'apiconfig' ? 'active' : ''}" id="panel-apiconfig">
                             <h3 class="panel-title" style="margin-bottom: 8px;">Pengaturan API Integrasi Pihak Ketiga</h3>
                             <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px;">
@@ -358,6 +428,50 @@ const adminView = {
                     </div>
                 </section>
             </div>
+
+            <!-- Modal Kelola Transaksi (Admin Only) -->
+            <div class="modal-overlay" id="admin-tx-modal" style="z-index: 1100;">
+                <div class="modal-card card-glass" style="max-width: 600px; width: 90%;">
+                    <div class="modal-header">
+                        <h3 class="gradient-text">Kelola & Update Transaksi</h3>
+                        <button class="modal-close" id="admin-tx-close">&times;</button>
+                    </div>
+                    <form id="admin-tx-form">
+                        <div class="modal-body" style="max-height: 65vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding-right: 8px;">
+                            <input type="hidden" id="admin-tx-id">
+                            
+                            <!-- Summary info -->
+                            <div id="admin-tx-summary" style="padding: 12px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px;">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <div class="form-group">
+                                <label for="admin-tx-status">Status Transaksi</label>
+                                <select id="admin-tx-status" class="form-input form-select" required>
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PROCESSING">PROCESSING</option>
+                                    <option value="SUCCESS">SUCCESS</option>
+                                    <option value="FAILED">FAILED</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="admin-tx-status-note">Keterangan Log (Opsional)</label>
+                                <input type="text" id="admin-tx-status-note" class="form-input" placeholder="Contoh: Pembayaran diterima / Diamond sedang dikirim">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="admin-tx-note">Nota Pembelian / Token / SN (Terlihat oleh User)</label>
+                                <textarea id="admin-tx-note" class="form-input" style="min-height: 100px; font-family: monospace; font-size: 13px;" placeholder="Masukkan nomor serial pengisian pulsa atau bukti top up lainnya..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-actions" style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px; justify-content: flex-end; gap: 12px;">
+                            <button type="button" class="btn-action-small" id="admin-tx-cancel" style="padding: 10px 20px;">Batal</button>
+                            <button type="submit" class="btn-grad" style="margin: 0; padding: 10px 24px;">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         `;
 
         // Load specific DOM containers
@@ -375,15 +489,17 @@ const adminView = {
         
         // 1. Render Transactions Table
         const drawTransactions = () => {
-            if (transactions.length === 0) {
-                txTableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 30px;">Belum ada transaksi simulasi yang tercatat.</td></tr>`;
-                return;
-            }
+            const txTableBody = document.getElementById('admin-tx-table-body');
+            if (!txTableBody) return;
             
             txTableBody.innerHTML = transactions.map(tx => {
+                const txDate = new Date(tx.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                
                 let statusBadge = '';
                 if (tx.status === 'PENDING') {
                     statusBadge = '<span class="badge status-pending">PENDING</span>';
+                } else if (tx.status === 'PROCESSING') {
+                    statusBadge = '<span class="badge status-pending" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.3);">PROCESSING</span>';
                 } else if (tx.status === 'SUCCESS') {
                     statusBadge = '<span class="badge status-success">SUCCESS</span>';
                 } else {
@@ -391,18 +507,13 @@ const adminView = {
                 }
                 
                 const targetStr = Object.values(tx.accountData).join(' / ');
-                const txDate = new Date(tx.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                 
-                const actionsHtml = tx.status === 'PENDING' ? `
-                    <div class="admin-action-buttons">
-                        <button class="btn-action-small success btn-tx-approve" data-invoice-id="${tx.invoiceId}" title="Setujui Pembayaran">
-                            <i data-lucide="check" style="width: 14px; height: 14px;"></i>
-                        </button>
-                        <button class="btn-action-small failed btn-tx-reject" data-invoice-id="${tx.invoiceId}" title="Batalkan Transaksi">
-                            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-                ` : `<span style="font-size: 11px; color: var(--text-muted);">Selesai</span>`;
+                const actionsHtml = `
+                    <button class="btn-action-small btn-tx-manage" data-invoice-id="${tx.invoiceId}" style="border-color: var(--secondary); color: var(--secondary); display: flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 11px; font-weight: 700;">
+                        <i data-lucide="settings" style="width: 12px; height: 12px;"></i>
+                        <span>Kelola</span>
+                    </button>
+                `;
                 
                 return `
                     <tr>
@@ -419,20 +530,14 @@ const adminView = {
                 `;
             }).join('');
             
-            // Bind approve/reject events
-            document.querySelectorAll('.btn-tx-approve').forEach(btn => {
+            // Bind Kelola / Manage events
+            document.querySelectorAll('.btn-tx-manage').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-invoice-id');
-                    window.dbService.updateTransactionStatus(id, 'SUCCESS');
-                    this.render(container); // Re-render admin to update stats and api balance
-                });
-            });
-            
-            document.querySelectorAll('.btn-tx-reject').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-invoice-id');
-                    window.dbService.updateTransactionStatus(id, 'FAILED');
-                    this.render(container);
+                    const invoiceId = btn.getAttribute('data-invoice-id');
+                    const tx = window.dbService.getTransactionById(invoiceId);
+                    if (tx) {
+                        showAdminTxModal(tx);
+                    }
                 });
             });
         };
@@ -859,6 +964,169 @@ const adminView = {
             productFormContainer.style.display = 'none';
             drawProducts();
         });
+
+        // --- VOUCHER CRUD PANEL RENDERING ---
+        const vouchersTableBody = document.getElementById('admin-voucher-table-body');
+        const voucherFormContainer = document.getElementById('admin-voucher-form-container');
+        const voucherForm = document.getElementById('admin-voucher-form');
+        const btnAddVoucher = document.getElementById('btn-admin-add-voucher');
+        const btnVoucherCancel = document.getElementById('btn-voucher-form-cancel');
+
+        const drawVouchers = () => {
+            if (!vouchersTableBody) return;
+            const vouchers = window.dbService.getVouchers();
+            
+            vouchersTableBody.innerHTML = vouchers.map(v => {
+                return `
+                    <tr>
+                        <td style="font-weight: 700; font-family: monospace; color: var(--secondary);">${v.code}</td>
+                        <td style="font-size: 13px;">${v.type === 'percent' ? 'Persentase' : 'Nominal Flat'}</td>
+                        <td style="font-weight: 600;">${v.type === 'percent' ? `${v.value}%` : window.formatRupiah(v.value)}</td>
+                        <td>${v.maxUsage} kali</td>
+                        <td style="font-weight: 700;">${v.usageCount} kali</td>
+                        <td>
+                            <span class="badge ${v.isActive ? 'status-success' : 'status-failed'}">${v.isActive ? 'AKTIF' : 'NONAKTIF'}</span>
+                        </td>
+                        <td>
+                            <div class="admin-action-buttons">
+                                <button class="btn-action-small btn-voucher-edit" data-voucher-id="${v.id}">
+                                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button class="btn-action-small danger btn-voucher-delete" data-voucher-id="${v.id}">
+                                    <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Bind Edit events
+            document.querySelectorAll('.btn-voucher-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-voucher-id');
+                    const v = window.dbService.getVouchers().find(item => item.id === id);
+                    if (v) {
+                        document.getElementById('form-voucher-id').value = v.id;
+                        document.getElementById('form-voucher-code').value = v.code;
+                        document.getElementById('form-voucher-type').value = v.type;
+                        document.getElementById('form-voucher-value').value = v.value;
+                        document.getElementById('form-voucher-max-usage').value = v.maxUsage;
+                        document.getElementById('form-voucher-active').value = String(v.isActive);
+                        
+                        document.getElementById('voucher-form-title').textContent = 'Edit Voucher';
+                        voucherFormContainer.style.display = 'block';
+                        voucherFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            });
+
+            // Bind Delete events
+            document.querySelectorAll('.btn-voucher-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-voucher-id');
+                    if (confirm('Apakah Anda yakin ingin menghapus voucher ini?')) {
+                        window.dbService.deleteVoucher(id);
+                        drawVouchers();
+                    }
+                });
+            });
+
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        if (btnAddVoucher) {
+            btnAddVoucher.addEventListener('click', () => {
+                voucherForm.reset();
+                document.getElementById('form-voucher-id').value = '';
+                document.getElementById('voucher-form-title').textContent = 'Tambah Voucher Baru';
+                voucherFormContainer.style.display = voucherFormContainer.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        if (btnVoucherCancel) {
+            btnVoucherCancel.addEventListener('click', () => {
+                voucherFormContainer.style.display = 'none';
+            });
+        }
+
+        if (voucherForm) {
+            voucherForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const vData = {
+                    id: document.getElementById('form-voucher-id').value || undefined,
+                    code: document.getElementById('form-voucher-code').value.trim().toUpperCase(),
+                    type: document.getElementById('form-voucher-type').value,
+                    value: parseInt(document.getElementById('form-voucher-value').value),
+                    maxUsage: parseInt(document.getElementById('form-voucher-max-usage').value),
+                    isActive: document.getElementById('form-voucher-active').value === 'true'
+                };
+
+                const result = window.dbService.saveVoucher(vData);
+                if (result.success) {
+                    voucherFormContainer.style.display = 'none';
+                    drawVouchers();
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
+        // --- TRANSACTION MANAGE MODAL LOGIC (ADMIN) ---
+        const adminTxModal = document.getElementById('admin-tx-modal');
+        const adminTxClose = document.getElementById('admin-tx-close');
+        const adminTxCancel = document.getElementById('admin-tx-cancel');
+        const adminTxForm = document.getElementById('admin-tx-form');
+        const adminTxSummary = document.getElementById('admin-tx-summary');
+        
+        const closeAdminTxModal = () => {
+            if (adminTxModal) adminTxModal.classList.remove('active');
+        };
+
+        if (adminTxClose) adminTxClose.addEventListener('click', closeAdminTxModal);
+        if (adminTxCancel) adminTxCancel.addEventListener('click', closeAdminTxModal);
+
+        const showAdminTxModal = (tx) => {
+            if (!adminTxModal || !adminTxSummary) return;
+
+            document.getElementById('admin-tx-id').value = tx.invoiceId;
+            document.getElementById('admin-tx-status').value = tx.status;
+            document.getElementById('admin-tx-status-note').value = '';
+            document.getElementById('admin-tx-note').value = tx.purchaseNote || '';
+
+            const targetStr = Object.values(tx.accountData).join(' / ');
+
+            adminTxSummary.innerHTML = `
+                <div><strong>Invoice:</strong> <span style="font-family: monospace; color: var(--secondary);">${tx.invoiceId}</span></div>
+                <div><strong>Layanan / Produk:</strong> ${tx.gameName} - ${tx.productName}</div>
+                <div><strong>Tujuan / WhatsApp:</strong> ${targetStr} (${tx.whatsapp})</div>
+                <div><strong>Total Tagihan:</strong> ${window.formatRupiah(tx.totalAmount)}</div>
+                ${tx.voucherCode ? `<div><strong>Voucher Diskon:</strong> <span style="color: var(--success); font-weight:700;">${tx.voucherCode} (-${window.formatRupiah(tx.discountAmount)})</span></div>` : ''}
+            `;
+
+            adminTxModal.classList.add('active');
+        };
+
+        if (adminTxForm) {
+            adminTxForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const invoiceId = document.getElementById('admin-tx-id').value;
+                const status = document.getElementById('admin-tx-status').value;
+                const statusNote = document.getElementById('admin-tx-status-note').value.trim();
+                const note = document.getElementById('admin-tx-note').value.trim();
+
+                window.dbService.updateTransactionStatus(invoiceId, status, statusNote);
+                window.dbService.updateTransactionNote(invoiceId, note);
+
+                closeAdminTxModal();
+                this.render(container); // Full re-render to update stats and tables
+            });
+        }
+
+        // Initial draw for vouchers tab if active
+        if (this.activeTab === 'vouchers') {
+            drawVouchers();
+        }
 
         // --- THIRD-PARTY API HANDLERS ---
         const apiConfigForm = document.getElementById('api-config-form');
