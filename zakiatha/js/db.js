@@ -677,26 +677,31 @@ const dbService = {
         
         // Uniqueness validation for buyer_sku_code
         if (productData.buyer_sku_code) {
+            const targetSku = String(productData.buyer_sku_code).trim().toLowerCase();
             const duplicate = db.products.find(p => 
                 p.id !== productData.id && 
                 p.buyer_sku_code && 
-                p.buyer_sku_code.toLowerCase() === productData.buyer_sku_code.toLowerCase()
+                String(p.buyer_sku_code).trim().toLowerCase() === targetSku
             );
             if (duplicate) {
-                return { success: false, message: `Kode SKU "${productData.buyer_sku_code}" sudah digunakan oleh produk lain!` };
+                return { success: false, message: `Kode SKU "${productData.buyer_sku_code}" sudah digunakan oleh produk "${duplicate.name}"!` };
             }
         }
 
         const index = db.products.findIndex(p => p.id === productData.id);
         
         if (index > -1) {
-            db.products[index] = { ...db.products[index], ...productData };
+            db.products[index] = { 
+                ...db.products[index], 
+                ...productData,
+                originalPrice: Math.round(productData.price * 1.15) // Update original price when price changes
+            };
         } else {
             const newProduct = {
                 id: 'p-' + Math.random().toString(36).substring(2, 9),
                 isActive: true,
                 isPopular: false,
-                originalPrice: productData.price * 1.15,
+                originalPrice: Math.round(productData.price * 1.15),
                 ...productData
             };
             db.products.push(newProduct);

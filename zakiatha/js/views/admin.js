@@ -834,11 +834,19 @@ const adminView = {
         productForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
+            const priceInput = document.getElementById('form-product-price').value;
+            const priceVal = parseInt(priceInput);
+            
+            if (isNaN(priceVal) || priceVal <= 0) {
+                alert('Harga jual harus berupa angka yang valid dan lebih dari 0!');
+                return;
+            }
+            
             const productData = {
                 id: document.getElementById('form-product-id').value || undefined,
                 gameId: this.selectedGameId,
                 name: document.getElementById('form-product-name').value.trim(),
-                price: parseInt(document.getElementById('form-product-price').value),
+                price: priceVal,
                 buyer_sku_code: document.getElementById('form-product-sku').value.trim(),
                 isPopular: document.getElementById('form-product-popular').checked
             };
