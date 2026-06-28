@@ -605,6 +605,10 @@ const adminView = {
                     }
                 });
             });
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         };
         
         // 4. Render Payments Table
