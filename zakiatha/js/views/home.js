@@ -113,6 +113,40 @@ const homeView = {
                         <stop offset="100%" stop-color="#FC466B"/>
                     </linearGradient>
                 </defs>
+            </svg>`,
+        'shopeepay.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#ee4d2d"/>
+                <path d="M7 8h10v8H7V8zm2 2v4h6v-4H9z" fill="#ffffff"/>
+                <path d="M11 11h2v2h-2v-2z" fill="#ee4d2d"/>
+            </svg>`,
+        'dana.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#108ee9"/>
+                <path d="M6 10h12v4H6v-4z" fill="#ffffff"/>
+                <path d="M9 12h6v1h-6v-1z" fill="#108ee9"/>
+            </svg>`,
+        'gopay.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#00aed6"/>
+                <circle cx="12" cy="12" r="4" fill="#ffffff"/>
+            </svg>`,
+        'ovo.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#4c2a86"/>
+                <circle cx="12" cy="12" r="5" stroke="#ffffff" stroke-width="2"/>
+            </svg>`,
+        'grabpay.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#00b14f"/>
+                <path d="M8 8h8c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-4c0-1.1.9-2 2-2z" fill="#ffffff"/>
+                <path d="M10 10v4m4-4v4" stroke="#00b14f" stroke-width="2"/>
+            </svg>`,
+        'sakuku.svg': `
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="12" fill="#1e3a8a"/>
+                <path d="M7 7h10v10H7V7z" fill="#f59e0b"/>
+                <path d="M9 9h6v6H9V9z" fill="#ffffff"/>
             </svg>`
     },
 
@@ -297,6 +331,7 @@ const homeView = {
                     <button class="tab-btn" data-category="pc">💻 Game PC</button>
                     <button class="tab-btn" data-category="voucher">🎫 Voucher Game</button>
                     <button class="tab-btn" data-category="pulsa">📞 Isi Pulsa</button>
+                    <button class="tab-btn" data-category="ewallet">💳 E-Wallet</button>
                 </div>
             </section>
             
@@ -327,7 +362,8 @@ const homeView = {
                 { key: 'mobile', title: '📱 Game Mobile', desc: 'Isi Diamond, Token, dan Crystal game mobile favorit Anda secara instan.' },
                 { key: 'pc', title: '💻 Game PC', desc: 'Top-up Points & Wallet Game PC terbaik dengan harga paling miring.' },
                 { key: 'voucher', title: '🎫 Voucher Digital', desc: 'Beli Kode Voucher Google Play, Steam Wallet secara aman.' },
-                { key: 'pulsa', title: '📞 Isi Pulsa', desc: 'Isi ulang pulsa XL, Axis, By.U, Telkomsel, Smartfren, Indosat otomatis 24 Jam.' }
+                { key: 'pulsa', title: '📞 Isi Pulsa', desc: 'Isi ulang pulsa XL, Axis, By.U, Telkomsel, Smartfren, Indosat otomatis 24 Jam.' },
+                { key: 'ewallet', title: '💳 E-Wallet', desc: 'Top up saldo digital ShopeePay, DANA, GoPay, OVO, GrabPay, dan SakuKu Anda.' }
             ];
 
             let totalRendered = 0;
@@ -374,7 +410,7 @@ const homeView = {
                                         
                                         <div class="game-card-info">
                                             <h3 class="game-card-title">${game.name}</h3>
-                                            <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : 'Isi Pulsa'}</span>
+                                            <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
                                         </div>
                                     </div>
                                 </div>

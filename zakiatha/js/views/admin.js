@@ -192,6 +192,10 @@ const adminView = {
                                         <label for="form-product-price">Harga Jual (Rupiah)</label>
                                         <input type="number" id="form-product-price" class="form-input" placeholder="Contoh: 20000" required>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="form-product-sku">Kode Unik Digiflazz (SKU)</label>
+                                        <input type="text" id="form-product-sku" class="form-input sku-input" placeholder="Contoh: ml86, spay50" required>
+                                    </div>
                                     <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 10px;">
                                         <label class="toggle-switch">
                                             <input type="checkbox" id="form-product-popular">
@@ -212,6 +216,7 @@ const adminView = {
                                     <thead>
                                         <tr>
                                             <th>Nama Nominal</th>
+                                            <th>Kode SKU</th>
                                             <th>Harga Coreng (Diskon)</th>
                                             <th>Harga Jual</th>
                                             <th>Badge Populer</th>
@@ -285,19 +290,30 @@ const adminView = {
                                     <form id="api-config-form" style="display: flex; flex-direction: column; gap: 16px;">
                                         <div class="form-group" style="margin-bottom: 0;">
                                             <label for="api-provider-name">Nama Provider</label>
-                                            <input type="text" id="api-provider-name" class="form-input" value="${apiConfig.providerName}" required>
+                                            <input type="text" id="api-provider-name" class="form-input" value="${apiConfig.providerName || ''}" required>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 0;">
                                             <label for="api-url">Base URL API</label>
-                                            <input type="text" id="api-url" class="form-input" value="${apiConfig.apiUrl}" required>
+                                            <input type="text" id="api-url" class="form-input" value="${apiConfig.apiUrl || ''}" required>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 0;">
-                                            <label for="api-key">API Key / Username</label>
-                                            <input type="text" id="api-key" class="form-input" value="${apiConfig.apiKey}" required>
+                                            <label for="api-username">Username Digiflazz</label>
+                                            <input type="text" id="api-username" class="form-input" value="${apiConfig.username || ''}" placeholder="Masukkan Username Digiflazz" required>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 0;">
-                                            <label for="api-secret">Secret Key / Signature</label>
-                                            <input type="password" id="api-secret" class="form-input" value="${apiConfig.secretKey}" required>
+                                            <label for="api-key">API Key</label>
+                                            <input type="text" id="api-key" class="form-input" value="${apiConfig.apiKey || ''}" placeholder="Masukkan API Key" required>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0;">
+                                            <label for="api-webhook">Webhook URL (Callback)</label>
+                                            <input type="text" id="api-webhook" class="form-input" value="${apiConfig.webhookUrl || ''}" placeholder="Masukkan Webhook Callback URL">
+                                        </div>
+                                        <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 10px;">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="api-testmode" ${apiConfig.isTestMode ? 'checked' : ''}>
+                                                <span class="slider-switch"></span>
+                                            </label>
+                                            <span style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">Simulasi Sandbox / Test Mode</span>
                                         </div>
                                         <div class="form-group" style="margin-bottom: 0;">
                                             <label>Status Provider</label>
@@ -509,7 +525,7 @@ const adminView = {
             const gameProducts = window.dbService.getProducts(this.selectedGameId, true); // Include inactive
             
             if (gameProducts.length === 0) {
-                productsTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">Belum ada nominal produk untuk game ini. Silakan buat baru!</td></tr>`;
+                productsTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">Belum ada nominal produk untuk game ini. Silakan buat baru!</td></tr>`;
                 return;
             }
             
@@ -517,6 +533,7 @@ const adminView = {
                 return `
                     <tr>
                         <td style="font-weight: 700; font-size: 15px;">${p.name}</td>
+                        <td><code style="background: rgba(6, 182, 212, 0.1); color: var(--secondary); padding: 4px 8px; border-radius: 4px; font-weight: 700;">${p.buyer_sku_code || '-'}</code></td>
                         <td style="text-decoration: line-through; color: var(--text-muted);">${window.formatRupiah(p.originalPrice)}</td>
                         <td style="font-weight: 800; color: var(--secondary); font-size: 15px;">${window.formatRupiah(p.price)}</td>
                         <td>
@@ -579,6 +596,7 @@ const adminView = {
                         document.getElementById('form-product-id').value = p.id;
                         document.getElementById('form-product-name').value = p.name;
                         document.getElementById('form-product-price').value = p.price;
+                        document.getElementById('form-product-sku').value = p.buyer_sku_code || '';
                         document.getElementById('form-product-popular').checked = p.isPopular;
                         
                         document.getElementById('product-form-title').textContent = `Edit Nominal: ${p.name}`;
@@ -817,10 +835,15 @@ const adminView = {
                 gameId: this.selectedGameId,
                 name: document.getElementById('form-product-name').value.trim(),
                 price: parseInt(document.getElementById('form-product-price').value),
+                buyer_sku_code: document.getElementById('form-product-sku').value.trim(),
                 isPopular: document.getElementById('form-product-popular').checked
             };
             
-            window.dbService.saveProduct(productData);
+            const result = window.dbService.saveProduct(productData);
+            if (result && result.success === false) {
+                alert(result.message);
+                return;
+            }
             productFormContainer.style.display = 'none';
             drawProducts();
         });
@@ -835,13 +858,17 @@ const adminView = {
             
             const url = document.getElementById('api-url').value.trim();
             const key = document.getElementById('api-key').value.trim();
-            const secret = document.getElementById('api-secret').value;
+            const username = document.getElementById('api-username').value.trim();
+            const webhook = document.getElementById('api-webhook').value.trim();
+            const isTest = document.getElementById('api-testmode').checked;
             const provider = document.getElementById('api-provider-name').value.trim();
 
             window.dbService.saveApiConfig({
                 apiUrl: url,
                 apiKey: key,
-                secretKey: secret,
+                username: username,
+                webhookUrl: webhook,
+                isTestMode: isTest,
                 providerName: provider
             });
 

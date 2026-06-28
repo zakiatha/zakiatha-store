@@ -27,10 +27,58 @@ function getSession() {
     }
 }
 
+// --- Hamburger Menu Logic ---
+function initHamburger() {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navLinks = document.getElementById('main-nav-links');
+    const overlay = document.getElementById('mobile-nav-overlay');
+
+    if (!hamburgerBtn || !navLinks) return;
+
+    hamburgerBtn.addEventListener('click', () => {
+        const isOpen = navLinks.classList.contains('open');
+        toggleMenu(!isOpen);
+    });
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            toggleMenu(false);
+        });
+    }
+
+    // Close menu when a nav link is clicked
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            toggleMenu(false);
+        });
+    });
+}
+
+function toggleMenu(open) {
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navLinks = document.getElementById('main-nav-links');
+    const overlay = document.getElementById('mobile-nav-overlay');
+
+    if (open) {
+        hamburgerBtn.classList.add('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        navLinks.classList.add('open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        hamburgerBtn.classList.remove('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        navLinks.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 // Dynamic Auth Navbar Header updater
 function refreshAuthHeader() {
     const container = document.getElementById('auth-nav-container');
     const adminLink = document.getElementById('nav-admin-link');
+    const settingsLink = document.getElementById('nav-settings-link');
     if (!container) return;
 
     const session = getSession();
@@ -58,8 +106,9 @@ function refreshAuthHeader() {
         document.getElementById('btn-logout').addEventListener('click', () => {
             localStorage.removeItem('topup_store_session');
             refreshAuthHeader();
-            // If current page is admin, redirect to home
-            if (window.location.hash === '#admin') {
+            toggleMenu(false);
+            // If current page is admin or settings, redirect to home
+            if (window.location.hash === '#admin' || window.location.hash === '#settings') {
                 window.location.hash = '#home';
             } else {
                 router(); // force redraw
@@ -72,6 +121,9 @@ function refreshAuthHeader() {
         } else {
             if (adminLink) adminLink.style.display = 'none';
         }
+
+        // Show Settings link for logged-in users
+        if (settingsLink) settingsLink.style.display = 'flex';
     } else {
         // Guest (not logged in)
         container.innerHTML = `
@@ -85,6 +137,7 @@ function refreshAuthHeader() {
             </a>
         `;
         if (adminLink) adminLink.style.display = 'none';
+        if (settingsLink) settingsLink.style.display = 'none';
     }
 
     if (window.lucide) {
@@ -96,6 +149,9 @@ function refreshAuthHeader() {
 function router() {
     const appContainer = document.getElementById('app');
     const hash = window.location.hash || '#home';
+    
+    // Close hamburger menu on navigation
+    toggleMenu(false);
     
     // Smooth transition effect: fade out current view
     appContainer.style.opacity = '0';
@@ -155,7 +211,22 @@ function router() {
             } else {
                 renderError(appContainer, 'Track View not loaded');
             }
-        } 
+        }
+        else if (hash === '#settings') {
+            // Protected Route: Check if user is logged in
+            const session = getSession();
+            if (!session) {
+                window.location.hash = '#login';
+                return;
+            }
+            
+            updateActiveNav('nav-settings-link');
+            if (window.settingsView) {
+                window.settingsView.render(appContainer);
+            } else {
+                renderError(appContainer, 'Settings View not loaded');
+            }
+        }
         else if (hash === '#admin') {
             // Protected Route: Check if user is logged in as admin
             const session = getSession();
@@ -194,7 +265,7 @@ function router() {
 
 // Helper: Highlight active nav link
 function updateActiveNav(activeId) {
-    const navLinks = ['nav-home-link', 'nav-track-link', 'nav-admin-link'];
+    const navLinks = ['nav-home-link', 'nav-track-link', 'nav-admin-link', 'nav-settings-link'];
     navLinks.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -247,6 +318,9 @@ function init() {
     window.getSession = getSession;
     window.refreshAuthHeader = refreshAuthHeader;
     
+    // Initialize hamburger menu
+    initHamburger();
+    
     // Listen for hash changes
     window.addEventListener('hashchange', router);
     
@@ -257,7 +331,7 @@ function init() {
     // Initial load for header auth state
     refreshAuthHeader();
 
-    console.log("ZakiTopup SPA Initialized.");
+    console.log("ZakiTopup SPA Initialized — Galaxy Edition 🌌");
 }
 
 // Start application

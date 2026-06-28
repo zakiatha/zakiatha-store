@@ -221,101 +221,219 @@ function initDefaultDB() {
                     { id: 'email', label: 'Alamat Email Penerima', placeholder: 'Contoh: budi@gmail.com', type: 'text', required: true }
                 ],
                 isActive: true
+            },
+            // --- KATEGORI E-WALLET ---
+            {
+                id: 'g-shopeepay',
+                name: 'ShopeePay',
+                slug: 'shopeepay',
+                category: 'ewallet',
+                logo: 'shopeepay.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo ShopeePay instan. Masukkan nomor HP yang terdaftar di akun Shopee Anda, pilih nominal, dan saldo akan langsung masuk.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP ShopeePay', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
+            },
+            {
+                id: 'g-dana',
+                name: 'DANA',
+                slug: 'dana',
+                category: 'ewallet',
+                logo: 'dana.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo DANA instan dan murah. Masukkan nomor HP terdaftar di DANA Anda.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP DANA', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
+            },
+            {
+                id: 'g-gopay',
+                name: 'GoPay',
+                slug: 'gopay',
+                category: 'ewallet',
+                logo: 'gopay.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo GoPay instan. Masukkan nomor HP yang terdaftar di akun Gojek Anda.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP GoPay', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
+            },
+            {
+                id: 'g-ovo',
+                name: 'OVO',
+                slug: 'ovo',
+                category: 'ewallet',
+                logo: 'ovo.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo OVO instan dan terpercaya. Masukkan nomor HP yang terdaftar di OVO Anda.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP OVO', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
+            },
+            {
+                id: 'g-grabpay',
+                name: 'GrabPay',
+                slug: 'grabpay',
+                category: 'ewallet',
+                logo: 'grabpay.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo GrabPay / OVO (via Grab) instan. Masukkan nomor HP terdaftar di Grab Anda.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP Grab', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
+            },
+            {
+                id: 'g-sakuku',
+                name: 'SakuKu',
+                slug: 'sakuku',
+                category: 'ewallet',
+                logo: 'sakuku.svg',
+                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                description: 'Top up saldo SakuKu (BCA) instan. Masukkan nomor HP terdaftar di SakuKu Anda.',
+                fields: [
+                    { id: 'phone', label: 'Nomor HP SakuKu', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
+                ],
+                isActive: true
             }
         ],
         products: [
+            // ===== BUYER_SKU_CODE is used for Digiflazz API integration =====
             // Mobile Legends
-            { id: 'p-ml-5', gameId: 'g-mlbb', name: '5 Diamonds', price: 1500, originalPrice: 2000, isPopular: false, isActive: true },
-            { id: 'p-ml-12', gameId: 'g-mlbb', name: '12 Diamonds', price: 3500, originalPrice: 4000, isPopular: false, isActive: true },
-            { id: 'p-ml-50', gameId: 'g-mlbb', name: '50 Diamonds', price: 14000, originalPrice: 16000, isPopular: false, isActive: true },
-            { id: 'p-ml-86', gameId: 'g-mlbb', name: '86 Diamonds', price: 20000, originalPrice: 24000, isPopular: false, isActive: true },
-            { id: 'p-ml-wdp', gameId: 'g-mlbb', name: 'Weekly Diamond Pass', price: 28000, originalPrice: 32000, isPopular: true, isActive: true },
-            { id: 'p-ml-257', gameId: 'g-mlbb', name: '257 Diamonds (234 + 23 Bonus)', price: 60000, originalPrice: 70000, isPopular: false, isActive: true },
-            { id: 'p-ml-706', gameId: 'g-mlbb', name: '706 Diamonds (625 + 81 Bonus)', price: 165000, originalPrice: 180000, isPopular: true, isActive: true },
+            { id: 'p-ml-5', gameId: 'g-mlbb', name: '5 Diamonds', price: 1500, originalPrice: 2000, isPopular: false, isActive: true, buyer_sku_code: 'ml5' },
+            { id: 'p-ml-12', gameId: 'g-mlbb', name: '12 Diamonds', price: 3500, originalPrice: 4000, isPopular: false, isActive: true, buyer_sku_code: 'ml12' },
+            { id: 'p-ml-50', gameId: 'g-mlbb', name: '50 Diamonds', price: 14000, originalPrice: 16000, isPopular: false, isActive: true, buyer_sku_code: 'ml50' },
+            { id: 'p-ml-86', gameId: 'g-mlbb', name: '86 Diamonds', price: 20000, originalPrice: 24000, isPopular: false, isActive: true, buyer_sku_code: 'ml86' },
+            { id: 'p-ml-wdp', gameId: 'g-mlbb', name: 'Weekly Diamond Pass', price: 28000, originalPrice: 32000, isPopular: true, isActive: true, buyer_sku_code: 'mlwdp' },
+            { id: 'p-ml-257', gameId: 'g-mlbb', name: '257 Diamonds (234 + 23 Bonus)', price: 60000, originalPrice: 70000, isPopular: false, isActive: true, buyer_sku_code: 'ml257' },
+            { id: 'p-ml-706', gameId: 'g-mlbb', name: '706 Diamonds (625 + 81 Bonus)', price: 165000, originalPrice: 180000, isPopular: true, isActive: true, buyer_sku_code: 'ml706' },
             
             // Free Fire
-            { id: 'p-ff-5', gameId: 'g-ff', name: '5 Diamonds', price: 1000, originalPrice: 1500, isPopular: false, isActive: true },
-            { id: 'p-ff-12', gameId: 'g-ff', name: '12 Diamonds', price: 2000, originalPrice: 2500, isPopular: false, isActive: true },
-            { id: 'p-ff-50', gameId: 'g-ff', name: '50 Diamonds', price: 7000, originalPrice: 9000, isPopular: false, isActive: true },
-            { id: 'p-ff-70', gameId: 'g-ff', name: '70 Diamonds', price: 10000, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-ff-140', gameId: 'g-ff', name: '140 Diamonds', price: 19000, originalPrice: 22000, isPopular: false, isActive: true },
-            { id: 'p-ff-355', gameId: 'g-ff', name: '355 Diamonds', price: 47000, originalPrice: 55000, isPopular: true, isActive: true },
-            { id: 'p-ff-720', gameId: 'g-ff', name: '720 Diamonds', price: 95000, originalPrice: 110000, isPopular: true, isActive: true },
+            { id: 'p-ff-5', gameId: 'g-ff', name: '5 Diamonds', price: 1000, originalPrice: 1500, isPopular: false, isActive: true, buyer_sku_code: 'ff5' },
+            { id: 'p-ff-12', gameId: 'g-ff', name: '12 Diamonds', price: 2000, originalPrice: 2500, isPopular: false, isActive: true, buyer_sku_code: 'ff12' },
+            { id: 'p-ff-50', gameId: 'g-ff', name: '50 Diamonds', price: 7000, originalPrice: 9000, isPopular: false, isActive: true, buyer_sku_code: 'ff50' },
+            { id: 'p-ff-70', gameId: 'g-ff', name: '70 Diamonds', price: 10000, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'ff70' },
+            { id: 'p-ff-140', gameId: 'g-ff', name: '140 Diamonds', price: 19000, originalPrice: 22000, isPopular: false, isActive: true, buyer_sku_code: 'ff140' },
+            { id: 'p-ff-355', gameId: 'g-ff', name: '355 Diamonds', price: 47000, originalPrice: 55000, isPopular: true, isActive: true, buyer_sku_code: 'ff355' },
+            { id: 'p-ff-720', gameId: 'g-ff', name: '720 Diamonds', price: 95000, originalPrice: 110000, isPopular: true, isActive: true, buyer_sku_code: 'ff720' },
 
             // PUBG Mobile
-            { id: 'p-pubg-60', gameId: 'g-pubg', name: '60 UC', price: 14000, originalPrice: 16000, isPopular: false, isActive: true },
-            { id: 'p-pubg-325', gameId: 'g-pubg', name: '325 UC', price: 69000, originalPrice: 79000, isPopular: true, isActive: true },
-            { id: 'p-pubg-660', gameId: 'g-pubg', name: '660 UC', price: 139000, originalPrice: 155000, isPopular: false, isActive: true },
-            { id: 'p-pubg-1800', gameId: 'g-pubg', name: '1800 UC', price: 349000, originalPrice: 399000, isPopular: true, isActive: true },
+            { id: 'p-pubg-60', gameId: 'g-pubg', name: '60 UC', price: 14000, originalPrice: 16000, isPopular: false, isActive: true, buyer_sku_code: 'pubg60' },
+            { id: 'p-pubg-325', gameId: 'g-pubg', name: '325 UC', price: 69000, originalPrice: 79000, isPopular: true, isActive: true, buyer_sku_code: 'pubg325' },
+            { id: 'p-pubg-660', gameId: 'g-pubg', name: '660 UC', price: 139000, originalPrice: 155000, isPopular: false, isActive: true, buyer_sku_code: 'pubg660' },
+            { id: 'p-pubg-1800', gameId: 'g-pubg', name: '1800 UC', price: 349000, originalPrice: 399000, isPopular: true, isActive: true, buyer_sku_code: 'pubg1800' },
 
             // Valorant
-            { id: 'p-val-125', gameId: 'g-valorant', name: '125 Points', price: 15000, originalPrice: 18000, isPopular: false, isActive: true },
-            { id: 'p-val-375', gameId: 'g-valorant', name: '375 Points', price: 45000, originalPrice: 50000, isPopular: false, isActive: true },
-            { id: 'p-val-700', gameId: 'g-valorant', name: '700 Points', price: 79000, originalPrice: 85000, isPopular: false, isActive: true },
-            { id: 'p-val-1375', gameId: 'g-valorant', name: '1375 Points', price: 149000, originalPrice: 165000, isPopular: true, isActive: true },
-            { id: 'p-val-2400', gameId: 'g-valorant', name: '2400 Points', price: 249000, originalPrice: 280000, isPopular: true, isActive: true },
+            { id: 'p-val-125', gameId: 'g-valorant', name: '125 Points', price: 15000, originalPrice: 18000, isPopular: false, isActive: true, buyer_sku_code: 'val125' },
+            { id: 'p-val-375', gameId: 'g-valorant', name: '375 Points', price: 45000, originalPrice: 50000, isPopular: false, isActive: true, buyer_sku_code: 'val375' },
+            { id: 'p-val-700', gameId: 'g-valorant', name: '700 Points', price: 79000, originalPrice: 85000, isPopular: false, isActive: true, buyer_sku_code: 'val700' },
+            { id: 'p-val-1375', gameId: 'g-valorant', name: '1375 Points', price: 149000, originalPrice: 165000, isPopular: true, isActive: true, buyer_sku_code: 'val1375' },
+            { id: 'p-val-2400', gameId: 'g-valorant', name: '2400 Points', price: 249000, originalPrice: 280000, isPopular: true, isActive: true, buyer_sku_code: 'val2400' },
 
             // Genshin Impact
-            { id: 'p-gen-60', gameId: 'g-genshin', name: '60 Genesis Crystals', price: 15000, originalPrice: 16500, isPopular: false, isActive: true },
-            { id: 'p-gen-300', gameId: 'g-genshin', name: '300 Crystals', price: 75000, originalPrice: 79000, isPopular: false, isActive: true },
-            { id: 'p-gen-welkin', gameId: 'g-genshin', name: 'Blessing of the Welkin Moon', price: 79000, originalPrice: 89000, isPopular: true, isActive: true },
-            { id: 'p-gen-980', gameId: 'g-genshin', name: '980 Genesis Crystals', price: 220000, originalPrice: 249000, isPopular: false, isActive: true },
-            { id: 'p-gen-1980', gameId: 'g-genshin', name: '1980 Genesis Crystals', price: 439000, originalPrice: 489000, isPopular: true, isActive: true },
+            { id: 'p-gen-60', gameId: 'g-genshin', name: '60 Genesis Crystals', price: 15000, originalPrice: 16500, isPopular: false, isActive: true, buyer_sku_code: 'gen60' },
+            { id: 'p-gen-300', gameId: 'g-genshin', name: '300 Crystals', price: 75000, originalPrice: 79000, isPopular: false, isActive: true, buyer_sku_code: 'gen300' },
+            { id: 'p-gen-welkin', gameId: 'g-genshin', name: 'Blessing of the Welkin Moon', price: 79000, originalPrice: 89000, isPopular: true, isActive: true, buyer_sku_code: 'genwelkin' },
+            { id: 'p-gen-980', gameId: 'g-genshin', name: '980 Genesis Crystals', price: 220000, originalPrice: 249000, isPopular: false, isActive: true, buyer_sku_code: 'gen980' },
+            { id: 'p-gen-1980', gameId: 'g-genshin', name: '1980 Genesis Crystals', price: 439000, originalPrice: 489000, isPopular: true, isActive: true, buyer_sku_code: 'gen1980' },
 
             // Steam Wallet
-            { id: 'p-steam-12', gameId: 'g-steam', name: 'Steam Wallet IDR 12.000', price: 15000, originalPrice: 16000, isPopular: false, isActive: true },
-            { id: 'p-steam-45', gameId: 'g-steam', name: 'Steam Wallet IDR 45.000', price: 52000, originalPrice: 56000, isPopular: false, isActive: true },
-            { id: 'p-steam-60', gameId: 'g-steam', name: 'Steam Wallet IDR 60.000', price: 69000, originalPrice: 75000, isPopular: true, isActive: true },
-            { id: 'p-steam-120', gameId: 'g-steam', name: 'Steam Wallet IDR 120.000', price: 135000, originalPrice: 145000, isPopular: true, isActive: true },
+            { id: 'p-steam-12', gameId: 'g-steam', name: 'Steam Wallet IDR 12.000', price: 15000, originalPrice: 16000, isPopular: false, isActive: true, buyer_sku_code: 'steam12' },
+            { id: 'p-steam-45', gameId: 'g-steam', name: 'Steam Wallet IDR 45.000', price: 52000, originalPrice: 56000, isPopular: false, isActive: true, buyer_sku_code: 'steam45' },
+            { id: 'p-steam-60', gameId: 'g-steam', name: 'Steam Wallet IDR 60.000', price: 69000, originalPrice: 75000, isPopular: true, isActive: true, buyer_sku_code: 'steam60' },
+            { id: 'p-steam-120', gameId: 'g-steam', name: 'Steam Wallet IDR 120.000', price: 135000, originalPrice: 145000, isPopular: true, isActive: true, buyer_sku_code: 'steam120' },
 
             // Pulsa Nominals (XL, Axis, By.U, Telkomsel, Smartfren, Indosat share these nominal prices)
             // XL
-            { id: 'p-xl-5', gameId: 'g-xl', name: 'Pulsa XL Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-xl-10', gameId: 'g-xl', name: 'Pulsa XL Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-xl-25', gameId: 'g-xl', name: 'Pulsa XL Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-xl-50', gameId: 'g-xl', name: 'Pulsa XL Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-xl-100', gameId: 'g-xl', name: 'Pulsa XL Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-xl-5', gameId: 'g-xl', name: 'Pulsa XL Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'xl5' },
+            { id: 'p-xl-10', gameId: 'g-xl', name: 'Pulsa XL Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'xl10' },
+            { id: 'p-xl-25', gameId: 'g-xl', name: 'Pulsa XL Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'xl25' },
+            { id: 'p-xl-50', gameId: 'g-xl', name: 'Pulsa XL Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'xl50' },
+            { id: 'p-xl-100', gameId: 'g-xl', name: 'Pulsa XL Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'xl100' },
 
             // Axis
-            { id: 'p-ax-5', gameId: 'g-axis', name: 'Pulsa Axis Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-ax-10', gameId: 'g-axis', name: 'Pulsa Axis Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-ax-25', gameId: 'g-axis', name: 'Pulsa Axis Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-ax-50', gameId: 'g-axis', name: 'Pulsa Axis Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-ax-100', gameId: 'g-axis', name: 'Pulsa Axis Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-ax-5', gameId: 'g-axis', name: 'Pulsa Axis Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'ax5' },
+            { id: 'p-ax-10', gameId: 'g-axis', name: 'Pulsa Axis Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'ax10' },
+            { id: 'p-ax-25', gameId: 'g-axis', name: 'Pulsa Axis Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'ax25' },
+            { id: 'p-ax-50', gameId: 'g-axis', name: 'Pulsa Axis Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'ax50' },
+            { id: 'p-ax-100', gameId: 'g-axis', name: 'Pulsa Axis Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'ax100' },
 
             // By.U
-            { id: 'p-byu-5', gameId: 'g-byu', name: 'Pulsa by.U Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-byu-10', gameId: 'g-byu', name: 'Pulsa by.U Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-byu-25', gameId: 'g-byu', name: 'Pulsa by.U Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-byu-50', gameId: 'g-byu', name: 'Pulsa by.U Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-byu-100', gameId: 'g-byu', name: 'Pulsa by.U Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-byu-5', gameId: 'g-byu', name: 'Pulsa by.U Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'byu5' },
+            { id: 'p-byu-10', gameId: 'g-byu', name: 'Pulsa by.U Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'byu10' },
+            { id: 'p-byu-25', gameId: 'g-byu', name: 'Pulsa by.U Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'byu25' },
+            { id: 'p-byu-50', gameId: 'g-byu', name: 'Pulsa by.U Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'byu50' },
+            { id: 'p-byu-100', gameId: 'g-byu', name: 'Pulsa by.U Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'byu100' },
 
             // Telkomsel
-            { id: 'p-ts-5', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-ts-10', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-ts-25', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-ts-50', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-ts-100', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-ts-5', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'ts5' },
+            { id: 'p-ts-10', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'ts10' },
+            { id: 'p-ts-25', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'ts25' },
+            { id: 'p-ts-50', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 5.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'ts50' },
+            { id: 'p-ts-100', gameId: 'g-telkomsel', name: 'Pulsa Telkomsel Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'ts100' },
 
             // Smartfren
-            { id: 'p-sf-5', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-sf-10', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-sf-25', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-sf-50', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-sf-100', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-sf-5', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'sf5' },
+            { id: 'p-sf-10', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'sf10' },
+            { id: 'p-sf-25', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'sf25' },
+            { id: 'p-sf-50', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'sf50' },
+            { id: 'p-sf-100', gameId: 'g-smartfren', name: 'Pulsa Smartfren Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'sf100' },
 
             // Indosat
-            { id: 'p-ind-5', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true },
-            { id: 'p-ind-10', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true },
-            { id: 'p-ind-25', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true },
-            { id: 'p-ind-50', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true },
-            { id: 'p-ind-100', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true },
+            { id: 'p-ind-5', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 5.000', price: 6000, originalPrice: 7000, isPopular: false, isActive: true, buyer_sku_code: 'ind5' },
+            { id: 'p-ind-10', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 10.000', price: 11200, originalPrice: 12000, isPopular: false, isActive: true, buyer_sku_code: 'ind10' },
+            { id: 'p-ind-25', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 25.000', price: 26000, originalPrice: 27000, isPopular: true, isActive: true, buyer_sku_code: 'ind25' },
+            { id: 'p-ind-50', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 50.000', price: 50800, originalPrice: 52000, isPopular: false, isActive: true, buyer_sku_code: 'ind50' },
+            { id: 'p-ind-100', gameId: 'g-indosat', name: 'Pulsa Indosat Rp 100.000', price: 99500, originalPrice: 102000, isPopular: true, isActive: true, buyer_sku_code: 'ind100' },
 
             // Google Play Voucher
-            { id: 'p-gp-20', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 20.000', price: 22000, originalPrice: 25000, isPopular: false, isActive: true },
-            { id: 'p-gp-50', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 50.000', price: 53500, originalPrice: 59000, isPopular: false, isActive: true },
-            { id: 'p-gp-100', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 100.000', price: 105000, originalPrice: 115000, isPopular: true, isActive: true },
-            { id: 'p-gp-200', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 200.000', price: 208000, originalPrice: 220000, isPopular: true, isActive: true }
+            { id: 'p-gp-20', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 20.000', price: 22000, originalPrice: 25000, isPopular: false, isActive: true, buyer_sku_code: 'gp20' },
+            { id: 'p-gp-50', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 50.000', price: 53500, originalPrice: 59000, isPopular: false, isActive: true, buyer_sku_code: 'gp50' },
+            { id: 'p-gp-100', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 100.000', price: 105000, originalPrice: 115000, isPopular: true, isActive: true, buyer_sku_code: 'gp100' },
+            { id: 'p-gp-200', gameId: 'g-googleplay', name: 'Google Play Gift Card Rp 200.000', price: 208000, originalPrice: 220000, isPopular: true, isActive: true, buyer_sku_code: 'gp200' },
+
+            // === E-WALLET PRODUCTS ===
+            // ShopeePay
+            { id: 'p-spay-25', gameId: 'g-shopeepay', name: 'ShopeePay Rp 25.000', price: 26000, originalPrice: 27500, isPopular: false, isActive: true, buyer_sku_code: 'spay25' },
+            { id: 'p-spay-50', gameId: 'g-shopeepay', name: 'ShopeePay Rp 50.000', price: 51000, originalPrice: 53000, isPopular: true, isActive: true, buyer_sku_code: 'spay50' },
+            { id: 'p-spay-100', gameId: 'g-shopeepay', name: 'ShopeePay Rp 100.000', price: 101000, originalPrice: 105000, isPopular: false, isActive: true, buyer_sku_code: 'spay100' },
+            { id: 'p-spay-200', gameId: 'g-shopeepay', name: 'ShopeePay Rp 200.000', price: 201000, originalPrice: 210000, isPopular: true, isActive: true, buyer_sku_code: 'spay200' },
+            { id: 'p-spay-500', gameId: 'g-shopeepay', name: 'ShopeePay Rp 500.000', price: 501000, originalPrice: 520000, isPopular: false, isActive: true, buyer_sku_code: 'spay500' },
+            // DANA
+            { id: 'p-dana-25', gameId: 'g-dana', name: 'DANA Rp 25.000', price: 26000, originalPrice: 27500, isPopular: false, isActive: true, buyer_sku_code: 'dana25' },
+            { id: 'p-dana-50', gameId: 'g-dana', name: 'DANA Rp 50.000', price: 51000, originalPrice: 53000, isPopular: true, isActive: true, buyer_sku_code: 'dana50' },
+            { id: 'p-dana-100', gameId: 'g-dana', name: 'DANA Rp 100.000', price: 101000, originalPrice: 105000, isPopular: false, isActive: true, buyer_sku_code: 'dana100' },
+            { id: 'p-dana-200', gameId: 'g-dana', name: 'DANA Rp 200.000', price: 201000, originalPrice: 210000, isPopular: true, isActive: true, buyer_sku_code: 'dana200' },
+            { id: 'p-dana-500', gameId: 'g-dana', name: 'DANA Rp 500.000', price: 501000, originalPrice: 520000, isPopular: false, isActive: true, buyer_sku_code: 'dana500' },
+            // GoPay
+            { id: 'p-gopay-25', gameId: 'g-gopay', name: 'GoPay Rp 25.000', price: 26000, originalPrice: 27500, isPopular: false, isActive: true, buyer_sku_code: 'gopay25' },
+            { id: 'p-gopay-50', gameId: 'g-gopay', name: 'GoPay Rp 50.000', price: 51000, originalPrice: 53000, isPopular: true, isActive: true, buyer_sku_code: 'gopay50' },
+            { id: 'p-gopay-100', gameId: 'g-gopay', name: 'GoPay Rp 100.000', price: 101000, originalPrice: 105000, isPopular: false, isActive: true, buyer_sku_code: 'gopay100' },
+            { id: 'p-gopay-200', gameId: 'g-gopay', name: 'GoPay Rp 200.000', price: 201000, originalPrice: 210000, isPopular: true, isActive: true, buyer_sku_code: 'gopay200' },
+            { id: 'p-gopay-500', gameId: 'g-gopay', name: 'GoPay Rp 500.000', price: 501000, originalPrice: 520000, isPopular: false, isActive: true, buyer_sku_code: 'gopay500' },
+            // OVO
+            { id: 'p-ovo-25', gameId: 'g-ovo', name: 'OVO Rp 25.000', price: 26000, originalPrice: 27500, isPopular: false, isActive: true, buyer_sku_code: 'ovo25' },
+            { id: 'p-ovo-50', gameId: 'g-ovo', name: 'OVO Rp 50.000', price: 51000, originalPrice: 53000, isPopular: true, isActive: true, buyer_sku_code: 'ovo50' },
+            { id: 'p-ovo-100', gameId: 'g-ovo', name: 'OVO Rp 100.000', price: 101000, originalPrice: 105000, isPopular: false, isActive: true, buyer_sku_code: 'ovo100' },
+            { id: 'p-ovo-200', gameId: 'g-ovo', name: 'OVO Rp 200.000', price: 201000, originalPrice: 210000, isPopular: true, isActive: true, buyer_sku_code: 'ovo200' },
+            { id: 'p-ovo-500', gameId: 'g-ovo', name: 'OVO Rp 500.000', price: 501000, originalPrice: 520000, isPopular: false, isActive: true, buyer_sku_code: 'ovo500' },
+            // GrabPay
+            { id: 'p-grab-25', gameId: 'g-grabpay', name: 'GrabPay Rp 25.000', price: 26000, originalPrice: 27500, isPopular: false, isActive: true, buyer_sku_code: 'grab25' },
+            { id: 'p-grab-50', gameId: 'g-grabpay', name: 'GrabPay Rp 50.000', price: 51000, originalPrice: 53000, isPopular: true, isActive: true, buyer_sku_code: 'grab50' },
+            { id: 'p-grab-100', gameId: 'g-grabpay', name: 'GrabPay Rp 100.000', price: 101000, originalPrice: 105000, isPopular: false, isActive: true, buyer_sku_code: 'grab100' },
+            { id: 'p-grab-200', gameId: 'g-grabpay', name: 'GrabPay Rp 200.000', price: 201000, originalPrice: 210000, isPopular: true, isActive: true, buyer_sku_code: 'grab200' },
+            { id: 'p-grab-500', gameId: 'g-grabpay', name: 'GrabPay Rp 500.000', price: 501000, originalPrice: 520000, isPopular: false, isActive: true, buyer_sku_code: 'grab500' },
+            // SakuKu
+            { id: 'p-saku-25', gameId: 'g-sakuku', name: 'SakuKu Rp 25.000', price: 26500, originalPrice: 28000, isPopular: false, isActive: true, buyer_sku_code: 'saku25' },
+            { id: 'p-saku-50', gameId: 'g-sakuku', name: 'SakuKu Rp 50.000', price: 51500, originalPrice: 54000, isPopular: true, isActive: true, buyer_sku_code: 'saku50' },
+            { id: 'p-saku-100', gameId: 'g-sakuku', name: 'SakuKu Rp 100.000', price: 101500, originalPrice: 106000, isPopular: false, isActive: true, buyer_sku_code: 'saku100' },
+            { id: 'p-saku-200', gameId: 'g-sakuku', name: 'SakuKu Rp 200.000', price: 202000, originalPrice: 212000, isPopular: true, isActive: true, buyer_sku_code: 'saku200' },
+            { id: 'p-saku-500', gameId: 'g-sakuku', name: 'SakuKu Rp 500.000', price: 503000, originalPrice: 525000, isPopular: false, isActive: true, buyer_sku_code: 'saku500' }
         ],
         paymentMethods: [
             { id: 'pm-qris', name: 'QRIS', code: 'QRIS', type: 'qris', feeType: 'percent', feeValue: 0, isActive: true, info: 'Bayar instan via GoPay, Dana, OVO, LinkAja, ShopeePay' },
@@ -331,11 +449,15 @@ function initDefaultDB() {
         ],
         transactions: [],
         apiConfig: {
-            apiUrl: 'https://api.reseller-topup.com/v1',
-            apiKey: 'ZAKI_TRX_9281',
-            secretKey: 'd3v_s3cr3t_2026',
+            // Digiflazz API Configuration
+            apiUrl: 'https://api.digiflazz.com/v1',
+            username: '',
+            apiKey: '',
+            webhookUrl: '',
+            isTestMode: true,
+            // Simulated provider data
             balance: 7500000,
-            providerName: 'Digiflazz Reseller SDK'
+            providerName: 'Digiflazz'
         },
         apiLogs: []
     };
@@ -414,6 +536,54 @@ const dbService = {
         return 0;
     },
 
+    // --- USER PROFILE OPERATIONS ---
+    updateUserProfile: function(currentUsername, newData) {
+        const db = getDB();
+        const userIndex = db.users.findIndex(u => u.username.toLowerCase() === currentUsername.toLowerCase());
+        if (userIndex === -1) return { success: false, message: 'User tidak ditemukan.' };
+
+        // Check uniqueness if username/email changed
+        const otherUsers = db.users.filter((u, i) => i !== userIndex);
+        if (newData.username && otherUsers.some(u => u.username.toLowerCase() === newData.username.toLowerCase())) {
+            return { success: false, message: 'Username sudah digunakan oleh akun lain!' };
+        }
+        if (newData.gmail && otherUsers.some(u => u.gmail.toLowerCase() === newData.gmail.toLowerCase())) {
+            return { success: false, message: 'Email sudah digunakan oleh akun lain!' };
+        }
+
+        if (newData.username) db.users[userIndex].username = newData.username;
+        if (newData.gmail) db.users[userIndex].gmail = newData.gmail;
+        if (newData.phone !== undefined) db.users[userIndex].phone = newData.phone;
+
+        saveDB(db);
+        return { success: true, user: db.users[userIndex] };
+    },
+
+    changePassword: function(username, currentPassword, newPassword) {
+        const db = getDB();
+        const userIndex = db.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+        if (userIndex === -1) return { success: false, message: 'User tidak ditemukan.' };
+
+        if (db.users[userIndex].password !== currentPassword) {
+            return { success: false, message: 'Password saat ini salah!' };
+        }
+
+        if (newPassword.length < 6) {
+            return { success: false, message: 'Password baru minimal 6 karakter!' };
+        }
+
+        db.users[userIndex].password = newPassword;
+        saveDB(db);
+        return { success: true, message: 'Password berhasil diubah.' };
+    },
+
+    deleteAccount: function(username) {
+        const db = getDB();
+        db.users = db.users.filter(u => u.username.toLowerCase() !== username.toLowerCase());
+        saveDB(db);
+        return true;
+    },
+
     // --- GAME CATALOG OPERATIONS ---
     getGames: function(includeInactive = false) {
         const db = getDB();
@@ -469,6 +639,19 @@ const dbService = {
 
     saveProduct: function(productData) {
         const db = getDB();
+        
+        // Uniqueness validation for buyer_sku_code
+        if (productData.buyer_sku_code) {
+            const duplicate = db.products.find(p => 
+                p.id !== productData.id && 
+                p.buyer_sku_code && 
+                p.buyer_sku_code.toLowerCase() === productData.buyer_sku_code.toLowerCase()
+            );
+            if (duplicate) {
+                return { success: false, message: `Kode SKU "${productData.buyer_sku_code}" sudah digunakan oleh produk lain!` };
+            }
+        }
+
         const index = db.products.findIndex(p => p.id === productData.id);
         
         if (index > -1) {
@@ -484,7 +667,7 @@ const dbService = {
             db.products.push(newProduct);
         }
         saveDB(db);
-        return true;
+        return { success: true };
     },
 
     deleteProduct: function(id) {
@@ -571,28 +754,37 @@ const dbService = {
             }
         }
 
-        // Tulis log API Outgoing untuk simulasi koneksi 3rd party
+        // Tulis log API Outgoing untuk simulasi koneksi 3rd party (Digiflazz)
+        const product = db.products.find(p => p.id === txData.productId);
+        const buyerSku = product ? product.buyer_sku_code : 'unknown';
+        const customerNo = Object.values(txData.accountData).join('');
+        
         const logReq = {
-            api_key: db.apiConfig.apiKey,
+            username: db.apiConfig.username || 'zakitopup_reseller',
+            buyer_sku_code: buyerSku,
+            customer_no: customerNo,
             ref_id: invoiceId,
-            buyer_phone: txData.whatsapp,
-            game_code: txData.gameId,
-            product_code: txData.productId,
-            account_data: txData.accountData,
-            timestamp: now.toISOString()
+            sign: 'simulated_md5_hash_of_credentials_and_' + invoiceId
         };
         const logResp = {
-            status: 'RECEIVED',
-            message: 'Transaction successfully queued on provider server.',
-            provider_ref_id: '3RD-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-            balance_remaining: db.apiConfig.balance - txData.basePrice
+            data: {
+                ref_id: invoiceId,
+                buyer_sku_code: buyerSku,
+                customer_no: customerNo,
+                status: 'Pengisian dalam Proses',
+                rc: '39',
+                sn: '',
+                price: txData.basePrice,
+                message: 'PROSES',
+                balance: db.apiConfig.balance - txData.basePrice
+            }
         };
         
         // Simpan log API
         if (!db.apiLogs) db.apiLogs = [];
         db.apiLogs.unshift({
             timestamp: now.toISOString(),
-            action: `CREATE_TRX_OUTGOING`,
+            action: `DIGIFLAZZ_TRX_POST`,
             request: JSON.stringify(logReq, null, 2),
             response: JSON.stringify(logResp, null, 2)
         });
@@ -614,21 +806,32 @@ const dbService = {
             const oldStatus = tx.status;
             tx.status = status;
 
-            // Log callback webhook dari API 3rd party
+            // Log callback webhook dari API 3rd party (Digiflazz Webhook)
+            const product = db.products.find(p => p.id === tx.productId);
+            const buyerSku = product ? product.buyer_sku_code : 'unknown';
+            const customerNo = Object.values(tx.accountData).join('');
+            
             const logReq = {
-                callback_token: 'secure_webhook_token_abc123',
-                invoice_id: tx.invoiceId,
-                status: status,
-                updated_at: new Date().toISOString()
+                data: {
+                    ref_id: tx.invoiceId,
+                    buyer_sku_code: buyerSku,
+                    customer_no: customerNo,
+                    status: status === 'SUCCESS' ? 'Sukses' : 'Gagal',
+                    rc: status === 'SUCCESS' ? '00' : '06',
+                    sn: status === 'SUCCESS' ? Math.floor(100000000 + Math.random() * 900000000).toString() : '',
+                    price: tx.basePrice,
+                    message: status === 'SUCCESS' ? 'Transaksi Sukses' : 'Transaksi Gagal / Batalkan',
+                    sign: 'simulated_md5_hash_callback_' + tx.invoiceId
+                }
             };
             const logResp = {
                 success: true,
-                message: 'Callback received and transaction updated successfully.'
+                message: 'Callback received and transaction updated successfully. Status: ' + status
             };
             if (!db.apiLogs) db.apiLogs = [];
             db.apiLogs.unshift({
                 timestamp: new Date().toISOString(),
-                action: `CALLBACK_INCOMING_${status}`,
+                action: `DIGIFLAZZ_WEBHOOK_CALLBACK_${status}`,
                 request: JSON.stringify(logReq, null, 2),
                 response: JSON.stringify(logResp, null, 2)
             });

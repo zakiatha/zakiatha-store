@@ -1,0 +1,5 @@
+buat layout semua tidak hanya untuk desktop buat jadi para user hp,tab,dan mini tablet bisa di sesuaikan layout nya. dan buat seluruh device muat di dalam semua ukuran nya
+tambahkan juga produk e wallet seperti shoopepay,dana,gopay,ovo,grab dan sakuku dengan section baru 
+lalu buatkan dashboard admin bagian kelola roduk tambahkan kode unik untuk setiap produk yang akan di input manual oleh admin itu sendiri karena setelah integrasi api dengan digiflazz akan di setting setiap produk dengan kode unik sendiri jadi buatkan kotak untuk itu sendiri.
+dan untuk api nya coba anda telaah dan pelajari dari web https://developer.digiflazz.com/ sekiranya apa yang harus di ubah untuk section di web API reseller 3rd party. tambahkan juga menu user setting bagi user yang sudah punya akun dan jika sudah punya akun yang berisikan data pribadi mereka yang sudah di isi melalui registrasi awal.
+dan aku mau tampilan awal website menjadi 3D website agar berbeda dari yang lain dengan mengusung tema galaxy tapi tidak mencolok 

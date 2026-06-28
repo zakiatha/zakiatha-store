@@ -14,6 +14,10 @@
 </head>
 <body>
 
+    <!-- Galaxy Star Particles Background -->
+    <div id="galaxy-stars" aria-hidden="true"></div>
+    <div id="galaxy-nebula" aria-hidden="true"></div>
+
     <!-- Header Navigation -->
     <header>
         <div class="container header-container">
@@ -33,6 +37,14 @@
                 <span class="logo-text">ZakiTopup</span>
             </a>
             
+            <!-- Hamburger Menu Button (Mobile) -->
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Menu" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <!-- Desktop Nav + Mobile Drawer -->
             <nav class="nav-links" id="main-nav-links">
                 <a href="#home" class="nav-btn secondary" id="nav-home-link">
                     <i data-lucide="home" style="width: 16px; height: 16px;"></i>
@@ -42,6 +54,10 @@
                     <i data-lucide="search" style="width: 16px; height: 16px;"></i>
                     <span>Lacak Pesanan</span>
                 </a>
+                <a href="#settings" class="nav-btn secondary" id="nav-settings-link" style="display: none;">
+                    <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+                    <span>Pengaturan</span>
+                </a>
                 <a href="#admin" class="nav-btn primary" id="nav-admin-link" style="display: none;">
                     <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
                     <span>Dashboard Admin</span>
@@ -50,6 +66,9 @@
                     <!-- Dynamically populated buttons -->
                 </div>
             </nav>
+
+            <!-- Mobile Nav Overlay -->
+            <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
         </div>
     </header>
 
@@ -105,6 +124,7 @@
     <script src="js/views/invoice.js"></script>
     <script src="js/views/track.js"></script>
     <script src="js/views/admin.js"></script>
+    <script src="js/views/settings.js"></script>
     
     <!-- Router & Coordinator Script (Must load last) -->
     <script src="js/app.js"></script>
