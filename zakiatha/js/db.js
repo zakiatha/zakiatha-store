@@ -5,12 +5,47 @@ const DB_KEY = 'topup_store_db';
 
 // Helper: Get database from localStorage
 function getDB() {
-    let db = localStorage.getItem(DB_KEY);
-    if (!db) {
-        db = initDefaultDB();
-    } else {
-        db = JSON.parse(db);
+    let dbStr = localStorage.getItem(DB_KEY);
+    if (!dbStr) {
+        const defaultDb = initDefaultDB();
+        localStorage.setItem(DB_KEY, JSON.stringify(defaultDb));
+        return defaultDb;
     }
+    
+    let db = JSON.parse(dbStr);
+    
+    // Migration check: Ensure new default games and products (like E-Wallet) are injected
+    const defaultDb = initDefaultDB();
+    let hasUpdates = false;
+    
+    if (!db.games) db.games = [];
+    if (!db.products) db.products = [];
+    
+    defaultDb.games.forEach(defaultGame => {
+        const exists = db.games.some(g => g.id === defaultGame.id || g.slug === defaultGame.slug);
+        if (!exists) {
+            db.games.push(defaultGame);
+            hasUpdates = true;
+        }
+    });
+    
+    defaultDb.products.forEach(defaultProduct => {
+        const exists = db.products.some(p => p.id === defaultProduct.id);
+        if (!exists) {
+            db.products.push(defaultProduct);
+            hasUpdates = true;
+        }
+    });
+
+    if (!db.apiConfig) {
+        db.apiConfig = defaultDb.apiConfig;
+        hasUpdates = true;
+    }
+    
+    if (hasUpdates) {
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+    }
+    
     return db;
 }
 
