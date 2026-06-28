@@ -482,6 +482,11 @@ const adminView = {
         const usersTableBody = document.getElementById('admin-users-table-body');
         const productGameSelector = document.getElementById('admin-product-game-selector');
         const apiLogsContainer = document.getElementById('api-logs-container');
+        const vouchersTableBody = document.getElementById('admin-voucher-table-body');
+        const voucherFormContainer = document.getElementById('admin-voucher-form-container');
+        const voucherForm = document.getElementById('admin-voucher-form');
+        const btnAddVoucher = document.getElementById('btn-admin-add-voucher');
+        const btnVoucherCancel = document.getElementById('btn-voucher-form-cancel');
         
         // ----------------------------------------------------
         // PANEL RENDER FUNCTIONS
@@ -839,6 +844,107 @@ const adminView = {
             }).join('');
         };
         
+        // --- VOUCHER CRUD PANEL RENDERING ---
+        const drawVouchers = () => {
+            if (!vouchersTableBody) return;
+            const vouchers = window.dbService.getVouchers();
+            
+            vouchersTableBody.innerHTML = vouchers.map(v => {
+                return `
+                    <tr>
+                        <td style="font-weight: 700; font-family: monospace; color: var(--secondary);">${v.code}</td>
+                        <td style="font-size: 13px;">${v.type === 'percent' ? 'Persentase' : 'Nominal Flat'}</td>
+                        <td style="font-weight: 600;">${v.type === 'percent' ? `${v.value}%` : window.formatRupiah(v.value)}</td>
+                        <td>${v.maxUsage} kali</td>
+                        <td style="font-weight: 700;">${v.usageCount} kali</td>
+                        <td>
+                            <span class="badge ${v.isActive ? 'status-success' : 'status-failed'}">${v.isActive ? 'AKTIF' : 'NONAKTIF'}</span>
+                        </td>
+                        <td>
+                            <div class="admin-action-buttons">
+                                <button class="btn-action-small btn-voucher-edit" data-voucher-id="${v.id}">
+                                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                </button>
+                                <button class="btn-action-small danger btn-voucher-delete" data-voucher-id="${v.id}">
+                                    <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Bind Edit events
+            document.querySelectorAll('.btn-voucher-edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-voucher-id');
+                    const v = window.dbService.getVouchers().find(item => item.id === id);
+                    if (v) {
+                        document.getElementById('form-voucher-id').value = v.id;
+                        document.getElementById('form-voucher-code').value = v.code;
+                        document.getElementById('form-voucher-type').value = v.type;
+                        document.getElementById('form-voucher-value').value = v.value;
+                        document.getElementById('form-voucher-max-usage').value = v.maxUsage;
+                        document.getElementById('form-voucher-active').value = String(v.isActive);
+                        
+                        document.getElementById('voucher-form-title').textContent = 'Edit Voucher';
+                        voucherFormContainer.style.display = 'block';
+                        voucherFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            });
+
+            // Bind Delete events
+            document.querySelectorAll('.btn-voucher-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-voucher-id');
+                    if (confirm('Apakah Anda yakin ingin menghapus voucher ini?')) {
+                        window.dbService.deleteVoucher(id);
+                        drawVouchers();
+                    }
+                });
+            });
+
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        if (btnAddVoucher) {
+            btnAddVoucher.addEventListener('click', () => {
+                voucherForm.reset();
+                document.getElementById('form-voucher-id').value = '';
+                document.getElementById('voucher-form-title').textContent = 'Tambah Voucher Baru';
+                voucherFormContainer.style.display = voucherFormContainer.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        if (btnVoucherCancel) {
+            btnVoucherCancel.addEventListener('click', () => {
+                voucherFormContainer.style.display = 'none';
+            });
+        }
+
+        if (voucherForm) {
+            voucherForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const vData = {
+                    id: document.getElementById('form-voucher-id').value || undefined,
+                    code: document.getElementById('form-voucher-code').value.trim().toUpperCase(),
+                    type: document.getElementById('form-voucher-type').value,
+                    value: parseInt(document.getElementById('form-voucher-value').value),
+                    maxUsage: parseInt(document.getElementById('form-voucher-max-usage').value),
+                    isActive: document.getElementById('form-voucher-active').value === 'true'
+                };
+
+                const result = window.dbService.saveVoucher(vData);
+                if (result.success) {
+                    voucherFormContainer.style.display = 'none';
+                    drawVouchers();
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
         // ----------------------------------------------------
         // EXECUTE INITIAL DRAWS
         // ----------------------------------------------------
@@ -847,6 +953,7 @@ const adminView = {
         drawProducts();
         drawPayments();
         drawUsers();
+        drawVouchers();
         drawApiLogs();
         
         // ----------------------------------------------------
@@ -965,112 +1072,7 @@ const adminView = {
             drawProducts();
         });
 
-        // --- VOUCHER CRUD PANEL RENDERING ---
-        const vouchersTableBody = document.getElementById('admin-voucher-table-body');
-        const voucherFormContainer = document.getElementById('admin-voucher-form-container');
-        const voucherForm = document.getElementById('admin-voucher-form');
-        const btnAddVoucher = document.getElementById('btn-admin-add-voucher');
-        const btnVoucherCancel = document.getElementById('btn-voucher-form-cancel');
 
-        const drawVouchers = () => {
-            if (!vouchersTableBody) return;
-            const vouchers = window.dbService.getVouchers();
-            
-            vouchersTableBody.innerHTML = vouchers.map(v => {
-                return `
-                    <tr>
-                        <td style="font-weight: 700; font-family: monospace; color: var(--secondary);">${v.code}</td>
-                        <td style="font-size: 13px;">${v.type === 'percent' ? 'Persentase' : 'Nominal Flat'}</td>
-                        <td style="font-weight: 600;">${v.type === 'percent' ? `${v.value}%` : window.formatRupiah(v.value)}</td>
-                        <td>${v.maxUsage} kali</td>
-                        <td style="font-weight: 700;">${v.usageCount} kali</td>
-                        <td>
-                            <span class="badge ${v.isActive ? 'status-success' : 'status-failed'}">${v.isActive ? 'AKTIF' : 'NONAKTIF'}</span>
-                        </td>
-                        <td>
-                            <div class="admin-action-buttons">
-                                <button class="btn-action-small btn-voucher-edit" data-voucher-id="${v.id}">
-                                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
-                                </button>
-                                <button class="btn-action-small danger btn-voucher-delete" data-voucher-id="${v.id}">
-                                    <i data-lucide="trash" style="width: 14px; height: 14px;"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Bind Edit events
-            document.querySelectorAll('.btn-voucher-edit').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-voucher-id');
-                    const v = window.dbService.getVouchers().find(item => item.id === id);
-                    if (v) {
-                        document.getElementById('form-voucher-id').value = v.id;
-                        document.getElementById('form-voucher-code').value = v.code;
-                        document.getElementById('form-voucher-type').value = v.type;
-                        document.getElementById('form-voucher-value').value = v.value;
-                        document.getElementById('form-voucher-max-usage').value = v.maxUsage;
-                        document.getElementById('form-voucher-active').value = String(v.isActive);
-                        
-                        document.getElementById('voucher-form-title').textContent = 'Edit Voucher';
-                        voucherFormContainer.style.display = 'block';
-                        voucherFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                });
-            });
-
-            // Bind Delete events
-            document.querySelectorAll('.btn-voucher-delete').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-voucher-id');
-                    if (confirm('Apakah Anda yakin ingin menghapus voucher ini?')) {
-                        window.dbService.deleteVoucher(id);
-                        drawVouchers();
-                    }
-                });
-            });
-
-            if (window.lucide) window.lucide.createIcons();
-        };
-
-        if (btnAddVoucher) {
-            btnAddVoucher.addEventListener('click', () => {
-                voucherForm.reset();
-                document.getElementById('form-voucher-id').value = '';
-                document.getElementById('voucher-form-title').textContent = 'Tambah Voucher Baru';
-                voucherFormContainer.style.display = voucherFormContainer.style.display === 'none' ? 'block' : 'none';
-            });
-        }
-
-        if (btnVoucherCancel) {
-            btnVoucherCancel.addEventListener('click', () => {
-                voucherFormContainer.style.display = 'none';
-            });
-        }
-
-        if (voucherForm) {
-            voucherForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const vData = {
-                    id: document.getElementById('form-voucher-id').value || undefined,
-                    code: document.getElementById('form-voucher-code').value.trim().toUpperCase(),
-                    type: document.getElementById('form-voucher-type').value,
-                    value: parseInt(document.getElementById('form-voucher-value').value),
-                    maxUsage: parseInt(document.getElementById('form-voucher-max-usage').value),
-                    isActive: document.getElementById('form-voucher-active').value === 'true'
-                };
-
-                const result = window.dbService.saveVoucher(vData);
-                if (result.success) {
-                    voucherFormContainer.style.display = 'none';
-                    drawVouchers();
-                } else {
-                    alert(result.message);
-                }
-            });
-        }
 
         // --- TRANSACTION MANAGE MODAL LOGIC (ADMIN) ---
         const adminTxModal = document.getElementById('admin-tx-modal');
