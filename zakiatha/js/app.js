@@ -302,75 +302,6 @@ function initTheme() {
     };
 }
 
-// Translation Dictionary for Bilingual Mode (ID/AR)
-const translations = {
-    id: {
-        home: "Home",
-        track: "Lacak Pesanan",
-        settings: "Pengaturan",
-        admin: "Dashboard Admin",
-        lang_btn: "AR"
-    },
-    ar: {
-        home: "الرئيسية",
-        track: "تتبع الطلب",
-        settings: "الإعدادات",
-        admin: "لوحة التحكم",
-        lang_btn: "ID"
-    }
-};
-
-function initLanguage() {
-    let savedLang = localStorage.getItem('topup_store_lang');
-    if (!savedLang) {
-        savedLang = 'id';
-    }
-    
-    window.getCurrentLanguage = function() {
-        return localStorage.getItem('topup_store_lang') || 'id';
-    };
-    
-    window.toggleLanguage = function() {
-        const current = window.getCurrentLanguage();
-        const next = current === 'id' ? 'ar' : 'id';
-        localStorage.setItem('topup_store_lang', next);
-        applyLanguage(next);
-        // Re-render current view so the view translations take effect
-        router();
-    };
-    
-    applyLanguage(savedLang);
-    
-    // Bind click listener to lang toggle button
-    const langBtn = document.getElementById('lang-toggle-btn');
-    if (langBtn) {
-        langBtn.addEventListener('click', () => {
-            window.toggleLanguage();
-        });
-    }
-}
-
-function applyLanguage(lang) {
-    document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-    
-    // Translate static nav links
-    const homeLink = document.querySelector('#nav-home-link span');
-    if (homeLink) homeLink.textContent = translations[lang].home;
-    
-    const trackLink = document.querySelector('#nav-track-link span');
-    if (trackLink) trackLink.textContent = translations[lang].track;
-    
-    const settingsLink = document.querySelector('#nav-settings-link span');
-    if (settingsLink) settingsLink.textContent = translations[lang].settings;
-    
-    const adminLink = document.querySelector('#nav-admin-link span');
-    if (adminLink) adminLink.textContent = translations[lang].admin;
-    
-    const langText = document.getElementById('lang-text');
-    if (langText) langText.textContent = translations[lang].lang_btn;
-}
-
 // Application Initialization
 function init() {
     // Set global helper on window so views can access it
@@ -383,9 +314,6 @@ function init() {
     
     // Initialize theme
     initTheme();
-    
-    // Initialize language
-    initLanguage();
     
     // Listen for hash changes
     window.addEventListener('hashchange', router);

@@ -21,85 +21,44 @@ const settingsView = {
         const successTx = userTx.filter(t => t.status === 'SUCCESS');
         const totalSpent = successTx.reduce((sum, t) => sum + t.totalAmount, 0);
 
-        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'id';
         const texts = {
-            id: {
-                breadcrumb: "Pengaturan Akun",
-                title: "Pengaturan Akun",
-                profile_title: "Profil Saya",
-                security_title: "Keamanan & Kata Sandi",
-                theme_title: "Tampilan & Tema",
-                tx_history_title: "Riwayat Pesanan Saya",
-                edit_profile: "Edit Profil",
-                theme_desc: "Pilih tema tampilan website yang nyaman untuk mata Anda. Mode Gelap atau Terang dapat diubah kapan saja.",
-                theme_btn_light: "Ubah ke Mode Terang",
-                theme_btn_dark: "Ubah ke Mode Gelap",
-                logout_btn: "Keluar Akun",
-                points_title: "Poin Saya",
-                points_desc: "Setiap transaksi sukses memberikan cashback <strong style=\"color: var(--success);\">1%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.",
-                points_balance: "Saldo Poin",
-                summary_title: "Ringkasan Transaksi",
-                summary_total: "Total Transaksi",
-                summary_success: "Sukses",
-                summary_spent: "Total Belanja",
-                summary_track: "Lacak Semua Transaksi",
-                tx_col_inv: "Invoice ID",
-                tx_col_date: "Tanggal",
-                tx_col_game: "Game",
-                tx_col_product: "Produk",
-                tx_col_price: "Total Bayar",
-                tx_col_status: "Status",
-                filter_search_label: "Cari Layanan / Produk",
-                filter_search_placeholder: "Cari game, nominal, atau no. invoice...",
-                filter_start_date: "Mulai Tanggal",
-                filter_end_date: "Sampai Tanggal",
-                filter_status_label: "Status Transaksi",
-                filter_status_all: "Semua Status",
-                filter_status_pending: "Sedang Diproses (PENDING)",
-                filter_status_success: "Berhasil / Selesai (SUCCESS)",
-                filter_status_failed: "Pesanan Gagal (FAILED)",
-                filter_reset: "Reset",
-                no_orders: "Belum ada riwayat pesanan."
-            },
-            ar: {
-                breadcrumb: "إعدادات الحساب",
-                title: "إعدادات الحساب",
-                profile_title: "ملفي الشخصي",
-                security_title: "الأمان وكلمة المرور",
-                theme_title: "المظهر والسمة",
-                tx_history_title: "سجل طلباتي",
-                edit_profile: "تعديل الملف الشخصي",
-                theme_desc: "اختر سمة مظهر موقع الويب المريحة لعينيك. يمكن تغيير الوضع الداكن أو الفاتح في أي وقت.",
-                theme_btn_light: "تغيير إلى الوضع الفاتح",
-                theme_btn_dark: "تغيير إلى الوضع الداكن",
-                logout_btn: "تسجيل الخروج",
-                points_title: "نقاطي",
-                points_desc: "كل عملية شحن ناجحة تمنحك استرداداً نقدياً بنسبة <strong style=\"color: var(--success);\">1%</strong> في شكل نقاط. يمكن استخدام النقاط كخصم في المعاملة التالية.",
-                points_balance: "رصيد النقاط",
-                summary_title: "ملخص المعاملات",
-                summary_total: "إجمالي الطلبات",
-                summary_success: "ناجح",
-                summary_spent: "إجمالي الإنفاق",
-                summary_track: "تتبع جميع المعاملات",
-                tx_col_inv: "رقم الفاتورة",
-                tx_col_date: "التاريخ",
-                tx_col_game: "اللعبة",
-                tx_col_product: "المنتج",
-                tx_col_price: "إجمالي الدفع",
-                tx_col_status: "الحالة",
-                filter_search_label: "البحث عن الخدمة / المنتج",
-                filter_search_placeholder: "ابحث عن لعبة، مبلغ، أو رقم فاتورة...",
-                filter_start_date: "تاريخ البدء",
-                filter_end_date: "تاريخ الانتهاء",
-                filter_status_label: "حالة المعاملة",
-                filter_status_all: "جميع الحالات",
-                filter_status_pending: "قيد المعالجة (PENDING)",
-                filter_status_success: "ناجح / مكتمل (SUCCESS)",
-                filter_status_failed: "فشلت الطلبية (FAILED)",
-                filter_reset: "إعادة ضبط",
-                no_orders: "لا يوجد سجل طلبات بعد."
-            }
-        }[lang];
+            breadcrumb: "Pengaturan Akun",
+            title: "Pengaturan Akun",
+            profile_title: "Profil Saya",
+            security_title: "Keamanan & Kata Sandi",
+            theme_title: "Tampilan & Tema",
+            tx_history_title: "Riwayat Pesanan Saya",
+            edit_profile: "Edit Profil",
+            theme_desc: "Pilih tema tampilan website yang nyaman untuk mata Anda. Mode Gelap atau Terang dapat diubah kapan saja.",
+            theme_btn_light: "Ubah ke Mode Terang",
+            theme_btn_dark: "Ubah ke Mode Gelap",
+            logout_btn: "Keluar Akun",
+            points_title: "Poin Saya",
+            points_desc: "Setiap transaksi sukses memberikan cashback <strong style=\"color: var(--success);\">1%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.",
+            points_balance: "Saldo Poin",
+            summary_title: "Ringkasan Transaksi",
+            summary_total: "Total Transaksi",
+            summary_success: "Sukses",
+            summary_spent: "Total Belanja",
+            summary_track: "Lacak Semua Transaksi",
+            tx_col_inv: "Invoice ID",
+            tx_col_date: "Tanggal",
+            tx_col_game: "Game",
+            tx_col_product: "Produk",
+            tx_col_price: "Total Bayar",
+            tx_col_status: "Status",
+            filter_search_label: "Cari Layanan / Produk",
+            filter_search_placeholder: "Cari game, nominal, atau no. invoice...",
+            filter_start_date: "Mulai Tanggal",
+            filter_end_date: "Sampai Tanggal",
+            filter_status_label: "Status Transaksi",
+            filter_status_all: "Semua Status",
+            filter_status_pending: "Sedang Diproses (PENDING)",
+            filter_status_success: "Berhasil / Selesai (SUCCESS)",
+            filter_status_failed: "Pesanan Gagal (FAILED)",
+            filter_reset: "Reset",
+            no_orders: "Belum ada riwayat pesanan."
+        };
 
         container.innerHTML = `
             <div class="settings-layout">
@@ -142,10 +101,14 @@ const settingsView = {
                         </span>
                     </div>
 
-                    <div style="margin-top: 20px;">
-                        <button class="btn-grad" style="width: 100%; padding: 12px;" id="btn-edit-profile">
+                    <div style="margin-top: 20px; display: flex; gap: 12px;">
+                        <button class="btn-grad" style="flex: 1; padding: 12px; margin: 0;" id="btn-edit-profile">
                             <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
                             <span>${texts.edit_profile}</span>
+                        </button>
+                        <button class="btn-action-small danger" style="flex: 1; padding: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; font-size: 14px;" id="btn-logout-settings">
+                            <i data-lucide="log-out" style="width: 16px; height: 16px;"></i>
+                            <span>${texts.logout_btn}</span>
                         </button>
                     </div>
                 </div>
@@ -412,6 +375,16 @@ const settingsView = {
         cancelEditBtn.addEventListener('click', () => {
             editSection.style.display = 'none';
         });
+
+        // Logout Button
+        const logoutBtn = document.getElementById('btn-logout-settings');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('topup_store_session');
+                if (window.refreshAuthHeader) window.refreshAuthHeader();
+                window.location.hash = '#home';
+            });
+        }
 
         // Edit Profile Submit
         document.getElementById('edit-profile-form').addEventListener('submit', (e) => {

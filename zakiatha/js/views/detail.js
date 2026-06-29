@@ -172,39 +172,21 @@ const detailView = {
             if (window.lucide) window.lucide.createIcons();
         };
 
-        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'id';
         const texts = {
-            id: {
-                step1: "Masukkan Data Akun",
-                step2: "Pilih Nominal Top-Up",
-                step3: "Pilih Metode Pembayaran",
-                step4: "Konfirmasi & Beli",
-                phone_label: "Nomor WhatsApp",
-                phone_help: "Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.",
-                submit_btn: "Beli Sekarang",
-                voucher_label: "Kode Voucher (Opsional)",
-                voucher_btn: "Gunakan",
-                voucher_placeholder: "Contoh: PROMO10",
-                no_products: "Tidak ada produk tersedia.",
-                select_nominal_first: "Silakan pilih nominal top-up terlebih dahulu untuk melihat metode pembayaran dan harga.",
-                help_title: "Petunjuk Pengisian"
-            },
-            ar: {
-                step1: "أدخل بيانات الحساب",
-                step2: "اختر كمية الشحن",
-                step3: "اختر طريقة الدفع",
-                step4: "التأكيد والشراء",
-                phone_label: "رقم الواتساب",
-                phone_help: "سيتم إرسال الفاتورة وإيصال الدفع إلى رقم الواتساب هذا.",
-                submit_btn: "شحن الآن",
-                voucher_label: "رمز القسيمة (اختياري)",
-                voucher_btn: "تطبيق",
-                voucher_placeholder: "مثال: PROMO10",
-                no_products: "لا توجد منتجات متاحة.",
-                select_nominal_first: "يرجى اختيار كمية الشحن أولاً لعرض طرق الدفع والأسعار.",
-                help_title: "تعليمات الشحن"
-            }
-        }[lang];
+            step1: "Masukkan Data Akun",
+            step2: "Pilih Nominal Top-Up",
+            step3: "Pilih Metode Pembayaran",
+            step4: "Konfirmasi & Beli",
+            phone_label: "Nomor WhatsApp",
+            phone_help: "Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.",
+            submit_btn: "Beli Sekarang",
+            voucher_label: "Kode Voucher (Opsional)",
+            voucher_btn: "Gunakan",
+            voucher_placeholder: "Contoh: PROMO10",
+            no_products: "Tidak ada produk tersedia.",
+            select_nominal_first: "Silakan pilih nominal top-up terlebih dahulu untuk melihat metode pembayaran dan harga.",
+            help_title: "Petunjuk Pengisian"
+        };
 
         // Render view structure
         container.innerHTML = `
