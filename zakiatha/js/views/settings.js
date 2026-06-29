@@ -21,26 +21,106 @@ const settingsView = {
         const successTx = userTx.filter(t => t.status === 'SUCCESS');
         const totalSpent = successTx.reduce((sum, t) => sum + t.totalAmount, 0);
 
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'id';
+        const texts = {
+            id: {
+                breadcrumb: "Pengaturan Akun",
+                title: "Pengaturan Akun",
+                profile_title: "Profil Saya",
+                security_title: "Keamanan & Kata Sandi",
+                theme_title: "Tampilan & Tema",
+                tx_history_title: "Riwayat Pesanan Saya",
+                edit_profile: "Edit Profil",
+                theme_desc: "Pilih tema tampilan website yang nyaman untuk mata Anda. Mode Gelap atau Terang dapat diubah kapan saja.",
+                theme_btn_light: "Ubah ke Mode Terang",
+                theme_btn_dark: "Ubah ke Mode Gelap",
+                logout_btn: "Keluar Akun",
+                points_title: "Poin Saya",
+                points_desc: "Setiap transaksi sukses memberikan cashback <strong style=\"color: var(--success);\">1%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.",
+                points_balance: "Saldo Poin",
+                summary_title: "Ringkasan Transaksi",
+                summary_total: "Total Transaksi",
+                summary_success: "Sukses",
+                summary_spent: "Total Belanja",
+                summary_track: "Lacak Semua Transaksi",
+                tx_col_inv: "Invoice ID",
+                tx_col_date: "Tanggal",
+                tx_col_game: "Game",
+                tx_col_product: "Produk",
+                tx_col_price: "Total Bayar",
+                tx_col_status: "Status",
+                filter_search_label: "Cari Layanan / Produk",
+                filter_search_placeholder: "Cari game, nominal, atau no. invoice...",
+                filter_start_date: "Mulai Tanggal",
+                filter_end_date: "Sampai Tanggal",
+                filter_status_label: "Status Transaksi",
+                filter_status_all: "Semua Status",
+                filter_status_pending: "Sedang Diproses (PENDING)",
+                filter_status_success: "Berhasil / Selesai (SUCCESS)",
+                filter_status_failed: "Pesanan Gagal (FAILED)",
+                filter_reset: "Reset",
+                no_orders: "Belum ada riwayat pesanan."
+            },
+            ar: {
+                breadcrumb: "إعدادات الحساب",
+                title: "إعدادات الحساب",
+                profile_title: "ملفي الشخصي",
+                security_title: "الأمان وكلمة المرور",
+                theme_title: "المظهر والسمة",
+                tx_history_title: "سجل طلباتي",
+                edit_profile: "تعديل الملف الشخصي",
+                theme_desc: "اختر سمة مظهر موقع الويب المريحة لعينيك. يمكن تغيير الوضع الداكن أو الفاتح في أي وقت.",
+                theme_btn_light: "تغيير إلى الوضع الفاتح",
+                theme_btn_dark: "تغيير إلى الوضع الداكن",
+                logout_btn: "تسجيل الخروج",
+                points_title: "نقاطي",
+                points_desc: "كل عملية شحن ناجحة تمنحك استرداداً نقدياً بنسبة <strong style=\"color: var(--success);\">1%</strong> في شكل نقاط. يمكن استخدام النقاط كخصم في المعاملة التالية.",
+                points_balance: "رصيد النقاط",
+                summary_title: "ملخص المعاملات",
+                summary_total: "إجمالي الطلبات",
+                summary_success: "ناجح",
+                summary_spent: "إجمالي الإنفاق",
+                summary_track: "تتبع جميع المعاملات",
+                tx_col_inv: "رقم الفاتورة",
+                tx_col_date: "التاريخ",
+                tx_col_game: "اللعبة",
+                tx_col_product: "المنتج",
+                tx_col_price: "إجمالي الدفع",
+                tx_col_status: "الحالة",
+                filter_search_label: "البحث عن الخدمة / المنتج",
+                filter_search_placeholder: "ابحث عن لعبة، مبلغ، أو رقم فاتورة...",
+                filter_start_date: "تاريخ البدء",
+                filter_end_date: "تاريخ الانتهاء",
+                filter_status_label: "حالة المعاملة",
+                filter_status_all: "جميع الحالات",
+                filter_status_pending: "قيد المعالجة (PENDING)",
+                filter_status_success: "ناجح / مكتمل (SUCCESS)",
+                filter_status_failed: "فشلت الطلبية (FAILED)",
+                filter_reset: "إعادة ضبط",
+                no_orders: "لا يوجد سجل طلبات بعد."
+            }
+        }[lang];
+
         container.innerHTML = `
             <div class="settings-layout">
                 <!-- Breadcrumb -->
                 <div style="display: flex; gap: 8px; font-size: 14px; color: var(--text-secondary);">
                     <a href="#home" style="hover: color(var(--primary));">Home</a>
                     <span>/</span>
-                    <span style="color: var(--text-primary); font-weight:600;">Pengaturan Akun</span>
+                    <span style="color: var(--text-primary); font-weight:600;">${texts.breadcrumb}</span>
                 </div>
 
                 <!-- Header -->
                 <div class="settings-header">
                     <i data-lucide="settings" style="width: 32px; height: 32px; color: var(--primary);"></i>
-                    <h1 class="gradient-text">Pengaturan Akun</h1>
+                    <h1 class="gradient-text">${texts.title}</h1>
                 </div>
 
                 <!-- Profile Section -->
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
                         <i data-lucide="user" style="width: 20px; height: 20px; color: var(--primary);"></i>
-                        Profil Saya
+                        ${texts.profile_title}
                     </div>
 
                     <div class="settings-info-row">
@@ -65,7 +145,7 @@ const settingsView = {
                     <div style="margin-top: 20px;">
                         <button class="btn-grad" style="width: 100%; padding: 12px;" id="btn-edit-profile">
                             <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
-                            <span>Edit Profil</span>
+                            <span>${texts.edit_profile}</span>
                         </button>
                     </div>
                 </div>
@@ -74,7 +154,7 @@ const settingsView = {
                 <div class="card-glass settings-section" id="edit-profile-section" style="display: none;">
                     <div class="settings-section-title">
                         <i data-lucide="edit" style="width: 20px; height: 20px; color: var(--secondary);"></i>
-                        Edit Profil
+                        ${texts.edit_profile}
                     </div>
                     <div id="edit-profile-message" style="display: none; margin-bottom: 16px; padding: 10px; border-radius: var(--radius-sm);"></div>
                     <form id="edit-profile-form" style="display: flex; flex-direction: column; gap: 16px;">
@@ -104,17 +184,17 @@ const settingsView = {
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
                         <i data-lucide="award" style="width: 20px; height: 20px; color: var(--success);"></i>
-                        Poin Saya
+                        ${texts.points_title}
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(16, 185, 129, 0.05); border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
                         <div>
-                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Saldo Poin</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">${texts.points_balance}</div>
                             <div style="font-size: 28px; font-weight: 800; color: var(--success);">${user.points.toLocaleString('id-ID')} <span style="font-size: 14px;">Pts</span></div>
                         </div>
                         <i data-lucide="coins" style="width: 40px; height: 40px; color: var(--success); opacity: 0.5;"></i>
                     </div>
                     <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                        Setiap transaksi sukses memberikan cashback <strong style="color: var(--success);">1%</strong> dalam bentuk poin. Poin dapat digunakan sebagai diskon pada transaksi berikutnya.
+                        ${texts.points_desc}
                     </p>
                 </div>
 
@@ -122,26 +202,26 @@ const settingsView = {
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
                         <i data-lucide="receipt" style="width: 20px; height: 20px; color: var(--secondary);"></i>
-                        Ringkasan Transaksi
+                        ${texts.summary_title}
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
                         <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
                             <div style="font-size: 24px; font-weight: 800; color: var(--secondary);">${userTx.length}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Total Transaksi</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_total}</div>
                         </div>
                         <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
                             <div style="font-size: 24px; font-weight: 800; color: var(--success);">${successTx.length}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Sukses</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_success}</div>
                         </div>
                         <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
                             <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">${window.formatRupiah(totalSpent)}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Total Belanja</div>
+                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_spent}</div>
                         </div>
                     </div>
                     <div style="margin-top: 16px;">
                         <a href="#track" class="btn-grad" style="width: 100%; padding: 12px; text-align: center;">
                             <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                            <span>Lacak Semua Transaksi</span>
+                            <span>${texts.summary_track}</span>
                         </a>
                     </div>
                 </div>
@@ -150,14 +230,14 @@ const settingsView = {
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
                         <i data-lucide="palette" style="width: 20px; height: 20px; color: var(--primary);"></i>
-                        Tampilan & Tema
+                        ${texts.theme_title}
                     </div>
                     <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
-                        Pilih tema tampilan website yang nyaman untuk mata Anda. Mode Gelap atau Terang dapat diubah kapan saja.
+                        ${texts.theme_desc}
                     </p>
                     <button class="btn-grad" id="btn-toggle-theme-settings" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;">
                         <i data-lucide="sun" id="settings-theme-icon" style="width: 16px; height: 16px;"></i>
-                        <span id="settings-theme-text">Ubah ke Mode Terang</span>
+                        <span id="settings-theme-text">${window.getCurrentTheme() === 'light' ? texts.theme_btn_dark : texts.theme_btn_light}</span>
                     </button>
                 </div>
 
@@ -165,41 +245,41 @@ const settingsView = {
                 <div class="card-glass settings-section" style="grid-column: 1 / -1; width: 100%;">
                     <div class="settings-section-title">
                         <i data-lucide="history" style="width: 20px; height: 20px; color: var(--primary);"></i>
-                        Riwayat Pesanan Saya
+                        ${texts.tx_history_title}
                     </div>
                     
                     <!-- Filter & Search Bar -->
                     <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md);">
                         <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Cari Layanan / Produk</label>
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_search_label}</label>
                             <div style="position: relative;">
-                                <input type="text" id="input-search-product" class="form-input" placeholder="Cari game, nominal, atau no. invoice..." style="padding-left: 36px; height: 42px; font-size: 13px;">
+                                <input type="text" id="input-search-product" class="form-input" placeholder="${texts.filter_search_placeholder}" style="padding-left: 36px; height: 42px; font-size: 13px;">
                                 <i data-lucide="search" style="position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--text-muted);"></i>
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Mulai Tanggal</label>
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_start_date}</label>
                             <input type="date" id="input-filter-start-date" class="form-input" style="height: 42px; font-size: 13px;">
                         </div>
                         <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sampai Tanggal</label>
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_end_date}</label>
                             <input type="date" id="input-filter-end-date" class="form-input" style="height: 42px; font-size: 13px;">
                         </div>
                         <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status Transaksi</label>
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_status_label}</label>
                             <div style="position: relative;">
                                 <select id="select-filter-status" class="form-input form-select" style="height: 42px; font-size: 13px; padding-right: 32px;">
-                                    <option value="ALL">Semua Status</option>
-                                    <option value="PENDING">Sedang Diproses (PENDING)</option>
-                                    <option value="SUCCESS">Berhasil / Selesai (SUCCESS)</option>
-                                    <option value="FAILED">Pesanan Gagal (FAILED)</option>
+                                    <option value="ALL">${texts.filter_status_all}</option>
+                                    <option value="PENDING">${texts.filter_status_pending}</option>
+                                    <option value="SUCCESS">${texts.filter_status_success}</option>
+                                    <option value="FAILED">${texts.filter_status_failed}</option>
                                 </select>
                             </div>
                         </div>
                         <div style="display: flex; align-items: flex-end;">
                             <button id="btn-reset-filters" class="btn-grad" style="height: 42px; padding: 0 20px; margin: 0; font-size: 13px; display: flex; align-items: center; gap: 8px;">
                                 <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
-                                <span>Reset</span>
+                                <span>${texts.filter_reset}</span>
                             </button>
                         </div>
                     </div>
@@ -208,12 +288,12 @@ const settingsView = {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Invoice ID</th>
-                                    <th>Tanggal</th>
-                                    <th>Game</th>
-                                    <th>Produk</th>
-                                    <th>Total Bayar</th>
-                                    <th>Status</th>
+                                    <th>${texts.tx_col_inv}</th>
+                                    <th>${texts.tx_col_date}</th>
+                                    <th>${texts.tx_col_game}</th>
+                                    <th>${texts.tx_col_product}</th>
+                                    <th>${texts.tx_col_price}</th>
+                                    <th>${texts.tx_col_status}</th>
                                 </tr>
                             </thead>
                             <tbody>

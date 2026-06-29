@@ -2999,3 +2999,91 @@ input:checked + .slider-switch:before {
         display: none;
     }
 }
+
+/* Limit size of icons/images inside product cards (e.g., diamond icons) */
+.product-card img,
+.product-card-title img,
+.product-card-title svg,
+.product-card-title i {
+    max-width: 24px !important;
+    max-height: 24px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-inline-end: 8px;
+    display: inline-block;
+}
+
+/* RTL (Right-to-Left) Layout Support for Arabic */
+html[dir="rtl"] {
+    text-align: right;
+}
+
+html[dir="rtl"] body {
+    direction: rtl;
+}
+
+html[dir="rtl"] .search-icon {
+    left: auto;
+    right: 16px;
+}
+
+html[dir="rtl"] .search-box .form-input {
+    padding-left: 16px;
+    padding-right: 48px;
+}
+
+html[dir="rtl"] .lang-toggle-btn {
+    margin-left: 12px !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .step-header {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .help-box {
+    border-left: none;
+    border-right: 3px solid var(--primary);
+}
+
+html[dir="rtl"] .points-use-left {
+    text-align: right;
+}
+
+html[dir="rtl"] .payment-left {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+html[dir="rtl"] .payment-logo-wrapper {
+    margin-right: 0;
+    margin-left: 12px;
+}
+
+html[dir="rtl"] .product-card.selected::after {
+    left: 0;
+    right: auto;
+    border-width: 32px 32px 0 0;
+    border-color: var(--primary) transparent transparent transparent;
+}
+
+html[dir="rtl"] .product-card.selected::before {
+    left: 6px;
+    right: auto;
+}
+
+html[dir="rtl"] .modal-close-btn {
+    left: 16px;
+    right: auto;
+}
+
+html[dir="rtl"] .modal-details-row {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .invoice-row {
+    flex-direction: row-reverse;
+}
+

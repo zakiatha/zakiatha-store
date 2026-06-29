@@ -172,6 +172,40 @@ const detailView = {
             if (window.lucide) window.lucide.createIcons();
         };
 
+        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'id';
+        const texts = {
+            id: {
+                step1: "Masukkan Data Akun",
+                step2: "Pilih Nominal Top-Up",
+                step3: "Pilih Metode Pembayaran",
+                step4: "Konfirmasi & Beli",
+                phone_label: "Nomor WhatsApp",
+                phone_help: "Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.",
+                submit_btn: "Beli Sekarang",
+                voucher_label: "Kode Voucher (Opsional)",
+                voucher_btn: "Gunakan",
+                voucher_placeholder: "Contoh: PROMO10",
+                no_products: "Tidak ada produk tersedia.",
+                select_nominal_first: "Silakan pilih nominal top-up terlebih dahulu untuk melihat metode pembayaran dan harga.",
+                help_title: "Petunjuk Pengisian"
+            },
+            ar: {
+                step1: "أدخل بيانات الحساب",
+                step2: "اختر كمية الشحن",
+                step3: "اختر طريقة الدفع",
+                step4: "التأكيد والشراء",
+                phone_label: "رقم الواتساب",
+                phone_help: "سيتم إرسال الفاتورة وإيصال الدفع إلى رقم الواتساب هذا.",
+                submit_btn: "شحن الآن",
+                voucher_label: "رمز القسيمة (اختياري)",
+                voucher_btn: "تطبيق",
+                voucher_placeholder: "مثال: PROMO10",
+                no_products: "لا توجد منتجات متاحة.",
+                select_nominal_first: "يرجى اختيار كمية الشحن أولاً لعرض طرق الدفع والأسعار.",
+                help_title: "تعليمات الشحن"
+            }
+        }[lang];
+
         // Render view structure
         container.innerHTML = `
             <div class="detail-layout">
@@ -185,7 +219,7 @@ const detailView = {
                         <div class="help-box">
                             <h4 class="help-box-title">
                                 <i data-lucide="help-circle" style="width: 16px; height: 16px; color: var(--primary);"></i>
-                                <span>Petunjuk Petunjuk</span>
+                                <span>${texts.help_title}</span>
                             </h4>
                             <p class="help-box-content">${this.getGameInstructions(game.slug)}</p>
                         </div>
@@ -199,7 +233,7 @@ const detailView = {
                     <div class="card-glass step-card" id="step-account">
                         <div class="step-header">
                             <div class="step-num">1</div>
-                            <h2 class="step-title">Masukkan Data Akun</h2>
+                            <h2 class="step-title">${texts.step1}</h2>
                         </div>
                         <div class="step-content">
                             <div id="dynamic-fields-container">
@@ -212,7 +246,7 @@ const detailView = {
                     <div class="card-glass step-card" id="step-nominals">
                         <div class="step-header">
                             <div class="step-num">2</div>
-                            <h2 class="step-title">Pilih Nominal Top-Up</h2>
+                            <h2 class="step-title">${texts.step2}</h2>
                         </div>
                         <div class="step-content">
                             <div class="product-grid" id="product-grid-container">
@@ -225,11 +259,11 @@ const detailView = {
                     <div class="card-glass step-card" id="step-payment">
                         <div class="step-header">
                             <div class="step-num">3</div>
-                            <h2 class="step-title">Pilih Metode Pembayaran</h2>
+                            <h2 class="step-title">${texts.step3}</h2>
                         </div>
                         <div class="step-content">
                             <div id="payment-methods-container">
-                                <p style="color: var(--text-secondary); text-align: center; padding: 20px;">Silakan pilih nominal top-up terlebih dahulu untuk melihat metode pembayaran dan harga.</p>
+                                <p style="color: var(--text-secondary); text-align: center; padding: 20px;">${texts.select_nominal_first}</p>
                             </div>
                             <div id="points-usage-container" style="display: none; margin-top: 20px;">
                                 <!-- Points toggle checkbox rendered dynamically -->
@@ -241,32 +275,32 @@ const detailView = {
                     <div class="card-glass step-card" id="step-purchase">
                         <div class="step-header">
                             <div class="step-num">4</div>
-                            <h2 class="step-title">Konfirmasi & Beli</h2>
+                            <h2 class="step-title">${texts.step4}</h2>
                         </div>
                         <div class="step-content" style="display: flex; flex-direction: column; gap: 20px;">
                             <!-- Voucher Input Section -->
                             <div class="form-group" id="detail-voucher-container">
-                                <label for="detail-voucher-input">Kode Voucher (Opsional)</label>
+                                <label for="detail-voucher-input">${texts.voucher_label}</label>
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" id="detail-voucher-input" class="form-input" placeholder="Contoh: PROMO10" style="text-transform: uppercase;">
-                                    <button id="btn-apply-voucher" class="btn-grad" style="padding: 12px 20px; margin: 0; white-space: nowrap; height: auto;">Gunakan</button>
+                                    <input type="text" id="detail-voucher-input" class="form-input" placeholder="${texts.voucher_placeholder}" style="text-transform: uppercase;">
+                                    <button id="btn-apply-voucher" class="btn-grad" style="padding: 12px 20px; margin: 0; white-space: nowrap; height: auto;">${texts.voucher_btn}</button>
                                 </div>
                                 <div id="detail-voucher-message" style="font-size: 11px; margin-top: 6px; display: none; font-weight: 600;"></div>
                             </div>
-
+ 
                             <!-- Real-time Checkout Summary Box -->
                             <div id="checkout-summary-container" style="display: none; padding: 16px; border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px;">
                                 <!-- Populated dynamically by updateCheckoutSummary() -->
                             </div>
-
+ 
                             <div class="form-group">
-                                <label for="customer-whatsapp">Nomor WhatsApp</label>
+                                <label for="customer-whatsapp">${texts.phone_label}</label>
                                 <input type="tel" id="customer-whatsapp" class="form-input" placeholder="Contoh: 081234567890" required>
-                                <p style="font-size: 11px; color: var(--text-muted);">Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.</p>
+                                <p style="font-size: 11px; color: var(--text-muted);">${texts.phone_help}</p>
                             </div>
                             
                             <button id="btn-submit-order" class="btn-grad" style="width: 100%; padding: 16px;">
-                                <span>Beli Sekarang</span>
+                                <span>${texts.submit_btn}</span>
                             </button>
                         </div>
                     </div>
