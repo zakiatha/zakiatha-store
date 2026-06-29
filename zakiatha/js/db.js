@@ -52,11 +52,14 @@ function getDB() {
             db.games.push(defaultGame);
             hasUpdates = true;
         } else {
-            // Update logo, banner, and other static details for default games
-            if (db.games[index].logo !== defaultGame.logo || db.games[index].banner !== defaultGame.banner) {
+            // Update logo, banner, fields, and other static details for default games
+            if (db.games[index].logo !== defaultGame.logo || 
+                db.games[index].banner !== defaultGame.banner || 
+                JSON.stringify(db.games[index].fields) !== JSON.stringify(defaultGame.fields)) {
                 db.games[index].logo = defaultGame.logo;
                 db.games[index].banner = defaultGame.banner;
                 db.games[index].description = defaultGame.description;
+                db.games[index].fields = defaultGame.fields;
                 hasUpdates = true;
             }
         }
@@ -191,9 +194,10 @@ function initDefaultDB() {
                 category: 'voucher',
                 logo: 'steam.jpg',
                 banner: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=600&auto=format&fit=crop',
-                description: 'Beli Steam Wallet Code Rupiah instan untuk mengisi saldo akun Steam Anda. Masukkan Username akun Steam Anda (hanya untuk verifikasi) dan pilih nominal voucher.',
+                description: 'Beli Steam Wallet Code Rupiah instan untuk mengisi saldo akun Steam Anda. Masukkan Akun Gmail Pengguna dan Nomor Handphone Anda.',
                 fields: [
-                    { id: 'userId', label: 'Username Steam', placeholder: 'Masukkan Username Steam', type: 'text', required: true }
+                    { id: 'gmail', label: 'Akun Gmail Pengguna', placeholder: 'Masukkan Akun Gmail Anda', type: 'text', required: true },
+                    { id: 'phone', label: 'Nomor Handphone', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
                 ],
                 isActive: true
             },
@@ -286,7 +290,8 @@ function initDefaultDB() {
                 banner: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=600&auto=format&fit=crop',
                 description: 'Beli Google Play Gift Card instan. Kode voucher Google Play akan dikirimkan langsung ke email Anda.',
                 fields: [
-                    { id: 'email', label: 'Alamat Email Penerima', placeholder: 'Contoh: budi@gmail.com', type: 'text', required: true }
+                    { id: 'email', label: 'Akun Gmail Pengguna', placeholder: 'Masukkan Akun Gmail Anda', type: 'text', required: true },
+                    { id: 'phone', label: 'Nomor Handphone', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
                 ],
                 isActive: true
             },
@@ -950,7 +955,7 @@ const dbService = {
                     }
                 }
             }
-            // 2. Jika status berubah dari PENDING -> FAILED (Refund poin yang sudah dipotong)
+            // 2. Jika status berubah dari PENDING -> FAILED (Refund poin & kuota voucher yang sudah dipotong)
             else if (oldStatus === 'PENDING' && status === 'FAILED') {
                 if (tx.username && tx.pointsUsed > 0) {
                     const userIndex = db.users.findIndex(u => u.username.toLowerCase() === tx.username.toLowerCase());
@@ -961,6 +966,14 @@ const dbService = {
                 }
                 // Kembalikan saldo API provider karena trx gagal
                 db.apiConfig.balance += tx.basePrice;
+
+                // Kembalikan kuota penggunaan voucher
+                if (tx.voucherCode) {
+                    const voucher = db.vouchers.find(v => v.code.toUpperCase() === tx.voucherCode.toUpperCase());
+                    if (voucher) {
+                        voucher.usageCount = Math.max(0, voucher.usageCount - 1);
+                    }
+                }
             }
 
             saveDB(db);

@@ -506,9 +506,12 @@ const adminView = {
                 } else if (tx.status === 'PROCESSING') {
                     statusBadge = '<span class="badge status-pending" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.3);">PROCESSING</span>';
                 } else if (tx.status === 'SUCCESS') {
-                    statusBadge = '<span class="badge status-success">SUCCESS</span>';
+                    const game = window.dbService.getGameById(tx.gameId);
+                    const isVoucher = game && game.category === 'voucher';
+                    const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
+                    statusBadge = `<span class="badge status-success">${label}</span>`;
                 } else {
-                    statusBadge = '<span class="badge status-failed">FAILED</span>';
+                    statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
                 }
                 
                 const targetStr = Object.values(tx.accountData).join(' / ');

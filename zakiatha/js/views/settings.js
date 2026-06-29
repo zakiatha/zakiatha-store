@@ -172,15 +172,18 @@ const settingsView = {
                                         </td>
                                     </tr>
                                 ` : userTx.map(tx => {
-                                    const txDate = new Date(tx.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-                                    let statusBadge = '';
-                                    if (tx.status === 'PENDING') {
-                                        statusBadge = '<span class="badge status-pending">PENDING</span>';
-                                    } else if (tx.status === 'SUCCESS') {
-                                        statusBadge = '<span class="badge status-success">SUCCESS</span>';
-                                    } else {
-                                        statusBadge = '<span class="badge status-failed">FAILED</span>';
-                                    }
+                                     const txDate = new Date(tx.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                                     let statusBadge = '';
+                                     if (tx.status === 'PENDING') {
+                                         statusBadge = '<span class="badge status-pending">PENDING</span>';
+                                     } else if (tx.status === 'SUCCESS') {
+                                         const game = window.dbService.getGameById(tx.gameId);
+                                         const isVoucher = game && game.category === 'voucher';
+                                         const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
+                                         statusBadge = `<span class="badge status-success">${label}</span>`;
+                                     } else {
+                                         statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
+                                     }
                                     return `
                                         <tr class="tx-row" data-tx-id="${tx.id}" style="cursor: pointer;" title="Klik untuk melihat detail status & nota">
                                             <td style="font-weight: 700; font-family: monospace;">
@@ -392,10 +395,13 @@ const settingsView = {
                 statusBadge = '<span class="badge status-pending">PENDING</span>';
                 statusClass = 'status-pending';
             } else if (tx.status === 'SUCCESS') {
-                statusBadge = '<span class="badge status-success">SUCCESS</span>';
+                const game = window.dbService.getGameById(tx.gameId);
+                const isVoucher = game && game.category === 'voucher';
+                const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
+                statusBadge = `<span class="badge status-success">${label}</span>`;
                 statusClass = 'status-success';
             } else {
-                statusBadge = '<span class="badge status-failed">FAILED</span>';
+                statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
                 statusClass = 'status-failed';
             }
 

@@ -1,6 +1,17 @@
 // js/views/detail.js
 // Game Detail View - Handles dynamic forms, nominals grid, payment calculations, and checkout modal with points integration
 
+// Helper to normalize phone numbers
+function normalizePhoneNumber(phone) {
+    let clean = phone.replace(/[^0-9+]/g, '');
+    if (clean.startsWith('+62')) {
+        clean = '0' + clean.slice(3);
+    } else if (clean.startsWith('62')) {
+        clean = '0' + clean.slice(2);
+    }
+    return clean;
+}
+
 const detailView = {
     // Helper to get help instructions based on game slug
     getGameInstructions: function(slug) {
@@ -75,7 +86,92 @@ const detailView = {
                 mainVoucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
             }
         };
-        
+
+        // Helper to update the real-time checkout summary box in Step 4
+        const updateCheckoutSummary = () => {
+            const summaryContainer = document.getElementById('checkout-summary-container');
+            if (!summaryContainer) return;
+
+            if (!selectedProduct || !selectedPayment) {
+                summaryContainer.style.display = 'none';
+                return;
+            }
+
+            summaryContainer.style.display = 'flex';
+
+            // Calculate admin fee
+            let feeAmount = 0;
+            if (selectedPayment.feeType === 'percent') {
+                feeAmount = selectedProduct.price * (selectedPayment.feeValue / 100);
+            } else if (selectedPayment.feeType === 'flat') {
+                feeAmount = selectedPayment.feeValue;
+            }
+
+            const baseTotal = selectedProduct.price + feeAmount;
+
+            // Points
+            const session = window.getSession();
+            let userPoints = 0;
+            if (session) {
+                const userObj = window.dbService.getUserByUsername(session.username);
+                userPoints = userObj ? userObj.points : 0;
+            }
+            const pointsToUse = usePoints ? Math.min(userPoints, baseTotal) : 0;
+
+            // Recalculate voucher discount
+            if (activeVoucher) {
+                if (activeVoucher.type === 'percent') {
+                    voucherDiscount = Math.round(baseTotal * (activeVoucher.value / 100));
+                } else {
+                    voucherDiscount = Math.min(activeVoucher.value, baseTotal);
+                }
+            } else {
+                voucherDiscount = 0;
+            }
+
+            const finalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
+
+            summaryContainer.innerHTML = `
+                <div style="font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="receipt" style="width: 16px; height: 16px; color: var(--primary);"></i>
+                    <span>Detail Rincian Pembayaran</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
+                    <span>Produk:</span>
+                    <span style="font-weight: 600; color: var(--text-primary);">${selectedProduct.name}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
+                    <span>Harga:</span>
+                    <span>${window.formatRupiah(selectedProduct.price)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
+                    <span>Biaya Admin:</span>
+                    <span>${window.formatRupiah(feeAmount)}</span>
+                </div>
+                ${voucherDiscount > 0 ? `
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--success); font-weight: 600;">
+                    <span>Diskon Voucher (${activeVoucher.code}):</span>
+                    <span>- ${window.formatRupiah(voucherDiscount)}</span>
+                </div>
+                ` : ''}
+                ${pointsToUse > 0 ? `
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--success); font-weight: 600;">
+                    <span>Potongan Poin:</span>
+                    <span>- ${window.formatRupiah(pointsToUse)}</span>
+                </div>
+                ` : ''}
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
+                    <span>Metode Pembayaran:</span>
+                    <span style="font-weight: 600; color: var(--secondary);">${selectedPayment.name}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800; border-top: 1px solid var(--border-color); padding-top: 8px; color: var(--text-primary); margin-top: 4px;">
+                    <span>Total Tagihan:</span>
+                    <span style="color: var(--secondary); font-size: 16px;">${window.formatRupiah(finalTotal)}</span>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+        };
+
         // Render view structure
         container.innerHTML = `
             <div class="detail-layout">
@@ -156,6 +252,11 @@ const detailView = {
                                     <button id="btn-apply-voucher" class="btn-grad" style="padding: 12px 20px; margin: 0; white-space: nowrap; height: auto;">Gunakan</button>
                                 </div>
                                 <div id="detail-voucher-message" style="font-size: 11px; margin-top: 6px; display: none; font-weight: 600;"></div>
+                            </div>
+
+                            <!-- Real-time Checkout Summary Box -->
+                            <div id="checkout-summary-container" style="display: none; padding: 16px; border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 8px;">
+                                <!-- Populated dynamically by updateCheckoutSummary() -->
                             </div>
 
                             <div class="form-group">
@@ -239,18 +340,34 @@ const detailView = {
                 return;
             }
             
+            // If another voucher is already active, release its usage first
+            if (activeVoucher) {
+                activeVoucher.usageCount = Math.max(0, activeVoucher.usageCount - 1);
+                window.dbService.saveVoucher(activeVoucher);
+            }
+
             const checkResult = window.dbService.checkVoucher(code);
             if (checkResult.success) {
                 activeVoucher = checkResult.voucher;
+                
+                // Immediately increment usage count as it is applied
+                activeVoucher.usageCount += 1;
+                window.dbService.saveVoucher(activeVoucher);
+
                 recalculateVoucherDiscount();
                 mainVoucherMsg.style.display = 'block';
                 mainVoucherMsg.style.color = 'var(--success)';
+                mainVoucherMsg.textContent = `Voucher berhasil digunakan! Potongan ${window.formatRupiah(voucherDiscount)}`;
+                
+                updateCheckoutSummary();
             } else {
                 activeVoucher = null;
                 voucherDiscount = 0;
                 mainVoucherMsg.style.display = 'block';
                 mainVoucherMsg.style.color = 'var(--danger)';
                 mainVoucherMsg.textContent = checkResult.message;
+                
+                updateCheckoutSummary();
             }
         };
         
@@ -362,6 +479,7 @@ const detailView = {
                 document.getElementById('toggle-use-points').addEventListener('change', (e) => {
                     usePoints = e.target.checked;
                     renderPayments(); // Redraw prices with points calculation
+                    validateForm();
                 });
             } else {
                 pointsContainer.style.display = 'none';
@@ -449,7 +567,7 @@ const detailView = {
         };
         
         // ----------------------------------------------------
-        // 4. FORM VALIDATION
+        // 4. FORM VALIDATION & PHONE PREFIX CHECK
         // ----------------------------------------------------
         const validateForm = () => {
             const gameInputs = document.querySelectorAll('.game-input');
@@ -464,12 +582,56 @@ const detailView = {
             const isWhatsappFilled = whatsappInput.value.trim().length >= 9;
             const isProductSelected = selectedProduct !== null;
             const isPaymentSelected = selectedPayment !== null;
+
+            // Prefix validation for Pulsa category
+            if (game.category === 'pulsa') {
+                const phoneInput = document.getElementById('input-phone');
+                if (phoneInput) {
+                    const phoneVal = normalizePhoneNumber(phoneInput.value.trim());
+                    const providerPrefixes = {
+                        'xl': ['0817', '0818', '0819', '0859', '0877', '0878'],
+                        'axis': ['0831', '0832', '0833', '0838'],
+                        'byu': ['0851'],
+                        'telkomsel': ['0811', '0812', '0813', '0821', '0822', '0823', '0852', '0853', '0851'],
+                        'smartfren': ['0881', '0882', '0883', '0884', '0885', '0886', '0887', '0888', '0889'],
+                        'indosat': ['0815', '0816', '0855', '0856', '0857', '0858']
+                    };
+                    
+                    const prefixes = providerPrefixes[game.slug] || [];
+                    const isValidPrefix = prefixes.some(prefix => phoneVal.startsWith(prefix));
+                    
+                    let errorEl = document.getElementById('phone-validation-error');
+                    if (!errorEl) {
+                        errorEl = document.createElement('p');
+                        errorEl.id = 'phone-validation-error';
+                        errorEl.style.fontSize = '11px';
+                        errorEl.style.marginTop = '4px';
+                        phoneInput.parentNode.appendChild(errorEl);
+                    }
+                    
+                    if (phoneVal.length >= 4) {
+                        if (!isValidPrefix) {
+                            allInputsFilled = false;
+                            errorEl.style.color = 'var(--danger)';
+                            errorEl.textContent = `Nomor HP tidak sesuai dengan provider ${game.name}. Gunakan prefix yang benar!`;
+                        } else {
+                            errorEl.style.color = 'var(--success)';
+                            errorEl.textContent = `✓ Nomor HP sesuai dengan provider ${game.name}.`;
+                        }
+                    } else {
+                        errorEl.textContent = '';
+                    }
+                }
+            }
             
             if (allInputsFilled && isWhatsappFilled && isProductSelected && isPaymentSelected) {
                 submitBtn.removeAttribute('disabled');
             } else {
                 submitBtn.setAttribute('disabled', 'true');
             }
+
+            // Update real-time summary
+            updateCheckoutSummary();
         };
         
         fieldsContainer.addEventListener('input', validateForm);
@@ -539,7 +701,7 @@ const detailView = {
                 // Show dynamic verification detail based on Category
                 let targetLabel = 'Data Target';
                 if (game.category === 'pulsa') targetLabel = 'Nomor HP';
-                else if (game.category === 'voucher') targetLabel = 'Email Penerima';
+                else if (game.category === 'voucher') targetLabel = 'Email/Kontak Penerima';
   
                 const updateModalDisplay = () => {
                     const currentFinalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
@@ -641,9 +803,20 @@ const detailView = {
                         return;
                     }
 
+                    // Release old voucher usage in DB first
+                    if (activeVoucher) {
+                        activeVoucher.usageCount = Math.max(0, activeVoucher.usageCount - 1);
+                        window.dbService.saveVoucher(activeVoucher);
+                    }
+
                     const checkResult = window.dbService.checkVoucher(code);
                     if (checkResult.success) {
                         activeVoucher = checkResult.voucher;
+                        
+                        // Immediately increment usage count in DB
+                        activeVoucher.usageCount += 1;
+                        window.dbService.saveVoucher(activeVoucher);
+
                         recalculateVoucherDiscount();
                         
                         voucherMsg.style.display = 'block';
@@ -661,6 +834,7 @@ const detailView = {
                         }
                         
                         updateModalDisplay();
+                        updateCheckoutSummary();
                     } else {
                         activeVoucher = null;
                         voucherDiscount = 0;
@@ -677,6 +851,7 @@ const detailView = {
                         }
                         
                         updateModalDisplay();
+                        updateCheckoutSummary();
                     }
                 };
 
@@ -684,12 +859,7 @@ const detailView = {
                 modalConfirm.onclick = () => {
                     const currentFinalTotal = Math.max(0, baseTotal - pointsToUse - voucherDiscount);
                     
-                    // Increment voucher usage in DB
-                    if (activeVoucher) {
-                        activeVoucher.usageCount += 1;
-                        window.dbService.saveVoucher(activeVoucher);
-                    }
-
+                    // Voucher is already incremented in DB, so we just proceed to create transaction
                     const tx = window.dbService.createTransaction({
                         gameId: game.id,
                         gameName: game.name,
@@ -711,6 +881,10 @@ const detailView = {
                         whatsapp: whatsappInput.value.trim()
                     });
                     
+                    // Reset local active voucher reference so closeModal doesn't decrement it (since transaction succeeded)
+                    activeVoucher = null;
+                    voucherDiscount = 0;
+
                     modalOverlay.classList.remove('active');
                     window.location.hash = `#invoice/${tx.invoiceId}`;
                 };
@@ -719,8 +893,27 @@ const detailView = {
         });
         
         const closeModal = () => {
+            // Decrement usage count of the applied voucher since they cancelled the purchase/modal
+            if (activeVoucher) {
+                activeVoucher.usageCount = Math.max(0, activeVoucher.usageCount - 1);
+                window.dbService.saveVoucher(activeVoucher);
+                
+                // Reset state
+                activeVoucher = null;
+                voucherDiscount = 0;
+                
+                // Reset main page inputs
+                if (mainVoucherInput) mainVoucherInput.value = '';
+                if (mainVoucherMsg) {
+                    mainVoucherMsg.style.display = 'none';
+                    mainVoucherMsg.textContent = '';
+                }
+                
+                updateCheckoutSummary();
+            }
             modalOverlay.classList.remove('active');
         };
+
         modalClose.addEventListener('click', closeModal);
         modalCancel.addEventListener('click', closeModal);
         modalOverlay.addEventListener('click', (e) => {

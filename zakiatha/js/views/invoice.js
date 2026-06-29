@@ -75,6 +75,10 @@ const invoiceView = {
             accountTargetStr = Object.values(tx.accountData).join(' / ');
         }
 
+        // Fetch game category
+        const game = window.dbService.getGameById(tx.gameId);
+        const isVoucherProduct = game && game.category === 'voucher';
+
         // Contextual HTML based on Status
         let statusTitle = '';
         let statusClass = '';
@@ -85,11 +89,11 @@ const invoiceView = {
             statusClass = 'pending';
             statusIcon = 'clock';
         } else if (tx.status === 'SUCCESS') {
-            statusTitle = 'Pembayaran Berhasil';
+            statusTitle = isVoucherProduct ? 'Pembayaran Sukses' : 'Pesanan di Proses';
             statusClass = 'success';
             statusIcon = 'check-circle';
         } else {
-            statusTitle = 'Transaksi Gagal / Kedaluwarsa';
+            statusTitle = 'Pesanan Gagal';
             statusClass = 'failed';
             statusIcon = 'x-circle';
         }
@@ -161,28 +165,44 @@ const invoiceView = {
                 `;
             }
         } else if (tx.status === 'SUCCESS') {
-            const snCode = `${tx.gameId.substring(2).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}-${Math.floor(100000 + Math.random() * 900000)}`;
-            instructionsHtml = `
-                <div class="card-glass payment-instructions-box" style="border-color: var(--success); background: rgba(16, 185, 129, 0.02);">
-                    <i data-lucide="check-circle" style="width: 48px; height: 48px; color: var(--success); filter: drop-shadow(0 0 8px var(--success-glow));"></i>
-                    <h3 style="font-size: 18px; font-weight: 800; color: var(--success);">Top-up Berhasil Dikirim!</h3>
-                    <p style="font-size: 13px; color: var(--text-secondary); max-width: 420px;">
-                        Pembayaran telah berhasil diverifikasi oleh sistem. Produk digital / saldo pulsa / kode voucher telah terkirim instan.
-                    </p>
-                    <div style="background: rgba(16, 185, 129, 0.1); padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2); font-family: monospace; font-size: 14px; font-weight: 700; color: var(--success); width: 100%; max-width: 400px;">
-                        SN / VOUCHER: ${snCode}
+            if (isVoucherProduct) {
+                const snCode = `${tx.gameId.substring(2).toUpperCase()}-${Math.floor(10000 + Math.random() * 90000)}-${Math.floor(100000 + Math.random() * 900000)}`;
+                instructionsHtml = `
+                    <div class="card-glass payment-instructions-box" style="border-color: var(--success); background: rgba(16, 185, 129, 0.02);">
+                        <i data-lucide="check-circle" style="width: 48px; height: 48px; color: var(--success); filter: drop-shadow(0 0 8px var(--success-glow));"></i>
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--success);">Pembayaran Sukses!</h3>
+                        <p style="font-size: 13px; color: var(--text-secondary); max-width: 420px;">
+                            Pembayaran telah berhasil diverifikasi oleh sistem. Kode voucher belanja Anda telah terbit di bawah ini.
+                        </p>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2); font-family: monospace; font-size: 14px; font-weight: 700; color: var(--success); width: 100%; max-width: 400px; text-align: center;">
+                            KODE VOUCHER / SN: ${snCode}
+                        </div>
+                        <a href="#home" class="btn-grad" style="padding: 10px 24px; font-size: 14px; margin-top: 8px;">
+                            <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                            <span>Belanja Lagi</span>
+                        </a>
                     </div>
-                    <a href="#home" class="btn-grad" style="padding: 10px 24px; font-size: 14px; margin-top: 8px;">
-                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
-                        <span>Belanja Lagi</span>
-                    </a>
-                </div>
-            `;
+                `;
+            } else {
+                instructionsHtml = `
+                    <div class="card-glass payment-instructions-box" style="border-color: var(--success); background: rgba(16, 185, 129, 0.02);">
+                        <i data-lucide="check-circle" style="width: 48px; height: 48px; color: var(--success); filter: drop-shadow(0 0 8px var(--success-glow));"></i>
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--success);">Pesanan di Proses!</h3>
+                        <p style="font-size: 13px; color: var(--text-secondary); max-width: 420px;">
+                            Pembayaran telah berhasil diverifikasi oleh sistem. Pesanan top-up game Anda sedang dalam proses pengisian. Silakan cek akun Anda dalam beberapa saat.
+                        </p>
+                        <a href="#home" class="btn-grad" style="padding: 10px 24px; font-size: 14px; margin-top: 8px;">
+                            <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                            <span>Belanja Lagi</span>
+                        </a>
+                    </div>
+                `;
+            }
         } else {
             instructionsHtml = `
                 <div class="card-glass payment-instructions-box" style="border-color: var(--danger); background: rgba(239, 68, 68, 0.02);">
                     <i data-lucide="alert-triangle" style="width: 48px; height: 48px; color: var(--danger);"></i>
-                    <h3 style="font-size: 18px; font-weight: 800; color: var(--danger);">Pembayaran Kedaluwarsa / Gagal</h3>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--danger);">Pesanan Gagal</h3>
                     <p style="font-size: 13px; color: var(--text-secondary); max-width: 400px;">
                         Batas waktu pembayaran untuk transaksi ini telah habis atau dibatalkan oleh sistem. Poin belanja yang digunakan telah dikembalikan ke saldo Anda (jika ada).
                     </p>

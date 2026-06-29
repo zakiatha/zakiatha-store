@@ -78,6 +78,7 @@ function toggleMenu(open) {
 function refreshAuthHeader() {
     const container = document.getElementById('auth-nav-container');
     const adminLink = document.getElementById('nav-admin-link');
+    const footerAdminLink = document.getElementById('footer-admin-link');
     const settingsLink = document.getElementById('nav-settings-link');
     if (!container) return;
 
@@ -118,8 +119,10 @@ function refreshAuthHeader() {
         // Show Admin link if user is admin
         if (session.role === 'admin') {
             if (adminLink) adminLink.style.display = 'flex';
+            if (footerAdminLink) footerAdminLink.style.display = 'inline-block';
         } else {
             if (adminLink) adminLink.style.display = 'none';
+            if (footerAdminLink) footerAdminLink.style.display = 'none';
         }
 
         // Show Settings link for logged-in users
@@ -138,6 +141,7 @@ function refreshAuthHeader() {
         `;
         if (adminLink) adminLink.style.display = 'none';
         if (settingsLink) settingsLink.style.display = 'none';
+        if (footerAdminLink) footerAdminLink.style.display = 'none';
     }
 
     if (window.lucide) {

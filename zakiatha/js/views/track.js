@@ -66,9 +66,12 @@ const trackView = {
                     if (tx.status === 'PENDING') {
                         statusBadge = '<span class="badge status-pending">PENDING</span>';
                     } else if (tx.status === 'SUCCESS') {
-                        statusBadge = '<span class="badge status-success">SUCCESS</span>';
+                        const game = window.dbService.getGameById(tx.gameId);
+                        const isVoucher = game && game.category === 'voucher';
+                        const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
+                        statusBadge = `<span class="badge status-success">${label}</span>`;
                     } else {
-                        statusBadge = '<span class="badge status-failed">FAILED</span>';
+                        statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
                     }
 
                     // Format date
