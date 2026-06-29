@@ -72,6 +72,13 @@ const adminView = {
                         <!-- 1. TRANSACTIONS PANEL -->
                         <div class="admin-panel ${this.activeTab === 'transactions' ? 'active' : ''}" id="panel-transactions">
                             <h3 class="panel-title" style="margin-bottom: 20px;">Daftar Riwayat Pemesanan</h3>
+                            
+                            <!-- Search Bar -->
+                            <div class="search-box" style="margin-bottom: 20px; max-width: 100%; width: 100%; position: relative;">
+                                <i data-lucide="search" class="search-icon" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--primary);"></i>
+                                <input type="text" id="admin-tx-search" class="form-input" placeholder="Cari transaksi berdasarkan ID, nama game, kategori, ID akun, whatsapp, status, pembayaran, tanggal, harga..." style="border-color: rgba(139, 92, 246, 0.3); width: 100%; padding-left: 48px; border-radius: var(--radius-full);">
+                            </div>
+
                             <div class="table-responsive">
                                 <table>
                                     <thead>
@@ -497,7 +504,41 @@ const adminView = {
             const txTableBody = document.getElementById('admin-tx-table-body');
             if (!txTableBody) return;
             
-            txTableBody.innerHTML = transactions.map(tx => {
+            const searchInput = document.getElementById('admin-tx-search');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            
+            // Filter transactions based on query
+            const filteredTxs = transactions.filter(tx => {
+                if (!query) return true;
+                
+                const txDate = new Date(tx.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).toLowerCase();
+                const targetStr = Object.values(tx.accountData).join(' / ').toLowerCase();
+                
+                // Get game category
+                const gameObj = window.dbService.getGameById(tx.gameId);
+                const categoryName = gameObj ? (gameObj.category === 'mobile' ? 'Mobile' : gameObj.category === 'pc' ? 'PC' : gameObj.category === 'voucher' ? 'Voucher' : gameObj.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa') : '';
+                const categoryStr = categoryName.toLowerCase();
+                
+                const priceStr = window.formatRupiah(tx.totalAmount).toLowerCase();
+                const rawPriceStr = String(tx.totalAmount);
+                const statusStr = tx.status.toLowerCase();
+                
+                // Fields to search:
+                // id/invoiceId, nama game, kategori game, user id, zona id, nomor whatsapp, status, metode pembayaran, tanggal transaksi, dan harga
+                return tx.invoiceId.toLowerCase().includes(query) ||
+                       tx.gameName.toLowerCase().includes(query) ||
+                       categoryStr.includes(query) ||
+                       targetStr.includes(query) ||
+                       tx.productName.toLowerCase().includes(query) ||
+                       tx.whatsapp.toLowerCase().includes(query) ||
+                       statusStr.includes(query) ||
+                       (tx.paymentMethodName || '').toLowerCase().includes(query) ||
+                       txDate.includes(query) ||
+                       priceStr.includes(query) ||
+                       rawPriceStr.includes(query);
+            });
+            
+            txTableBody.innerHTML = filteredTxs.map(tx => {
                 const txDate = new Date(tx.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                 
                 let statusBadge = '';
@@ -958,6 +999,14 @@ const adminView = {
         drawUsers();
         drawVouchers();
         drawApiLogs();
+
+        // Bind Transaction Search Bar
+        const txSearchInput = document.getElementById('admin-tx-search');
+        if (txSearchInput) {
+            txSearchInput.addEventListener('input', () => {
+                drawTransactions();
+            });
+        }
         
         // ----------------------------------------------------
         // EVENT HANDLERS & LISTENERS
