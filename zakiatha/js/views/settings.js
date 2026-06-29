@@ -177,9 +177,13 @@ const settingsView = {
                                 <i data-lucide="search" style="position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--text-muted);"></i>
                             </div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Filter Tanggal</label>
-                            <input type="date" id="input-filter-date" class="form-input" style="height: 42px; font-size: 13px;">
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Mulai Tanggal</label>
+                            <input type="date" id="input-filter-start-date" class="form-input" style="height: 42px; font-size: 13px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sampai Tanggal</label>
+                            <input type="date" id="input-filter-end-date" class="form-input" style="height: 42px; font-size: 13px;">
                         </div>
                         <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
                             <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status Transaksi</label>
@@ -584,7 +588,8 @@ const settingsView = {
 
         // --- Transaction History Filtering Logic ---
         const searchInput = document.getElementById('input-search-product');
-        const dateInput = document.getElementById('input-filter-date');
+        const startDateInput = document.getElementById('input-filter-start-date');
+        const endDateInput = document.getElementById('input-filter-end-date');
         const statusSelect = document.getElementById('select-filter-status');
         const btnReset = document.getElementById('btn-reset-filters');
         const tbody = container.querySelector('tbody');
@@ -593,7 +598,8 @@ const settingsView = {
             if (!tbody) return;
 
             const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
-            const dateQuery = dateInput ? dateInput.value : ''; // Format: YYYY-MM-DD
+            const startDateVal = startDateInput ? startDateInput.value : ''; // Format: YYYY-MM-DD
+            const endDateVal = endDateInput ? endDateInput.value : ''; // Format: YYYY-MM-DD
             const statusQuery = statusSelect ? statusSelect.value : 'ALL';
 
             const filteredTx = userTx.filter(tx => {
@@ -605,10 +611,23 @@ const settingsView = {
                     if (!matchProduct && !matchInvoice && !matchGame) return false;
                 }
 
-                // 2. Date Query
-                if (dateQuery) {
-                    const txDateStr = new Date(tx.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
-                    if (txDateStr !== dateQuery) return false;
+                // 2. Custom Date Range Query
+                if (startDateVal || endDateVal) {
+                    const txDate = new Date(tx.createdAt);
+                    // Reset time to midnight for date-only comparison
+                    const txDateOnly = new Date(txDate.getFullYear(), txDate.getMonth(), txDate.getDate()).getTime();
+                    
+                    if (startDateVal) {
+                        const start = new Date(startDateVal);
+                        const startOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate()).getTime();
+                        if (txDateOnly < startOnly) return false;
+                    }
+                    
+                    if (endDateVal) {
+                        const end = new Date(endDateVal);
+                        const endOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate()).getTime();
+                        if (txDateOnly > endOnly) return false;
+                    }
                 }
 
                 // 3. Status Query
@@ -673,12 +692,14 @@ const settingsView = {
 
         // Attach event listeners to filter inputs
         if (searchInput) searchInput.addEventListener('input', filterAndRenderTransactions);
-        if (dateInput) dateInput.addEventListener('change', filterAndRenderTransactions);
+        if (startDateInput) startDateInput.addEventListener('change', filterAndRenderTransactions);
+        if (endDateInput) endDateInput.addEventListener('change', filterAndRenderTransactions);
         if (statusSelect) statusSelect.addEventListener('change', filterAndRenderTransactions);
         if (btnReset) {
             btnReset.addEventListener('click', () => {
                 if (searchInput) searchInput.value = '';
-                if (dateInput) dateInput.value = '';
+                if (startDateInput) startDateInput.value = '';
+                if (endDateInput) endDateInput.value = '';
                 if (statusSelect) statusSelect.value = 'ALL';
                 filterAndRenderTransactions();
             });
