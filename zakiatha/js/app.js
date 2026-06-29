@@ -80,25 +80,44 @@ function refreshAuthHeader() {
     const adminLink = document.getElementById('nav-admin-link');
     const footerAdminLink = document.getElementById('footer-admin-link');
     const settingsLink = document.getElementById('nav-settings-link');
-    if (!container) return;
+    if (!settingsLink) return;
 
     const session = getSession();
     
     // As requested, completely remove login, register, and logout/profile badge from the header.
-    // They are now accessed via the settings page.
-    container.innerHTML = '';
+    if (container) {
+        container.innerHTML = '';
+    }
 
-    // Show Admin link if user is admin
-    if (session && session.role === 'admin') {
-        if (adminLink) adminLink.style.display = 'flex';
-        if (footerAdminLink) footerAdminLink.style.display = 'inline-block';
+    if (session) {
+        // User is logged in: show Settings with the user icon
+        settingsLink.href = '#settings';
+        settingsLink.innerHTML = `
+            <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+            <span>Pengaturan</span>
+        `;
+        settingsLink.style.display = 'flex';
+
+        // Show Admin link if user is admin
+        if (session.role === 'admin') {
+            if (adminLink) adminLink.style.display = 'flex';
+            if (footerAdminLink) footerAdminLink.style.display = 'inline-block';
+        } else {
+            if (adminLink) adminLink.style.display = 'none';
+            if (footerAdminLink) footerAdminLink.style.display = 'none';
+        }
     } else {
+        // Guest: change Settings button to "Masuk / Daftar" linking to #login
+        settingsLink.href = '#login';
+        settingsLink.innerHTML = `
+            <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+            <span>Masuk / Daftar</span>
+        `;
+        settingsLink.style.display = 'flex';
+
         if (adminLink) adminLink.style.display = 'none';
         if (footerAdminLink) footerAdminLink.style.display = 'none';
     }
-
-    // Always show Settings link for all users (guests will be redirected to #login)
-    if (settingsLink) settingsLink.style.display = 'flex';
 
     if (window.lucide) {
         window.lucide.createIcons();
