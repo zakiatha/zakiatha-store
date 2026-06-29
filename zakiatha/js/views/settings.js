@@ -146,12 +146,60 @@ const settingsView = {
                     </div>
                 </div>
 
+                <!-- Tampilan & Tema Section -->
+                <div class="card-glass settings-section">
+                    <div class="settings-section-title">
+                        <i data-lucide="palette" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                        Tampilan & Tema
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
+                        Pilih tema tampilan website yang nyaman untuk mata Anda. Mode Gelap atau Terang dapat diubah kapan saja.
+                    </p>
+                    <button class="btn-grad" id="btn-toggle-theme-settings" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;">
+                        <i data-lucide="sun" id="settings-theme-icon" style="width: 16px; height: 16px;"></i>
+                        <span id="settings-theme-text">Ubah ke Mode Terang</span>
+                    </button>
+                </div>
+
                 <!-- Order History Section -->
                 <div class="card-glass settings-section" style="grid-column: 1 / -1; width: 100%;">
                     <div class="settings-section-title">
                         <i data-lucide="history" style="width: 20px; height: 20px; color: var(--primary);"></i>
                         Riwayat Pesanan Saya
                     </div>
+                    
+                    <!-- Filter & Search Bar -->
+                    <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md);">
+                        <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Cari Layanan / Produk</label>
+                            <div style="position: relative;">
+                                <input type="text" id="input-search-product" class="form-input" placeholder="Cari game, nominal, atau no. invoice..." style="padding-left: 36px; height: 42px; font-size: 13px;">
+                                <i data-lucide="search" style="position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--text-muted);"></i>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Filter Tanggal</label>
+                            <input type="date" id="input-filter-date" class="form-input" style="height: 42px; font-size: 13px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
+                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status Transaksi</label>
+                            <div style="position: relative;">
+                                <select id="select-filter-status" class="form-input form-select" style="height: 42px; font-size: 13px; padding-right: 32px;">
+                                    <option value="ALL">Semua Status</option>
+                                    <option value="PENDING">Sedang Diproses (PENDING)</option>
+                                    <option value="SUCCESS">Berhasil / Selesai (SUCCESS)</option>
+                                    <option value="FAILED">Pesanan Gagal (FAILED)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button id="btn-reset-filters" class="btn-grad" style="height: 42px; padding: 0 20px; margin: 0; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                                <span>Reset</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table>
                             <thead>
@@ -501,20 +549,150 @@ const settingsView = {
             if (window.lucide) window.lucide.createIcons();
         };
 
-        // Attach click listener to table rows
-        const txRows = document.querySelectorAll('.tx-row');
-        txRows.forEach(row => {
-            row.addEventListener('click', (e) => {
-                // If they clicked on the Invoice ID link specifically, let the default routing handle it
-                if (e.target.tagName === 'A') return;
-                
-                const txId = row.getAttribute('data-tx-id');
-                const tx = window.dbService.getTransactionById(txId);
-                if (tx) {
-                    showTxDetail(tx);
-                }
+        // --- Theme Toggle Logic inside Settings ---
+        const themeBtn = document.getElementById('btn-toggle-theme-settings');
+        const themeIcon = document.getElementById('settings-theme-icon');
+        const themeText = document.getElementById('settings-theme-text');
+
+        const updateThemeBtnUI = () => {
+            if (!themeBtn || !themeIcon || !themeText) return;
+            const currentTheme = window.getCurrentTheme();
+            if (currentTheme === 'light') {
+                themeIcon.setAttribute('data-lucide', 'moon');
+                themeText.textContent = 'Ubah ke Mode Gelap';
+            } else {
+                themeIcon.setAttribute('data-lucide', 'sun');
+                themeText.textContent = 'Ubah ke Mode Terang';
+            }
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                window.toggleTheme();
             });
-        });
+        }
+
+        // Listen to theme changed event
+        const handleThemeChanged = () => {
+            updateThemeBtnUI();
+        };
+        window.addEventListener('themeChanged', handleThemeChanged);
+
+        // Initial theme button state
+        updateThemeBtnUI();
+
+        // --- Transaction History Filtering Logic ---
+        const searchInput = document.getElementById('input-search-product');
+        const dateInput = document.getElementById('input-filter-date');
+        const statusSelect = document.getElementById('select-filter-status');
+        const btnReset = document.getElementById('btn-reset-filters');
+        const tbody = container.querySelector('tbody');
+
+        const filterAndRenderTransactions = () => {
+            if (!tbody) return;
+
+            const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const dateQuery = dateInput ? dateInput.value : ''; // Format: YYYY-MM-DD
+            const statusQuery = statusSelect ? statusSelect.value : 'ALL';
+
+            const filteredTx = userTx.filter(tx => {
+                // 1. Search Query (Matches product name, invoice ID, or game name)
+                if (searchQuery) {
+                    const matchProduct = tx.productName && tx.productName.toLowerCase().includes(searchQuery);
+                    const matchInvoice = tx.invoiceId && tx.invoiceId.toLowerCase().includes(searchQuery);
+                    const matchGame = tx.gameName && tx.gameName.toLowerCase().includes(searchQuery);
+                    if (!matchProduct && !matchInvoice && !matchGame) return false;
+                }
+
+                // 2. Date Query
+                if (dateQuery) {
+                    const txDateStr = new Date(tx.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
+                    if (txDateStr !== dateQuery) return false;
+                }
+
+                // 3. Status Query
+                if (statusQuery !== 'ALL') {
+                    if (tx.status !== statusQuery) return false;
+                }
+
+                return true;
+            });
+
+            if (filteredTx.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                            Tidak ada transaksi yang cocok dengan filter.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredTx.map(tx => {
+                 const txDate = new Date(tx.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                 let statusBadge = '';
+                 if (tx.status === 'PENDING') {
+                     statusBadge = '<span class="badge status-pending">PENDING</span>';
+                 } else if (tx.status === 'SUCCESS') {
+                     const game = window.dbService.getGameById(tx.gameId);
+                     const isVoucher = game && game.category === 'voucher';
+                     const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
+                     statusBadge = `<span class="badge status-success">${label}</span>`;
+                 } else {
+                     statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
+                 }
+                return `
+                    <tr class="tx-row" data-tx-id="${tx.id}" style="cursor: pointer;" title="Klik untuk melihat detail status & nota">
+                        <td style="font-weight: 700; font-family: monospace;">
+                            <a href="#invoice/${tx.invoiceId}" style="color: var(--secondary);">${tx.invoiceId}</a>
+                        </td>
+                        <td>${txDate}</td>
+                        <td style="font-weight: 600;">${tx.gameName}</td>
+                        <td>${tx.productName}</td>
+                        <td style="font-weight: 800; color: var(--secondary);">${window.formatRupiah(tx.totalAmount)}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Re-attach click listeners
+            const txRows = tbody.querySelectorAll('.tx-row');
+            txRows.forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'A') return;
+                    const txId = row.getAttribute('data-tx-id');
+                    const tx = window.dbService.getTransactionById(txId);
+                    if (tx) {
+                        showTxDetail(tx);
+                    }
+                });
+            });
+        };
+
+        // Attach event listeners to filter inputs
+        if (searchInput) searchInput.addEventListener('input', filterAndRenderTransactions);
+        if (dateInput) dateInput.addEventListener('change', filterAndRenderTransactions);
+        if (statusSelect) statusSelect.addEventListener('change', filterAndRenderTransactions);
+        if (btnReset) {
+            btnReset.addEventListener('click', () => {
+                if (searchInput) searchInput.value = '';
+                if (dateInput) dateInput.value = '';
+                if (statusSelect) statusSelect.value = 'ALL';
+                filterAndRenderTransactions();
+            });
+        }
+
+        // Run initial render
+        filterAndRenderTransactions();
+
+        // Remove window event listener on hashchange to prevent memory leak
+        const cleanupSettingsEvents = () => {
+            window.removeEventListener('themeChanged', handleThemeChanged);
+            window.removeEventListener('hashchange', cleanupSettingsEvents);
+        };
+        window.addEventListener('hashchange', cleanupSettingsEvents);
     }
 };
 

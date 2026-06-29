@@ -89,18 +89,28 @@ function refreshAuthHeader() {
         const points = user ? user.points : 0;
         
         container.innerHTML = `
-            <div class="user-profile-badge">
-                <i data-lucide="user" style="width: 14px; height: 14px; color: var(--primary);"></i>
-                <span>${session.username}</span>
-                <div class="user-points-badge" id="nav-points-badge" title="Poin Belanja Anda (1% Cashback)">
-                    <i data-lucide="award" style="width: 12px; height: 12px;"></i>
-                    <span>${points.toLocaleString('id-ID')} Pts</span>
+            <div class="profile-dropdown">
+                <div class="user-profile-badge dropdown-trigger">
+                    <i data-lucide="user" style="width: 14px; height: 14px; color: var(--primary);"></i>
+                    <span>${session.username}</span>
+                    <div class="user-points-badge" id="nav-points-badge" title="Poin Belanja Anda (1% Cashback)">
+                        <i data-lucide="award" style="width: 12px; height: 12px;"></i>
+                        <span>${points.toLocaleString('id-ID')} Pts</span>
+                    </div>
+                    <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 12px; height: 12px; margin-left: 4px; transition: transform 0.2s;"></i>
+                </div>
+                <div class="profile-dropdown-content card-glass">
+                    <a href="#settings" class="dropdown-item">
+                        <i data-lucide="settings" style="width: 14px; height: 14px;"></i>
+                        <span>Pengaturan</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <button id="btn-logout" class="dropdown-item logout-btn">
+                        <i data-lucide="log-out" style="width: 14px; height: 14px; color: var(--danger);"></i>
+                        <span style="color: var(--danger);">Keluar Akun</span>
+                    </button>
                 </div>
             </div>
-            <button id="btn-logout" class="nav-btn secondary" style="padding: 8px 16px; font-size: 13px; border-radius: var(--radius-sm);">
-                <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
-                <span>Keluar</span>
-            </button>
         `;
 
         // Bind logout
@@ -125,8 +135,8 @@ function refreshAuthHeader() {
             if (footerAdminLink) footerAdminLink.style.display = 'none';
         }
 
-        // Show Settings link for logged-in users
-        if (settingsLink) settingsLink.style.display = 'flex';
+        // Hide the old settings link in main navbar
+        if (settingsLink) settingsLink.style.display = 'none';
     } else {
         // Guest (not logged in)
         container.innerHTML = `
@@ -315,13 +325,8 @@ function renderError(container, message) {
     `;
 }
 
-// Theme Initialization & Toggle Logic
+// Theme Initialization & Logic
 function initTheme() {
-    const themeToggleBtn = document.getElementById('theme-toggle-btn');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    if (!themeToggleBtn || !themeIcon) return;
-
     // Load saved theme
     const savedTheme = localStorage.getItem('topup_store_theme');
     
@@ -330,32 +335,25 @@ function initTheme() {
     
     if (isLightTheme) {
         document.documentElement.classList.add('light-theme');
-        themeIcon.setAttribute('data-lucide', 'moon');
     } else {
         document.documentElement.classList.remove('light-theme');
-        themeIcon.setAttribute('data-lucide', 'sun');
     }
     
-    // Render the initial icon
-    if (window.lucide) {
-        window.lucide.createIcons();
-    }
-
-    themeToggleBtn.addEventListener('click', () => {
+    window.getCurrentTheme = function() {
+        return document.documentElement.classList.contains('light-theme') ? 'light' : 'dark';
+    };
+    
+    window.toggleTheme = function() {
         const isCurrentLight = document.documentElement.classList.contains('light-theme');
         if (isCurrentLight) {
             document.documentElement.classList.remove('light-theme');
             localStorage.setItem('topup_store_theme', 'dark');
-            themeIcon.setAttribute('data-lucide', 'sun');
         } else {
             document.documentElement.classList.add('light-theme');
             localStorage.setItem('topup_store_theme', 'light');
-            themeIcon.setAttribute('data-lucide', 'moon');
         }
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
-    });
+        window.dispatchEvent(new CustomEvent('themeChanged'));
+    };
 }
 
 // Application Initialization

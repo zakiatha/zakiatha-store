@@ -265,8 +265,7 @@ const detailView = {
                                 <p style="font-size: 11px; color: var(--text-muted);">Invoice dan bukti pembayaran akan dikirimkan ke nomor WhatsApp ini.</p>
                             </div>
                             
-                            <button id="btn-submit-order" class="btn-grad" style="width: 100%; padding: 16px;" disabled>
-                                <i data-lucide="shopping-bag" style="width: 20px; height: 20px;"></i>
+                            <button id="btn-submit-order" class="btn-grad" style="width: 100%; padding: 16px;">
                                 <span>Beli Sekarang</span>
                             </button>
                         </div>
@@ -493,8 +492,10 @@ const detailView = {
             };
             
             paymentMethods.forEach(pm => {
-                if (groups[pm.type]) {
-                    groups[pm.type].items.push(pm);
+                let targetType = pm.type;
+                if (targetType === 'qris') targetType = 'ewallet';
+                if (groups[targetType]) {
+                    groups[targetType].items.push(pm);
                 }
             });
             
@@ -566,6 +567,37 @@ const detailView = {
             });
         };
         
+        // Helper: Show a premium glassmorphic warning pop-up
+        const showWarningModal = (message) => {
+            let warningModal = document.getElementById('warning-modal');
+            if (!warningModal) {
+                warningModal = document.createElement('div');
+                warningModal.id = 'warning-modal';
+                warningModal.className = 'modal-overlay';
+                warningModal.style.zIndex = '2000'; // Make sure it is above everything
+                warningModal.innerHTML = `
+                    <div class="card-glass modal-card" style="max-width: 400px; text-align: center; padding: 32px; border-color: rgba(245, 158, 11, 0.3);">
+                        <i data-lucide="alert-triangle" style="width: 48px; height: 48px; color: var(--warning); margin: 0 auto 16px auto; filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));"></i>
+                        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 12px; color: var(--text-primary);">Peringatan</h3>
+                        <p id="warning-modal-message" style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 24px;"></p>
+                        <button class="btn-grad" id="btn-warning-ok" style="width: 100%; margin: 0; padding: 12px;">Mengerti</button>
+                    </div>
+                `;
+                document.body.appendChild(warningModal);
+                
+                document.getElementById('btn-warning-ok').onclick = () => {
+                    warningModal.classList.remove('active');
+                };
+                warningModal.onclick = (e) => {
+                    if (e.target === warningModal) warningModal.classList.remove('active');
+                };
+            }
+            
+            document.getElementById('warning-modal-message').textContent = message;
+            warningModal.classList.add('active');
+            if (window.lucide) window.lucide.createIcons();
+        };
+
         // ----------------------------------------------------
         // 4. FORM VALIDATION & PHONE PREFIX CHECK
         // ----------------------------------------------------
@@ -578,10 +610,6 @@ const detailView = {
                     allInputsFilled = false;
                 }
             });
-            
-            const isWhatsappFilled = whatsappInput.value.trim().length >= 9;
-            const isProductSelected = selectedProduct !== null;
-            const isPaymentSelected = selectedPayment !== null;
 
             // Prefix validation for Pulsa category
             if (game.category === 'pulsa') {
@@ -624,12 +652,6 @@ const detailView = {
                 }
             }
             
-            if (allInputsFilled && isWhatsappFilled && isProductSelected && isPaymentSelected) {
-                submitBtn.removeAttribute('disabled');
-            } else {
-                submitBtn.setAttribute('disabled', 'true');
-            }
-
             // Update real-time summary
             updateCheckoutSummary();
         };
@@ -642,7 +664,60 @@ const detailView = {
         // 5. SUBMIT ORDER & CHECKOUT MODAL
         // ----------------------------------------------------
         submitBtn.addEventListener('click', () => {
-            if (!selectedProduct || !selectedPayment) return;
+            // 1. Check if product is selected
+            if (!selectedProduct) {
+                showWarningModal("Harap pilih nominal top-up terlebih dahulu!");
+                return;
+            }
+            
+            // 2. Check if payment method is selected
+            if (!selectedPayment) {
+                showWarningModal("Harap pilih metode pembayaran terlebih dahulu!");
+                return;
+            }
+            
+            // 3. Check if all dynamic game fields are filled
+            const gameInputs = document.querySelectorAll('.game-input');
+            let missingFieldLabel = '';
+            for (let input of gameInputs) {
+                if (!input.value.trim()) {
+                    const labelEl = input.parentNode.querySelector('label');
+                    missingFieldLabel = labelEl ? labelEl.textContent : 'Data Akun';
+                    break;
+                }
+            }
+            if (missingFieldLabel) {
+                showWarningModal(`Harap isi kolom [${missingFieldLabel}] terlebih dahulu!`);
+                return;
+            }
+            
+            // 4. Check if phone prefix is valid (for pulsa category)
+            if (game.category === 'pulsa') {
+                const phoneInput = document.getElementById('input-phone');
+                if (phoneInput) {
+                    const phoneVal = normalizePhoneNumber(phoneInput.value.trim());
+                    const providerPrefixes = {
+                        'xl': ['0817', '0818', '0819', '0859', '0877', '0878'],
+                        'axis': ['0831', '0832', '0833', '0838'],
+                        'byu': ['0851'],
+                        'telkomsel': ['0811', '0812', '0813', '0821', '0822', '0823', '0852', '0853', '0851'],
+                        'smartfren': ['0881', '0882', '0883', '0884', '0885', '0886', '0887', '0888', '0889'],
+                        'indosat': ['0815', '0816', '0855', '0856', '0857', '0858']
+                    };
+                    const prefixes = providerPrefixes[game.slug] || [];
+                    const isValidPrefix = prefixes.some(prefix => phoneVal.startsWith(prefix));
+                    if (!isValidPrefix) {
+                        showWarningModal(`Nomor HP yang Anda masukkan tidak sesuai dengan provider ${game.name}!`);
+                        return;
+                    }
+                }
+            }
+            
+            // 5. Check if WhatsApp is filled and valid
+            if (whatsappInput.value.trim().length < 9) {
+                showWarningModal("Harap masukkan nomor WhatsApp yang valid (minimal 9 digit) untuk menerima rincian transaksi!");
+                return;
+            }
             
             // Get session points
             const session = window.getSession();
