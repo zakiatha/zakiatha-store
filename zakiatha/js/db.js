@@ -25,6 +25,36 @@ function getDB() {
         hasUpdates = true;
     }
     
+    if (!db.paymentMethods) {
+        db.paymentMethods = defaultDb.paymentMethods || [];
+        hasUpdates = true;
+    } else {
+        // Sync payment methods
+        defaultDb.paymentMethods.forEach(defaultPM => {
+            const index = db.paymentMethods.findIndex(pm => pm.id === defaultPM.id);
+            if (index === -1) {
+                db.paymentMethods.push(defaultPM);
+                hasUpdates = true;
+            } else {
+                // Update properties if changed
+                if (db.paymentMethods[index].name !== defaultPM.name ||
+                    db.paymentMethods[index].code !== defaultPM.code ||
+                    db.paymentMethods[index].type !== defaultPM.type ||
+                    db.paymentMethods[index].feeType !== defaultPM.feeType ||
+                    db.paymentMethods[index].feeValue !== defaultPM.feeValue ||
+                    db.paymentMethods[index].info !== defaultPM.info) {
+                    db.paymentMethods[index].name = defaultPM.name;
+                    db.paymentMethods[index].code = defaultPM.code;
+                    db.paymentMethods[index].type = defaultPM.type;
+                    db.paymentMethods[index].feeType = defaultPM.feeType;
+                    db.paymentMethods[index].feeValue = defaultPM.feeValue;
+                    db.paymentMethods[index].info = defaultPM.info;
+                    hasUpdates = true;
+                }
+            }
+        });
+    }
+    
     // Healing: Clean up any invalid/undefined IDs in the existing database
     db.games.forEach(g => {
         if (!g.id || g.id === 'undefined') {
@@ -513,10 +543,14 @@ function initDefaultDB() {
             { id: 'pm-dana', name: 'DANA', code: 'DANA', type: 'ewallet', feeType: 'percent', feeValue: 1.5, isActive: true, info: 'Biaya admin 1.5%' },
             { id: 'pm-ovo', name: 'OVO', code: 'OVO', type: 'ewallet', feeType: 'percent', feeValue: 1.5, isActive: true, info: 'Biaya admin 1.5%' },
             { id: 'pm-shopeepay', name: 'ShopeePay', code: 'SHOPEEPAY', type: 'ewallet', feeType: 'percent', feeValue: 2.0, isActive: true, info: 'Biaya admin 2%' },
+            { id: 'pm-gopay', name: 'GoPay', code: 'GOPAY', type: 'ewallet', feeType: 'percent', feeValue: 1.5, isActive: true, info: 'Biaya admin 1.5%' },
+            { id: 'pm-linkaja', name: 'LinkAja', code: 'LINKAJA', type: 'ewallet', feeType: 'percent', feeValue: 1.5, isActive: true, info: 'Biaya admin 1.5%' },
             { id: 'pm-bca', name: 'BCA Virtual Account', code: 'BCA_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
             { id: 'pm-mandiri', name: 'Mandiri Virtual Account', code: 'MANDIRI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
-            { id: 'pm-bni', name: 'BNI Virtual Account', code: 'BNI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis' },
-            { id: 'pm-bri', name: 'BRI Virtual Account', code: 'BRI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis' },
+            { id: 'pm-bni', name: 'BNI Virtual Account', code: 'BNI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
+            { id: 'pm-bri', name: 'BRI Virtual Account', code: 'BRI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
+            { id: 'pm-bsi', name: 'BSI Virtual Account', code: 'BSI_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
+            { id: 'pm-cimb', name: 'CIMB Virtual Account', code: 'CIMB_VA', type: 'va', feeType: 'flat', feeValue: 3000, isActive: true, info: 'Dicek otomatis 24 jam' },
             { id: 'pm-alfa', name: 'Alfamart', code: 'ALFAMART', type: 'retail', feeType: 'flat', feeValue: 2500, isActive: true, info: 'Bayar di kasir Alfamart terdekat' },
             { id: 'pm-indomaret', name: 'Indomaret', code: 'INDOMARET', type: 'retail', feeType: 'flat', feeValue: 2500, isActive: true, info: 'Bayar di kasir Indomaret terdekat' }
         ],

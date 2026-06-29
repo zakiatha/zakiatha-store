@@ -528,16 +528,16 @@ const detailView = {
                     
                     accordionHtml += `
                         <div class="payment-card payment-item ${isSelected ? 'selected' : ''}" data-pm-id="${pm.id}">
-                            <div class="payment-card-logo-name">
-                                <div class="payment-logo-container">
+                            <div class="payment-left">
+                                <div class="payment-logo-wrapper">
                                     <span class="payment-logo-text">${pm.code}</span>
                                 </div>
-                                <div class="payment-details-info">
+                                <div class="payment-info-text">
                                     <div class="payment-name">${pm.name}</div>
-                                    <div class="payment-info-text">${pm.info}</div>
+                                    <div class="payment-meta">${pm.info}</div>
                                 </div>
                             </div>
-                            <div style="text-align: right;">
+                            <div class="payment-right">
                                 <div class="payment-price">${window.formatRupiah(finalPrice)}</div>
                                 ${discountAmount > 0 ? `<div style="font-size:10px; color:var(--success); font-weight:700;">Potong ${discountAmount.toLocaleString('id-ID')} Pts</div>` : ''}
                             </div>
