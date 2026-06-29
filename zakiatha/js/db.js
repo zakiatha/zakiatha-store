@@ -150,7 +150,7 @@ function initDefaultDB() {
                 slug: 'mobile-legends',
                 category: 'mobile',
                 logo: 'mobilelgendsbangbang.jpg',
-                banner: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-mlbb.jpg',
                 description: 'Top up Diamond Mobile Legends: Bang Bang instan, murah, dan aman. Masukkan data akun Anda, pilih nominal, selesaikan pembayaran, dan Diamond akan langsung masuk ke akun Anda!',
                 fields: [
                     { id: 'userId', label: 'User ID', placeholder: 'Masukkan User ID', type: 'text', required: true },
@@ -164,7 +164,7 @@ function initDefaultDB() {
                 slug: 'free-fire',
                 category: 'mobile',
                 logo: 'freefire.jpg',
-                banner: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-ff.jpg',
                 description: 'Top up Diamond Free Fire instan, murah, dan terpercaya. Cukup masukkan Player ID Free Fire Anda, pilih nominal Diamond, dan selesaikan pembayaran.',
                 fields: [
                     { id: 'userId', label: 'Player ID', placeholder: 'Masukkan Player ID', type: 'text', required: true }
@@ -177,7 +177,7 @@ function initDefaultDB() {
                 slug: 'pubg-mobile',
                 category: 'mobile',
                 logo: 'PUBGM.jpg',
-                banner: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-pubg.jpg',
                 description: 'Top up Unknown Cash (UC) PUBG Mobile instan dan murah. Masukkan Character ID Anda, pilih jumlah UC yang diinginkan, dan bayar dengan metode pembayaran favorit Anda.',
                 fields: [
                     { id: 'userId', label: 'Character ID', placeholder: 'Masukkan Character ID', type: 'text', required: true }
@@ -190,7 +190,7 @@ function initDefaultDB() {
                 slug: 'genshin-impact',
                 category: 'mobile',
                 logo: 'gensinimpact.jpg',
-                banner: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-genshin.jpg',
                 description: 'Top up Genesis Crystals atau Welkin Moon Genshin Impact instan. Masukkan UID dan pilih Server yang sesuai dengan akun Genshin Impact Anda.',
                 fields: [
                     { id: 'userId', label: 'UID', placeholder: 'Masukkan UID Akun', type: 'text', required: true },
@@ -210,7 +210,7 @@ function initDefaultDB() {
                 slug: 'valorant',
                 category: 'pc',
                 logo: 'valorant.jpg',
-                banner: 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-valorant.jpg',
                 description: 'Top up Valorant Points (VP) murah dan cepat. Masukkan Riot ID + Tagline Anda (contoh: Username#1234), pilih nominal VP, dan VP akan segera masuk.',
                 fields: [
                     { id: 'userId', label: 'Riot ID (Username#Tagline)', placeholder: 'Contoh: GamerSejati#ID1', type: 'text', required: true }
@@ -223,7 +223,7 @@ function initDefaultDB() {
                 slug: 'steam-wallet',
                 category: 'voucher',
                 logo: 'steam.jpg',
-                banner: 'https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-steam.jpg',
                 description: 'Beli Steam Wallet Code Rupiah instan untuk mengisi saldo akun Steam Anda. Masukkan Akun Gmail Pengguna dan Nomor Handphone Anda.',
                 fields: [
                     { id: 'gmail', label: 'Akun Gmail Pengguna', placeholder: 'Masukkan Akun Gmail Anda', type: 'text', required: true },
@@ -238,7 +238,7 @@ function initDefaultDB() {
                 slug: 'xl',
                 category: 'pulsa',
                 logo: 'XL.png',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-xl.jpg',
                 description: 'Isi ulang pulsa XL murah, cepat, dan otomatis 24 jam. Cukup masukkan nomor handphone XL Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone XL', placeholder: 'Contoh: 081812345678', type: 'text', required: true }
@@ -251,7 +251,7 @@ function initDefaultDB() {
                 slug: 'axis',
                 category: 'pulsa',
                 logo: 'axis.png',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-axis.jpg',
                 description: 'Isi ulang pulsa Axis murah, cepat, dan otomatis. Masukkan nomor handphone Axis Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone Axis', placeholder: 'Contoh: 083812345678', type: 'text', required: true }
@@ -264,7 +264,7 @@ function initDefaultDB() {
                 slug: 'byu',
                 category: 'pulsa',
                 logo: 'by-u.png',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-byu.jpg',
                 description: 'Isi ulang pulsa by.U instan 24 jam. Masukkan nomor handphone by.U Anda, pilih nominal pulsa, dan selesaikan pembayaran.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone by.U', placeholder: 'Contoh: 085112345678', type: 'text', required: true }
@@ -277,7 +277,7 @@ function initDefaultDB() {
                 slug: 'telkomsel',
                 category: 'pulsa',
                 logo: 'telkomsel.jpg',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-telkomsel.jpg',
                 description: 'Isi ulang pulsa Telkomsel murah, cepat, dan terpercaya. Masukkan nomor handphone Telkomsel Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone Telkomsel', placeholder: 'Contoh: 081212345678', type: 'text', required: true }
@@ -290,7 +290,7 @@ function initDefaultDB() {
                 slug: 'smartfren',
                 category: 'pulsa',
                 logo: 'smartfren.jpg',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-smartfren.jpg',
                 description: 'Isi ulang pulsa Smartfren murah dan cepat. Masukkan nomor HP Smartfren Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone Smartfren', placeholder: 'Contoh: 088212345678', type: 'text', required: true }
@@ -303,7 +303,7 @@ function initDefaultDB() {
                 slug: 'indosat',
                 category: 'pulsa',
                 logo: 'indoosat.png',
-                banner: 'https://images.unsplash.com/photo-1562408590-e32931084e23?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-indosat.jpg',
                 description: 'Isi ulang pulsa Indosat Ooredoo murah dan cepat. Masukkan nomor HP Indosat Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor Handphone Indosat', placeholder: 'Contoh: 085712345678', type: 'text', required: true }
@@ -317,7 +317,7 @@ function initDefaultDB() {
                 slug: 'google-play',
                 category: 'voucher',
                 logo: 'googleplay.png',
-                banner: 'https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-googleplay.jpg',
                 description: 'Beli Google Play Gift Card instan. Kode voucher Google Play akan dikirimkan langsung ke email Anda.',
                 fields: [
                     { id: 'email', label: 'Akun Gmail Pengguna', placeholder: 'Masukkan Akun Gmail Anda', type: 'text', required: true },
@@ -332,7 +332,7 @@ function initDefaultDB() {
                 slug: 'shopeepay',
                 category: 'ewallet',
                 logo: 'shoopepay.png',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-shopeepay.jpg',
                 description: 'Top up saldo ShopeePay instan. Masukkan nomor HP yang terdaftar di akun Shopee Anda, pilih nominal, dan saldo akan langsung masuk.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP ShopeePay', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
@@ -345,7 +345,7 @@ function initDefaultDB() {
                 slug: 'dana',
                 category: 'ewallet',
                 logo: 'dana.jpg',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-dana.jpg',
                 description: 'Top up saldo DANA instan dan murah. Masukkan nomor HP terdaftar di DANA Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP DANA', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
@@ -358,7 +358,7 @@ function initDefaultDB() {
                 slug: 'gopay',
                 category: 'ewallet',
                 logo: 'gopay.jpg',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-gopay.jpg',
                 description: 'Top up saldo GoPay instan. Masukkan nomor HP yang terdaftar di akun Gojek Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP GoPay', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
@@ -371,7 +371,7 @@ function initDefaultDB() {
                 slug: 'ovo',
                 category: 'ewallet',
                 logo: 'ovo.jpg',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-ovo.jpg',
                 description: 'Top up saldo OVO instan dan terpercaya. Masukkan nomor HP yang terdaftar di OVO Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP OVO', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
@@ -384,7 +384,7 @@ function initDefaultDB() {
                 slug: 'grabpay',
                 category: 'ewallet',
                 logo: 'grabpay.png',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-grabpay.jpg',
                 description: 'Top up saldo GrabPay / OVO (via Grab) instan. Masukkan nomor HP terdaftar di Grab Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP Grab', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
@@ -397,7 +397,7 @@ function initDefaultDB() {
                 slug: 'sakuku',
                 category: 'ewallet',
                 logo: 'sakuku.jpg',
-                banner: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
+                banner: 'img/banner-sakuku.jpg',
                 description: 'Top up saldo SakuKu (BCA) instan. Masukkan nomor HP terdaftar di SakuKu Anda.',
                 fields: [
                     { id: 'phone', label: 'Nomor HP SakuKu', placeholder: 'Contoh: 081234567890', type: 'text', required: true }
