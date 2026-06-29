@@ -389,41 +389,26 @@ const detailView = {
         // ----------------------------------------------------
         // 1. DYNAMIC INPUT FIELDS GENERATION
         // ----------------------------------------------------
-        if (game.slug === 'mobile-legends') {
-            fieldsContainer.innerHTML = `
-                <div class="input-grid-ml">
+        fieldsContainer.innerHTML = game.fields.map(field => {
+            if (field.type === 'select') {
+                return `
                     <div class="form-group">
-                        <label for="input-userId">User ID</label>
-                        <input type="text" id="input-userId" class="form-input game-input" placeholder="Masukkan User ID" required>
+                        <label for="input-${field.id}">${field.label}</label>
+                        <select id="input-${field.id}" class="form-input form-select game-input" required>
+                            <option value="" disabled selected>Pilih ${field.label}</option>
+                            ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                        </select>
                     </div>
+                `;
+            } else {
+                return `
                     <div class="form-group">
-                        <label for="input-zoneId">Zone ID</label>
-                        <input type="text" id="input-zoneId" class="form-input game-input" placeholder="Zone ID" required>
+                        <label for="input-${field.id}">${field.label}</label>
+                        <input type="text" id="input-${field.id}" class="form-input game-input" placeholder="${field.placeholder}" required>
                     </div>
-                </div>
-            `;
-        } else {
-            fieldsContainer.innerHTML = game.fields.map(field => {
-                if (field.type === 'select') {
-                    return `
-                        <div class="form-group">
-                            <label for="input-${field.id}">${field.label}</label>
-                            <select id="input-${field.id}" class="form-input form-select game-input" required>
-                                <option value="" disabled selected>Pilih ${field.label}</option>
-                                ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                            </select>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div class="form-group">
-                            <label for="input-${field.id}">${field.label}</label>
-                            <input type="text" id="input-${field.id}" class="form-input game-input" placeholder="${field.placeholder}" required>
-                        </div>
-                    `;
-                }
-            }).join('');
-        }
+                `;
+            }
+        }).join('');
         
         // ----------------------------------------------------
         // 2. DYNAMIC NOMINALS GENERATION

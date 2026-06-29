@@ -1268,25 +1268,26 @@ header::after {
     gap: 16px;
 }
 
-/* Nominal Grid */
+/* Nominal Grid - Tampilan Sedang */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
 }
 
 .product-card {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: clamp(14px, 2vw, 20px);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     transition: var(--transition-normal);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    min-height: 95px;
 }
 
 .product-card:hover {
@@ -1326,7 +1327,8 @@ header::after {
 
 .product-card-title {
     font-weight: 700;
-    font-size: clamp(14px, 1.5vw, 16px);
+    font-size: 13px;
+    line-height: 1.35;
 }
 
 .product-card-price-wrapper {
@@ -1334,7 +1336,7 @@ header::after {
 }
 
 .product-card-price {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--secondary);
 }
@@ -2619,7 +2621,7 @@ input:checked + .slider-switch:before {
 
     /* Product grid */
     .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     }
 
     /* Track input group */
@@ -2676,7 +2678,7 @@ input:checked + .slider-switch:before {
 
     .product-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 8px;
     }
 
     .admin-stats-grid {
@@ -3013,5 +3015,50 @@ input:checked + .slider-switch:before {
     vertical-align: middle;
     margin-inline-end: 8px;
     display: inline-block;
+}
+
+/* ================================================
+   HUD PANEL & HERO CAROUSEL SPACING & STYLES
+   ================================================ */
+.hud-panel {
+    margin-top: 32px !important; /* Jarak lebih dengan header atas */
+    margin-bottom: 32px !important; /* Jarak dengan carousel game */
+    position: relative;
+    z-index: 5;
+}
+
+.hero-carousel {
+    margin-bottom: 48px !important; /* Jarak bawah carousel */
+}
+
+/* Hero Carousel Dots & Active State */
+.hero-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.hero-dot.active {
+    background: var(--primary) !important;
+    width: 24px !important;
+    border-radius: var(--radius-full) !important;
+}
+
+/* Light Theme overrides for Hero Carousel active dot */
+.light-theme .hero-dot {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.light-theme .hero-dot.active {
+    background: var(--primary) !important;
 }
 

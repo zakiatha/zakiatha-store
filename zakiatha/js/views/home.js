@@ -301,20 +301,76 @@ const homeView = {
                 </div>
             </div>
 
-            <!-- Immersive Hero Banner with 3D Cyber Console Aesthetic -->
-            <section class="hero-banner" style="border: 1px solid rgba(139, 92, 246, 0.3); background: radial-gradient(circle at top left, rgba(13, 19, 39, 0.95), rgba(7, 10, 19, 0.9));">
-                <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop" alt="Promo Banner" class="hero-bg">
-                <div class="hero-overlay" style="background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(139, 92, 246, 0.15) 100%);"></div>
-                <div class="hero-content">
-                    <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px;">GAMING PORTAL 3D</span>
-                    <h1 class="gradient-text" style="font-size: 46px; text-shadow: 0 0 20px rgba(139,92,246,0.3);">Portal Top-Up Gamers Sejati</h1>
-                    <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary);">
-                        Rasakan pengalaman top-up paling visual, cepat dan aman di Indonesia. Diuji oleh komunitas e-sports, terintegrasi langsung dengan gateway pihak ketiga otomatis 24 Jam.
-                    </p>
-                    <a href="#game/mobile-legends" class="btn-grad" style="border-radius: var(--radius-md);">
-                        <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
-                        <span>Isi Diamond MLBB</span>
+            <!-- Immersive Hero Carousel (Slideshow) with 3D Cyber Console Aesthetic -->
+            <section class="hero-carousel" style="position: relative; width: 100%; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(139, 92, 246, 0.3); background: #0d1327; box-shadow: var(--shadow-lg); height: 380px;">
+                <div class="hero-track" id="hero-carousel-track" style="display: flex; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);">
+                    
+                    <!-- Slide 1: Mobile Legends -->
+                    <a href="#game/mobile-legends" class="hero-slide" style="flex: 0 0 100%; width: 100%; height: 100%; position: relative; display: block; text-decoration: none;">
+                        <img src="img/mobilelgendsbangbang.jpg" alt="Mobile Legends Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
+                        <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(139, 92, 246, 0.15) 100%); z-index: 2;"></div>
+                        <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content;">MOBILE LEGENDS</span>
+                            <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(139,92,246,0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Isi Diamond MLBB Instan</h1>
+                            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                                Top-up Diamond Mobile Legends: Bang Bang instan, murah, dan aman. Masukkan data akun Anda, pilih nominal, selesaikan pembayaran!
+                            </p>
+                            <span class="btn-grad" style="border-radius: var(--radius-md); width: fit-content;">
+                                <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+                                <span>Top Up Sekarang</span>
+                            </span>
+                        </div>
                     </a>
+
+                    <!-- Slide 2: Free Fire -->
+                    <a href="#game/free-fire" class="hero-slide" style="flex: 0 0 100%; width: 100%; height: 100%; position: relative; display: block; text-decoration: none;">
+                        <img src="img/freefire.jpg" alt="Free Fire Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
+                        <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(249, 115, 22, 0.15) 100%); z-index: 2;"></div>
+                        <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content; background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">FREE FIRE</span>
+                            <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(249, 115, 22, 0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Top Up Free Fire Murah</h1>
+                            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                                Cukup masukkan Player ID Free Fire Anda, pilih nominal Diamond, dan dapatkan harga promo mingguan terendah otomatis 24 Jam!
+                            </p>
+                            <span class="btn-grad" style="border-radius: var(--radius-md); width: fit-content;">
+                                <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+                                <span>Top Up Sekarang</span>
+                            </span>
+                        </div>
+                    </a>
+
+                    <!-- Slide 3: Valorant -->
+                    <a href="#game/valorant" class="hero-slide" style="flex: 0 0 100%; width: 100%; height: 100%; position: relative; display: block; text-decoration: none;">
+                        <img src="img/valorant.jpg" alt="Valorant Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
+                        <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(239, 68, 68, 0.15) 100%); z-index: 2;"></div>
+                        <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
+                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content; background: linear-gradient(135deg, var(--danger) 0%, var(--accent) 100%);">VALORANT</span>
+                            <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(239, 68, 68, 0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Beli Valorant Points</h1>
+                            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
+                                Masukkan Riot ID + Tagline Anda, pilih nominal VP, dan VP akan langsung dikirim ke akun Anda secara instan 24 Jam.
+                            </p>
+                            <span class="btn-grad" style="border-radius: var(--radius-md); width: fit-content;">
+                                <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+                                <span>Top Up Sekarang</span>
+                            </span>
+                        </div>
+                    </a>
+
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button id="hero-prev" class="slide-arrow prev" style="left: 16px; width: 40px; height: 40px; border-radius: 50%;" aria-label="Sebelumnya">
+                    <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
+                </button>
+                <button id="hero-next" class="slide-arrow next" style="right: 16px; width: 40px; height: 40px; border-radius: 50%;" aria-label="Selanjutnya">
+                    <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                </button>
+
+                <!-- Navigation Dots -->
+                <div class="hero-dots" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 10;">
+                    <div class="hero-dot active" data-index="0" style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease;"></div>
+                    <div class="hero-dot" data-index="1" style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease;"></div>
+                    <div class="hero-dot" data-index="2" style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease;"></div>
                 </div>
             </section>
             
@@ -405,7 +461,7 @@ const homeView = {
                                 }
                                 return `
                                     <div class="game-card-wrapper">
-                                        <div class="game-card" data-slug="${game.slug}">
+                                        <a href="#game/${game.slug}" class="game-card" data-slug="${game.slug}">
                                             <div class="game-card-img-wrapper">
                                                 <img src="${game.banner}" alt="${game.name}" class="game-card-img" loading="lazy">
                                             </div>
@@ -420,7 +476,7 @@ const homeView = {
                                                 <h3 class="game-card-title">${game.name}</h3>
                                                 <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
                                             </div>
-                                        </div>
+                                        </a>
                                     </div>
                                 `;
                             }).join('')}
@@ -449,11 +505,93 @@ const homeView = {
                 });
             });
 
+            // Initialize hero carousel
+            initHeroCarousel();
+
             // Initialize sliders
             initSliders();
 
             // Initialize 3D dynamic tilt interaction
             this.init3DTilt();
+        };
+
+        // Hero Carousel Logic
+        const initHeroCarousel = () => {
+            const track = document.getElementById('hero-carousel-track');
+            const slides = document.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.hero-dot');
+            const prevBtn = document.getElementById('hero-prev');
+            const nextBtn = document.getElementById('hero-next');
+            if (!track || slides.length === 0) return;
+
+            let currentIndex = 0;
+            let slideInterval;
+
+            const updateHeroSlide = (index) => {
+                currentIndex = (index + slides.length) % slides.length;
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update dots
+                dots.forEach((dot, idx) => {
+                    if (idx === currentIndex) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            };
+
+            const nextSlide = () => {
+                updateHeroSlide(currentIndex + 1);
+            };
+
+            const prevSlide = () => {
+                updateHeroSlide(currentIndex - 1);
+            };
+
+            const startAutoPlay = () => {
+                stopAutoPlay();
+                slideInterval = setInterval(nextSlide, 5000); // 5 seconds
+            };
+
+            const stopAutoPlay = () => {
+                if (slideInterval) clearInterval(slideInterval);
+            };
+
+            // Event listeners
+            if (prevBtn) {
+                prevBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    prevSlide();
+                    startAutoPlay();
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    nextSlide();
+                    startAutoPlay();
+                });
+            }
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    updateHeroSlide(idx);
+                    startAutoPlay();
+                });
+            });
+
+            // Start autoplay
+            startAutoPlay();
+
+            // Pause on hover
+            track.addEventListener('mouseenter', stopAutoPlay);
+            track.addEventListener('mouseleave', startAutoPlay);
         };
 
         // Carousel Controller logic
