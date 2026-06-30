@@ -443,8 +443,59 @@ const detailView = {
                     recalculateVoucherDiscount();
                     renderPayments();
                     validateForm();
+                    
+                    // Re-evaluate borders on click/select
+                    document.querySelectorAll('.product-card').forEach(c => {
+                        if (c !== card) {
+                            c.style.borderColor = 'var(--border-color)';
+                            c.style.boxShadow = '';
+                        }
+                    });
+                    card.style.borderColor = 'var(--primary)';
+                    card.style.boxShadow = 'var(--shadow-glow)';
                 });
             });
+
+            // Initialize 3D dynamic tilt interaction for product cards
+            const initProduct3DTilt = () => {
+                const cards = document.querySelectorAll('.product-card');
+                cards.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left; 
+                        const y = e.clientY - rect.top;  
+                        const xc = rect.width / 2;
+                        const yc = rect.height / 2;
+                        const dx = x - xc;
+                        const dy = y - yc;
+
+                        const rotX = -(dy / yc) * 12; 
+                        const rotY = (dx / xc) * 12;
+
+                        const isSelected = card.classList.contains('selected');
+                        const borderCol = 'var(--primary)';
+                        const shadowGlow = isSelected ? '0 10px 25px rgba(139, 92, 246, 0.4), 0 0 15px var(--primary-glow)' : '0 10px 25px rgba(139, 92, 246, 0.25), 0 0 10px var(--primary-glow)';
+
+                        card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.04, 1.04, 1.04)`;
+                        card.style.borderColor = borderCol;
+                        card.style.boxShadow = shadowGlow;
+                        card.style.zIndex = '5';
+                    });
+
+                    card.style.transformStyle = 'preserve-3d';
+                    card.style.transition = 'transform 0.15s ease-out, border-color var(--transition-normal), box-shadow var(--transition-normal), z-index var(--transition-normal)';
+
+                    card.addEventListener('mouseleave', () => {
+                        const isSelected = card.classList.contains('selected');
+                        card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                        card.style.borderColor = isSelected ? 'var(--primary)' : 'var(--border-color)';
+                        card.style.boxShadow = isSelected ? 'var(--shadow-glow)' : '';
+                        card.style.zIndex = '';
+                    });
+                });
+            };
+
+            initProduct3DTilt();
         }
         
         // ----------------------------------------------------
