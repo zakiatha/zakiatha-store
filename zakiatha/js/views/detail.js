@@ -416,10 +416,11 @@ const detailView = {
         if (products.length === 0) {
             productsContainer.innerHTML = `<p style="color: var(--text-secondary); padding: 20px; text-align: center;">Tidak ada produk tersedia.</p>`;
         } else {
-            productsContainer.innerHTML = products.map(prod => {
+            productsContainer.innerHTML = products.map((prod, idx) => {
                 const hasDiscount = prod.originalPrice > prod.price;
+                const delay = (idx * 0.04).toFixed(2);
                 return `
-                    <div class="product-card" data-id="${prod.id}">
+                    <div class="product-card stagger-card" data-id="${prod.id}" style="animation-delay: ${delay}s;">
                         ${prod.isPopular ? `<div class="product-card-badge-container"><span class="badge popular">Populer</span></div>` : ''}
                         <div class="product-card-title">${prod.name}</div>
                         <div class="product-card-price-wrapper">

@@ -440,7 +440,7 @@ const homeView = {
 
                 // Create header and grid container
                 const section = document.createElement('div');
-                section.className = 'category-section';
+                section.className = 'category-section fade-slide-in';
 
                 section.innerHTML = `
                     <div style="margin-bottom: 20px;">
@@ -452,15 +452,16 @@ const homeView = {
                             <i data-lucide="chevron-left" style="width: 24px; height: 24px;"></i>
                         </button>
                         <div class="game-grid" id="grid-${group.key}">
-                            ${matchedGames.map(game => {
+                            ${matchedGames.map((game, idx) => {
                                 let logoHtml = '';
                                 if (game.logo && (game.logo.endsWith('.jpg') || game.logo.endsWith('.png') || game.logo.endsWith('.jpeg') || game.logo.endsWith('.webp'))) {
                                     logoHtml = `<img src="img/${game.logo}" alt="${game.name}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; display:block;">`;
                                 } else {
                                     logoHtml = this.logos[game.logo] || `<div style="width:48px; height:48px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">${game.name.substring(0,2)}</div>`;
                                 }
+                                const delay = (idx * 0.05).toFixed(2);
                                 return `
-                                    <div class="game-card-wrapper">
+                                    <div class="game-card-wrapper stagger-card" style="animation-delay: ${delay}s;">
                                         <a href="#game/${game.slug}" class="game-card" data-slug="${game.slug}">
                                             <div class="game-card-img-wrapper">
                                                 <img src="${game.banner}" alt="${game.name}" class="game-card-img" loading="lazy">
