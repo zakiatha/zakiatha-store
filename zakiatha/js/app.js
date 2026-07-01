@@ -17,6 +17,17 @@ function formatRupiah(amount) {
     }).format(amount);
 }
 
+// Global XSS Sanitization Helper as per fullstack-security skill guidelines
+function sanitizeHTML(str) {
+    if (!str) return '';
+    return str.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // Session Helpers
 function getSession() {
     try {
@@ -327,6 +338,7 @@ function init() {
     window.formatRupiah = formatRupiah;
     window.getSession = getSession;
     window.refreshAuthHeader = refreshAuthHeader;
+    window.sanitizeHTML = sanitizeHTML;
     
     // Initialize hamburger menu
     initHamburger();

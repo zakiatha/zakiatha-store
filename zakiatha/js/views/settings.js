@@ -84,15 +84,15 @@ const settingsView = {
 
                     <div class="settings-info-row">
                         <span class="settings-info-label">Username</span>
-                        <span class="settings-info-value">${user.username}</span>
+                        <span class="settings-info-value">${window.sanitizeHTML(user.username)}</span>
                     </div>
                     <div class="settings-info-row">
                         <span class="settings-info-label">Email</span>
-                        <span class="settings-info-value">${user.gmail}</span>
+                        <span class="settings-info-value">${window.sanitizeHTML(user.gmail)}</span>
                     </div>
                     <div class="settings-info-row">
                         <span class="settings-info-label">No. Handphone</span>
-                        <span class="settings-info-value">${user.phone || '-'}</span>
+                        <span class="settings-info-value">${window.sanitizeHTML(user.phone || '-')}</span>
                     </div>
                     <div class="settings-info-row">
                         <span class="settings-info-label">Role</span>
