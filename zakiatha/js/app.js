@@ -352,11 +352,9 @@ function init() {
     // Refresh header dynamic session updates
     window.addEventListener('dbUpdated', () => {
         refreshAuthHeader();
-        if (appState.currentView && typeof appState.currentView.render === 'function') {
-            const container = document.getElementById('main-content');
-            if (container) {
-                appState.currentView.render(container);
-            }
+        const container = document.getElementById('app');
+        if (container && appState.currentView && typeof appState.currentView.render === 'function') {
+            appState.currentView.render(container);
         }
     });
     
