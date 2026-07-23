@@ -350,8 +350,15 @@ function init() {
     window.addEventListener('hashchange', router);
     
     // Refresh header dynamic session updates
-    window.addEventListener('sessionUpdated', refreshAuthHeader);
-    window.addEventListener('dbUpdated', refreshAuthHeader);
+    window.addEventListener('dbUpdated', () => {
+        refreshAuthHeader();
+        if (appState.currentView && typeof appState.currentView.render === 'function') {
+            const container = document.getElementById('main-content');
+            if (container) {
+                appState.currentView.render(container);
+            }
+        }
+    });
     
     // Initial load for header auth state
     refreshAuthHeader();

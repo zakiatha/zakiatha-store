@@ -11,20 +11,20 @@ function getDB() {
         localStorage.setItem(DB_KEY, JSON.stringify(defaultDb));
         return defaultDb;
     }
-    
+
     let db = JSON.parse(dbStr);
-    
+
     // Migration check: Ensure new default games and products (like E-Wallet) are injected
     const defaultDb = initDefaultDB();
     let hasUpdates = false;
-    
+
     if (!db.games) db.games = [];
     if (!db.products) db.products = [];
     if (!db.vouchers) {
         db.vouchers = defaultDb.vouchers || [];
         hasUpdates = true;
     }
-    
+
     if (!db.paymentMethods) {
         db.paymentMethods = defaultDb.paymentMethods || [];
         hasUpdates = true;
@@ -54,7 +54,7 @@ function getDB() {
             }
         });
     }
-    
+
     // Healing: Clean up any invalid/undefined IDs in the existing database
     db.games.forEach(g => {
         if (!g.id || g.id === 'undefined') {
@@ -74,27 +74,16 @@ function getDB() {
             hasUpdates = true;
         }
     });
-    
-    // Sync default game properties (like logos) to existing games
+
+    // Sync default game properties if missing
     defaultDb.games.forEach(defaultGame => {
         const index = db.games.findIndex(g => g.id === defaultGame.id);
         if (index === -1) {
             db.games.push(defaultGame);
             hasUpdates = true;
-        } else {
-            // Update logo, banner, fields, and other static details for default games
-            if (db.games[index].logo !== defaultGame.logo || 
-                db.games[index].banner !== defaultGame.banner || 
-                JSON.stringify(db.games[index].fields) !== JSON.stringify(defaultGame.fields)) {
-                db.games[index].logo = defaultGame.logo;
-                db.games[index].banner = defaultGame.banner;
-                db.games[index].description = defaultGame.description;
-                db.games[index].fields = defaultGame.fields;
-                hasUpdates = true;
-            }
         }
     });
-    
+
     defaultDb.products.forEach(defaultProduct => {
         const exists = db.products.some(p => p.id === defaultProduct.id);
         if (!exists) {
@@ -107,12 +96,305 @@ function getDB() {
         db.apiConfig = defaultDb.apiConfig;
         hasUpdates = true;
     }
-    
+
     if (hasUpdates) {
         localStorage.setItem(DB_KEY, JSON.stringify(db));
     }
-    
+
     return db;
+}
+
+// ==================== SUPABASE REAL-TIME DATABASE SYNC ====================
+const SUPABASE_URL = 'https://krclgbbvloexepjgnukh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyY2xnYmJ2bG9leGVwamdudWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5OTk1ODEsImV4cCI6MjA5ODU3NTU4MX0.7ionzcFQpwCOO6mMl5OA1kFjty3KLtBR9CadqKyHONY';
+
+let supabase = null;
+if (window.supabase) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✔ Supabase Client initialized.');
+
+    // Initial background sync from Supabase on page load
+    setTimeout(syncFromSupabase, 300);
+
+    // Realtime Database Listener across all devices & logged-in users
+    try {
+        supabase
+            .channel('public-db-changes')
+            .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+                console.log('⚡ Realtime database change detected from Supabase:', payload.eventType, payload.table);
+                syncFromSupabase();
+            })
+            .subscribe();
+    } catch (e) {
+        console.warn('Realtime channel subscription error:', e);
+    }
+
+    // Auto-sync polling every 5 seconds for instant cross-device consistency
+    setInterval(syncFromSupabase, 5000);
+}
+
+async function syncFromSupabase() {
+    if (!supabase) return;
+    try {
+        console.log('🔄 Syncing data from Supabase...');
+        const [
+            { data: users },
+            { data: games },
+            { data: products },
+            { data: vouchers },
+            { data: paymentMethods },
+            { data: transactions },
+            { data: apiConfig }
+        ] = await Promise.all([
+            supabase.from('users').select('*'),
+            supabase.from('games').select('*').order('name'),
+            supabase.from('products').select('*').order('name'),
+            supabase.from('vouchers').select('*'),
+            supabase.from('payment_methods').select('*').order('name'),
+            supabase.from('transactions').select('*'),
+            supabase.from('api_config').select('*').limit(1)
+        ]);
+
+        let db = getDB();
+        let hasChanges = false;
+
+        if (users && users.length > 0) { db.users = users; hasChanges = true; }
+        if (games && games.length > 0) {
+            db.games = games.map(g => ({
+                id: g.id,
+                name: g.name,
+                slug: g.slug,
+                category: g.category,
+                logo: g.logo,
+                banner: g.banner,
+                description: g.description,
+                fields: g.fields,
+                isActive: g.is_active
+            }));
+            hasChanges = true;
+        }
+        if (products && products.length > 0) {
+            db.products = products.map(p => ({
+                id: p.id,
+                gameId: p.game_id,
+                name: p.name,
+                price: p.price,
+                originalPrice: p.original_price,
+                isPopular: p.is_popular,
+                isActive: p.is_active,
+                buyer_sku_code: p.buyer_sku_code
+            }));
+            hasChanges = true;
+        }
+        if (vouchers && vouchers.length > 0) {
+            db.vouchers = vouchers.map(v => ({
+                id: v.id,
+                code: v.code,
+                type: v.type,
+                value: v.value,
+                maxUsage: v.max_usage,
+                usageCount: v.usage_count,
+                isActive: v.is_active
+            }));
+            hasChanges = true;
+        }
+        if (paymentMethods && paymentMethods.length > 0) {
+            db.paymentMethods = paymentMethods.map(pm => ({
+                id: pm.id,
+                name: pm.name,
+                code: pm.code,
+                type: pm.type,
+                feeType: pm.fee_type,
+                feeValue: pm.fee_value,
+                info: pm.info,
+                isActive: pm.is_active
+            }));
+            hasChanges = true;
+        }
+        if (transactions) {
+            db.transactions = transactions.map(t => ({
+                id: t.id,
+                invoiceId: t.invoice_id,
+                username: t.username,
+                whatsapp: t.whatsapp,
+                accountData: t.account_data,
+                productId: t.product_id,
+                basePrice: t.base_price,
+                totalAmount: t.total_amount,
+                pointsEarned: t.points_earned,
+                pointsUsed: t.points_used,
+                paymentMethodId: t.payment_method_id,
+                voucherCode: t.voucher_code,
+                status: t.status,
+                statusHistory: t.status_history,
+                purchaseNote: t.purchase_note,
+                createdAt: t.created_at
+            }));
+            hasChanges = true;
+        }
+        if (apiConfig && apiConfig.length > 0) {
+            db.apiConfig = {
+                apiUrl: apiConfig[0].api_url,
+                apiKey: apiConfig[0].api_key,
+                secretKey: apiConfig[0].secret_key,
+                balance: apiConfig[0].balance,
+                providerName: apiConfig[0].provider_name
+            };
+            hasChanges = true;
+        }
+
+        if (hasChanges) {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            console.log('✔ Local cache successfully synced with Supabase.');
+            window.dispatchEvent(new CustomEvent('dbUpdated'));
+        }
+    } catch (err) {
+        console.error('❌ Error syncing from Supabase:', err);
+    }
+}
+
+async function syncLocalToSupabase(db) {
+    if (!supabase) return;
+    try {
+        await Promise.all([
+            supabaseUpsert('users', db.users || []),
+            supabaseUpsert('games', db.games || []),
+            supabaseUpsert('products', db.products || []),
+            supabaseUpsert('vouchers', db.vouchers || []),
+            supabaseUpsert('payment_methods', db.paymentMethods || []),
+            supabaseUpsert('transactions', db.transactions || []),
+            supabaseUpsert('api_config', db.apiConfig || {})
+        ]);
+        console.log('✔ All local changes successfully pushed to Supabase.');
+    } catch (err) {
+        console.error('❌ Error pushing local changes to Supabase:', err);
+    }
+}
+
+async function supabaseUpsert(table, data) {
+    if (!supabase) return;
+    try {
+        const formattedData = Array.isArray(data)
+            ? data.map(item => formatToSnakeCase(table, item))
+            : formatToSnakeCase(table, data);
+
+        const { error } = await supabase.from(table).upsert(formattedData);
+        if (error) throw error;
+        console.log(`✔ Synced upsert to Supabase table: ${table}`);
+    } catch (err) {
+        console.error(`❌ Supabase upsert error on ${table}:`, err);
+    }
+}
+
+async function supabaseDelete(table, eqField, eqValue) {
+    if (!supabase) return;
+    try {
+        const { error } = await supabase.from(table).delete().eq(eqField, eqValue);
+        if (error) throw error;
+        console.log(`✔ Synced delete to Supabase table: ${table}`);
+    } catch (err) {
+        console.error(`❌ Supabase delete error on ${table}:`, err);
+    }
+}
+
+function formatToSnakeCase(table, obj) {
+    if (table === 'users') {
+        return {
+            username: obj.username,
+            gmail: obj.gmail,
+            phone: obj.phone,
+            password: obj.password,
+            role: obj.role || 'user',
+            points: obj.points || 0
+        };
+    }
+    if (table === 'games') {
+        return {
+            id: obj.id,
+            name: obj.name,
+            slug: obj.slug,
+            category: obj.category,
+            logo: obj.logo,
+            banner: obj.banner,
+            description: obj.description,
+            fields: obj.fields,
+            is_active: obj.isActive
+        };
+    }
+    if (table === 'products') {
+        return {
+            id: obj.id,
+            game_id: obj.gameId,
+            name: obj.name,
+            price: obj.price,
+            original_price: obj.originalPrice,
+            is_popular: obj.isPopular,
+            is_active: obj.isActive,
+            buyer_sku_code: obj.buyer_sku_code
+        };
+    }
+    if (table === 'vouchers') {
+        return {
+            id: obj.id,
+            code: obj.code,
+            type: obj.type,
+            value: obj.value,
+            max_usage: obj.maxUsage,
+            usage_count: obj.usageCount,
+            is_active: obj.isActive
+        };
+    }
+    if (table === 'payment_methods') {
+        return {
+            id: obj.id,
+            name: obj.name,
+            code: obj.code,
+            type: obj.type,
+            fee_type: obj.feeType,
+            fee_value: obj.feeValue,
+            info: obj.info,
+            is_active: obj.isActive
+        };
+    }
+    if (table === 'transactions') {
+        return {
+            id: obj.id,
+            invoice_id: obj.invoiceId,
+            username: obj.username || null,
+            whatsapp: obj.whatsapp,
+            account_data: obj.accountData,
+            product_id: obj.productId,
+            base_price: obj.basePrice,
+            total_amount: obj.totalAmount,
+            points_earned: obj.pointsEarned,
+            points_used: obj.pointsUsed,
+            payment_method_id: obj.paymentMethodId,
+            voucher_code: obj.voucherCode || null,
+            status: obj.status,
+            status_history: obj.statusHistory,
+            purchase_note: obj.purchaseNote,
+            created_at: obj.createdAt
+        };
+    }
+    if (table === 'api_config') {
+        return {
+            id: 1,
+            api_url: obj.apiUrl,
+            api_key: obj.apiKey,
+            secret_key: obj.secretKey,
+            balance: obj.balance,
+            provider_name: obj.providerName
+        };
+    }
+    if (table === 'api_logs') {
+        return {
+            timestamp: obj.timestamp,
+            action: obj.action,
+            request: obj.request,
+            response: obj.response
+        };
+    }
+    return obj;
 }
 
 // Helper: Save database to localStorage
@@ -120,6 +402,11 @@ function saveDB(db) {
     localStorage.setItem(DB_KEY, JSON.stringify(db));
     // Trigger custom event so other views can react to database changes in real-time
     window.dispatchEvent(new CustomEvent('dbUpdated'));
+
+    // Asynchronously sync local cache changes to Supabase in background
+    if (supabase) {
+        syncLocalToSupabase(db);
+    }
 }
 
 // Initialize default data if database is empty
@@ -194,12 +481,12 @@ function initDefaultDB() {
                 description: 'Top up Genesis Crystals atau Welkin Moon Genshin Impact instan. Masukkan UID dan pilih Server yang sesuai dengan akun Genshin Impact Anda.',
                 fields: [
                     { id: 'userId', label: 'UID', placeholder: 'Masukkan UID Akun', type: 'text', required: true },
-                    { 
-                        id: 'server', 
-                        label: 'Server', 
-                        type: 'select', 
+                    {
+                        id: 'server',
+                        label: 'Server',
+                        type: 'select',
                         required: true,
-                        options: ['Asia', 'America', 'Europe', 'TW/HK/MO'] 
+                        options: ['Asia', 'America', 'Europe', 'TW/HK/MO']
                     }
                 ],
                 isActive: true
@@ -415,7 +702,7 @@ function initDefaultDB() {
             { id: 'p-ml-wdp', gameId: 'g-mlbb', name: 'Weekly Diamond Pass', price: 28000, originalPrice: 32000, isPopular: true, isActive: true, buyer_sku_code: 'mlwdp' },
             { id: 'p-ml-257', gameId: 'g-mlbb', name: '257 Diamonds (234 + 23 Bonus)', price: 60000, originalPrice: 70000, isPopular: false, isActive: true, buyer_sku_code: 'ml257' },
             { id: 'p-ml-706', gameId: 'g-mlbb', name: '706 Diamonds (625 + 81 Bonus)', price: 165000, originalPrice: 180000, isPopular: true, isActive: true, buyer_sku_code: 'ml706' },
-            
+
             // Free Fire
             { id: 'p-ff-5', gameId: 'g-ff', name: '5 Diamonds', price: 1000, originalPrice: 1500, isPopular: false, isActive: true, buyer_sku_code: 'ff5' },
             { id: 'p-ff-12', gameId: 'g-ff', name: '12 Diamonds', price: 2000, originalPrice: 2500, isPopular: false, isActive: true, buyer_sku_code: 'ff12' },
@@ -579,18 +866,18 @@ function initDefaultDB() {
 
 const dbService = {
     // --- AUTHENTICATION OPERATIONS ---
-    getUsers: function() {
+    getUsers: function () {
         const db = getDB();
         return db.users || [];
     },
 
-    registerUser: function(userData) {
+    registerUser: function (userData) {
         const db = getDB();
         if (!db.users) db.users = [];
 
         // Validate uniqueness of username and email
-        const userExists = db.users.some(u => 
-            u.username.toLowerCase() === userData.username.toLowerCase() || 
+        const userExists = db.users.some(u =>
+            u.username.toLowerCase() === userData.username.toLowerCase() ||
             u.gmail.toLowerCase() === userData.gmail.toLowerCase()
         );
 
@@ -612,13 +899,13 @@ const dbService = {
         return { success: true, user: newUser };
     },
 
-    loginUser: function(identifier, password) {
+    loginUser: function (identifier, password) {
         const db = getDB();
         if (!db.users) return { success: false, message: 'Belum ada pengguna terdaftar.' };
 
-        const user = db.users.find(u => 
-            (u.username.toLowerCase() === identifier.toLowerCase() || 
-             u.gmail.toLowerCase() === identifier.toLowerCase()) && 
+        const user = db.users.find(u =>
+            (u.username.toLowerCase() === identifier.toLowerCase() ||
+                u.gmail.toLowerCase() === identifier.toLowerCase()) &&
             u.password === password
         );
 
@@ -629,13 +916,13 @@ const dbService = {
         return { success: true, user: user };
     },
 
-    getUserByUsername: function(username) {
+    getUserByUsername: function (username) {
         const db = getDB();
         if (!db.users) return null;
         return db.users.find(u => u.username.toLowerCase() === username.toLowerCase()) || null;
     },
 
-    updateUserPoints: function(username, pointsChange) {
+    updateUserPoints: function (username, pointsChange) {
         const db = getDB();
         const userIndex = db.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
         if (userIndex > -1) {
@@ -647,7 +934,7 @@ const dbService = {
     },
 
     // --- USER PROFILE OPERATIONS ---
-    updateUserProfile: function(currentUsername, newData) {
+    updateUserProfile: function (currentUsername, newData) {
         const db = getDB();
         const userIndex = db.users.findIndex(u => u.username.toLowerCase() === currentUsername.toLowerCase());
         if (userIndex === -1) return { success: false, message: 'User tidak ditemukan.' };
@@ -669,7 +956,7 @@ const dbService = {
         return { success: true, user: db.users[userIndex] };
     },
 
-    changePassword: function(username, currentPassword, newPassword) {
+    changePassword: function (username, currentPassword, newPassword) {
         const db = getDB();
         const userIndex = db.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
         if (userIndex === -1) return { success: false, message: 'User tidak ditemukan.' };
@@ -687,7 +974,7 @@ const dbService = {
         return { success: true, message: 'Password berhasil diubah.' };
     },
 
-    deleteAccount: function(username) {
+    deleteAccount: function (username) {
         const db = getDB();
         db.users = db.users.filter(u => u.username.toLowerCase() !== username.toLowerCase());
         saveDB(db);
@@ -695,33 +982,35 @@ const dbService = {
     },
 
     // --- GAME CATALOG OPERATIONS ---
-    getGames: function(includeInactive = false) {
+    getGames: function (includeInactive = false) {
         const db = getDB();
         if (includeInactive) return db.games;
         return db.games.filter(g => g.isActive);
     },
 
-    getGameBySlug: function(slug) {
+    getGameBySlug: function (slug) {
         const db = getDB();
         return db.games.find(g => g.slug === slug);
     },
 
-    getGameById: function(id) {
+    getGameById: function (id) {
         const db = getDB();
         return db.games.find(g => g.id === id);
     },
 
-    saveGame: function(gameData) {
+    saveGame: function (gameData) {
         const db = getDB();
         const targetId = gameData.id && gameData.id !== 'undefined' ? gameData.id : null;
         const index = targetId ? db.games.findIndex(g => g.id === targetId) : -1;
-        
+        let savedObj;
+
         if (index > -1) {
-            db.games[index] = { 
-                ...db.games[index], 
+            db.games[index] = {
+                ...db.games[index],
                 ...gameData,
                 id: targetId // Ensure ID is preserved
             };
+            savedObj = db.games[index];
         } else {
             const newGame = {
                 isActive: true,
@@ -729,21 +1018,28 @@ const dbService = {
                 id: 'g-' + Math.random().toString(36).substring(2, 9) // Set a clean random ID
             };
             db.games.push(newGame);
+            savedObj = newGame;
         }
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('games', savedObj);
+        }
         return true;
     },
 
-    deleteGame: function(id) {
+    deleteGame: function (id) {
         const db = getDB();
         db.games = db.games.filter(g => g.id !== id);
         db.products = db.products.filter(p => p.gameId !== id);
         saveDB(db);
+        if (supabase) {
+            supabaseDelete('games', 'id', id);
+        }
         return true;
     },
 
     // --- PRODUCT OPERATIONS ---
-    getProducts: function(gameId, includeInactive = false) {
+    getProducts: function (gameId, includeInactive = false) {
         const db = getDB();
         let list = db.products.filter(p => p.gameId === gameId);
         if (!includeInactive) {
@@ -752,15 +1048,15 @@ const dbService = {
         return list.sort((a, b) => a.price - b.price);
     },
 
-    saveProduct: function(productData) {
+    saveProduct: function (productData) {
         const db = getDB();
-        
+
         // Uniqueness validation for buyer_sku_code
         if (productData.buyer_sku_code) {
             const targetSku = String(productData.buyer_sku_code).trim().toLowerCase();
-            const duplicate = db.products.find(p => 
-                p.id !== productData.id && 
-                p.buyer_sku_code && 
+            const duplicate = db.products.find(p =>
+                p.id !== productData.id &&
+                p.buyer_sku_code &&
                 String(p.buyer_sku_code).trim().toLowerCase() === targetSku
             );
             if (duplicate) {
@@ -770,14 +1066,16 @@ const dbService = {
 
         const targetId = productData.id && productData.id !== 'undefined' ? productData.id : null;
         const index = targetId ? db.products.findIndex(p => p.id === targetId) : -1;
-        
+        let savedObj;
+
         if (index > -1) {
-            db.products[index] = { 
-                ...db.products[index], 
+            db.products[index] = {
+                ...db.products[index],
                 ...productData,
                 id: targetId, // Ensure ID is preserved
                 originalPrice: Math.round(productData.price * 1.15) // Update original price when price changes
             };
+            savedObj = db.products[index];
         } else {
             const newProduct = {
                 isActive: true,
@@ -787,31 +1085,40 @@ const dbService = {
                 originalPrice: Math.round(productData.price * 1.15)
             };
             db.products.push(newProduct);
+            savedObj = newProduct;
         }
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('products', savedObj);
+        }
         return { success: true };
     },
 
-    deleteProduct: function(id) {
+    deleteProduct: function (id) {
         const db = getDB();
         db.products = db.products.filter(p => p.id !== id);
         saveDB(db);
+        if (supabase) {
+            supabaseDelete('products', 'id', id);
+        }
         return true;
     },
 
     // --- PAYMENT METHOD OPERATIONS ---
-    getPaymentMethods: function(includeInactive = false) {
+    getPaymentMethods: function (includeInactive = false) {
         const db = getDB();
         if (includeInactive) return db.paymentMethods;
         return db.paymentMethods.filter(pm => pm.isActive);
     },
 
-    savePaymentMethod: function(pmData) {
+    savePaymentMethod: function (pmData) {
         const db = getDB();
         const index = db.paymentMethods.findIndex(p => p.id === pmData.id);
-        
+        let savedObj;
+
         if (index > -1) {
             db.paymentMethods[index] = { ...db.paymentMethods[index], ...pmData };
+            savedObj = db.paymentMethods[index];
         } else {
             const newPM = {
                 id: 'pm-' + Math.random().toString(36).substring(2, 9),
@@ -819,23 +1126,27 @@ const dbService = {
                 ...pmData
             };
             db.paymentMethods.push(newPM);
+            savedObj = newPM;
         }
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('payment_methods', savedObj);
+        }
         return true;
     },
 
     // --- TRANSACTION OPERATIONS WITH POINTS & API SIMULATOR ---
-    getTransactions: function() {
+    getTransactions: function () {
         const db = getDB();
         return db.transactions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     },
 
-    getTransactionById: function(id) {
+    getTransactionById: function (id) {
         const db = getDB();
         return db.transactions.find(t => t.id === id || t.invoiceId === id);
     },
 
-    createTransaction: function(txData) {
+    createTransaction: function (txData) {
         const db = getDB();
         const now = new Date();
         const yyyy = now.getFullYear();
@@ -886,7 +1197,7 @@ const dbService = {
         const product = db.products.find(p => p.id === txData.productId);
         const buyerSku = product ? product.buyer_sku_code : 'unknown';
         const customerNo = Object.values(txData.accountData).join('');
-        
+
         const logReq = {
             username: db.apiConfig.username || 'zakitopup_reseller',
             buyer_sku_code: buyerSku,
@@ -907,7 +1218,7 @@ const dbService = {
                 balance: db.apiConfig.balance - txData.basePrice
             }
         };
-        
+
         // Simpan log API
         if (!db.apiLogs) db.apiLogs = [];
         db.apiLogs.unshift({
@@ -922,13 +1233,16 @@ const dbService = {
 
         db.transactions.push(newTx);
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('transactions', newTx);
+        }
         return newTx;
     },
 
-    updateTransactionStatus: function(id, status, noteText = '') {
+    updateTransactionStatus: function (id, status, noteText = '') {
         const db = getDB();
         const index = db.transactions.findIndex(t => t.id === id || t.invoiceId === id);
-        
+
         if (index > -1) {
             const tx = db.transactions[index];
             const oldStatus = tx.status;
@@ -952,7 +1266,7 @@ const dbService = {
             const product = db.products.find(p => p.id === tx.productId);
             const buyerSku = product ? product.buyer_sku_code : 'unknown';
             const customerNo = Object.values(tx.accountData).join('');
-            
+
             const logReq = {
                 data: {
                     ref_id: tx.invoiceId,
@@ -1011,12 +1325,15 @@ const dbService = {
             }
 
             saveDB(db);
+            if (supabase) {
+                supabaseUpsert('transactions', tx);
+            }
             return tx;
         }
         return null;
     },
 
-    updateTransactionNote: function(id, note) {
+    updateTransactionNote: function (id, note) {
         const db = getDB();
         const index = db.transactions.findIndex(t => t.id === id || t.invoiceId === id);
         if (index > -1) {
@@ -1028,18 +1345,18 @@ const dbService = {
     },
 
     // --- VOUCHER OPERATIONS ---
-    getVouchers: function() {
+    getVouchers: function () {
         const db = getDB();
         return db.vouchers || [];
     },
 
-    saveVoucher: function(voucherData) {
+    saveVoucher: function (voucherData) {
         const db = getDB();
-        
+
         // Uniqueness validation for voucher code
         const targetCode = String(voucherData.code).trim().toUpperCase();
-        const duplicate = db.vouchers.find(v => 
-            v.id !== voucherData.id && 
+        const duplicate = db.vouchers.find(v =>
+            v.id !== voucherData.id &&
             String(v.code).trim().toUpperCase() === targetCode
         );
         if (duplicate) {
@@ -1065,21 +1382,27 @@ const dbService = {
             db.vouchers.push(updatedVoucher);
         }
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('vouchers', updatedVoucher);
+        }
         return { success: true, voucher: updatedVoucher };
     },
 
-    deleteVoucher: function(id) {
+    deleteVoucher: function (id) {
         const db = getDB();
         db.vouchers = db.vouchers.filter(v => v.id !== id);
         saveDB(db);
+        if (supabase) {
+            supabaseDelete('vouchers', 'id', id);
+        }
         return true;
     },
 
-    checkVoucher: function(code) {
+    checkVoucher: function (code) {
         const db = getDB();
         const targetCode = String(code).trim().toUpperCase();
         const voucher = db.vouchers.find(v => String(v.code).trim().toUpperCase() === targetCode);
-        
+
         if (!voucher) {
             return { success: false, message: 'Kode voucher tidak ditemukan!' };
         }
@@ -1089,27 +1412,27 @@ const dbService = {
         if (voucher.usageCount >= voucher.maxUsage) {
             return { success: false, message: 'Voucher sudah melebihi batas penggunaan!' };
         }
-        
+
         return { success: true, voucher: voucher };
     },
 
-    searchTransactions: function(query) {
+    searchTransactions: function (query) {
         const db = getDB();
         if (!query) return [];
         const cleanQuery = query.trim().toLowerCase();
-        
-        return db.transactions.filter(t => 
-            t.invoiceId.toLowerCase().includes(cleanQuery) || 
+
+        return db.transactions.filter(t =>
+            t.invoiceId.toLowerCase().includes(cleanQuery) ||
             t.whatsapp.includes(cleanQuery)
         ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     },
 
-    getStats: function() {
+    getStats: function () {
         const db = getDB();
         const successTxs = db.transactions.filter(t => t.status === 'SUCCESS');
         const pendingTxs = db.transactions.filter(t => t.status === 'PENDING');
         const totalRevenue = successTxs.reduce((sum, t) => sum + t.totalAmount, 0);
-        
+
         return {
             totalRevenue: totalRevenue,
             successCount: successTxs.length,
@@ -1120,24 +1443,27 @@ const dbService = {
     },
 
     // --- API CONFIGURATION OPERATIONS ---
-    getApiConfig: function() {
+    getApiConfig: function () {
         const db = getDB();
         return db.apiConfig || { apiUrl: '', apiKey: '', secretKey: '', balance: 0 };
     },
 
-    saveApiConfig: function(config) {
+    saveApiConfig: function (config) {
         const db = getDB();
         db.apiConfig = { ...db.apiConfig, ...config };
         saveDB(db);
+        if (supabase) {
+            supabaseUpsert('api_config', db.apiConfig);
+        }
         return true;
     },
 
-    getApiLogs: function() {
+    getApiLogs: function () {
         const db = getDB();
         return db.apiLogs || [];
     },
 
-    clearApiLogs: function() {
+    clearApiLogs: function () {
         const db = getDB();
         db.apiLogs = [];
         saveDB(db);
@@ -1145,9 +1471,9 @@ const dbService = {
     },
 
     // Simulasi sinkronisasi produk via API Digiflazz/Apigames
-    syncThirdPartyProducts: function() {
+    syncThirdPartyProducts: function () {
         const db = getDB();
-        
+
         // Produk tiruan dari API
         const newProducts = [
             { gameSlug: 'mobile-legends', name: '86 Diamonds (API)', price: 19500, isPopular: false },

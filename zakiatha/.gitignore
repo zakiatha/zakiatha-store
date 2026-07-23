@@ -1,0 +1,20 @@
+# Sensitive & Configuration Files
+.env
+chat.md
+supabase.schema.sql
+migrate-supabase.js
+test-again.js
+check-conn.js
+
+# Dependencies & Build Files
+node_modules/
+package.json
+package-lock.json
+skills-lock.json
+.agents/
+
+# IDE & OS Files
+.vscode/
+Thumbs.db
+.DS_Store
+*.log
