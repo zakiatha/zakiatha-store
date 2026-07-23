@@ -108,9 +108,9 @@ function getDB() {
 const SUPABASE_URL = 'https://krclgbbvloexepjgnukh.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyY2xnYmJ2bG9leGVwamdudWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5OTk1ODEsImV4cCI6MjA5ODU3NTU4MX0.7ionzcFQpwCOO6mMl5OA1kFjty3KLtBR9CadqKyHONY';
 
-let supabase = null;
+let supabaseClient = null;
 if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('✔ Supabase Client initialized.');
 
     // Initial background sync from Supabase on page load
@@ -118,7 +118,7 @@ if (window.supabase) {
 
     // Realtime Database Listener across all devices & logged-in users
     try {
-        supabase
+        supabaseClient
             .channel('public-db-changes')
             .on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
                 console.log('⚡ Realtime database change detected from Supabase:', payload.eventType, payload.table);
@@ -134,7 +134,7 @@ if (window.supabase) {
 }
 
 async function syncFromSupabase() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
         console.log('🔄 Syncing data from Supabase...');
         const [
@@ -146,13 +146,13 @@ async function syncFromSupabase() {
             { data: transactions },
             { data: apiConfig }
         ] = await Promise.all([
-            supabase.from('users').select('*'),
-            supabase.from('games').select('*').order('name'),
-            supabase.from('products').select('*').order('name'),
-            supabase.from('vouchers').select('*'),
-            supabase.from('payment_methods').select('*').order('name'),
-            supabase.from('transactions').select('*'),
-            supabase.from('api_config').select('*').limit(1)
+            supabaseClient.from('users').select('*'),
+            supabaseClient.from('games').select('*').order('name'),
+            supabaseClient.from('products').select('*').order('name'),
+            supabaseClient.from('vouchers').select('*'),
+            supabaseClient.from('payment_methods').select('*').order('name'),
+            supabaseClient.from('transactions').select('*'),
+            supabaseClient.from('api_config').select('*').limit(1)
         ]);
 
         let db = getDB();
@@ -254,7 +254,7 @@ async function syncFromSupabase() {
 }
 
 async function syncLocalToSupabase(db) {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
         await Promise.all([
             supabaseUpsert('users', db.users || []),
@@ -272,13 +272,13 @@ async function syncLocalToSupabase(db) {
 }
 
 async function supabaseUpsert(table, data) {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
         const formattedData = Array.isArray(data)
             ? data.map(item => formatToSnakeCase(table, item))
             : formatToSnakeCase(table, data);
 
-        const { error } = await supabase.from(table).upsert(formattedData);
+        const { error } = await supabaseClient.from(table).upsert(formattedData);
         if (error) throw error;
         console.log(`✔ Synced upsert to Supabase table: ${table}`);
     } catch (err) {
@@ -287,9 +287,9 @@ async function supabaseUpsert(table, data) {
 }
 
 async function supabaseDelete(table, eqField, eqValue) {
-    if (!supabase) return;
+    if (!supabaseClient) return;
     try {
-        const { error } = await supabase.from(table).delete().eq(eqField, eqValue);
+        const { error } = await supabaseClient.from(table).delete().eq(eqField, eqValue);
         if (error) throw error;
         console.log(`✔ Synced delete to Supabase table: ${table}`);
     } catch (err) {
@@ -404,7 +404,7 @@ function saveDB(db) {
     window.dispatchEvent(new CustomEvent('dbUpdated'));
 
     // Asynchronously sync local cache changes to Supabase in background
-    if (supabase) {
+    if (supabaseClient) {
         syncLocalToSupabase(db);
     }
 }
@@ -1021,7 +1021,7 @@ const dbService = {
             savedObj = newGame;
         }
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('games', savedObj);
         }
         return true;
@@ -1032,7 +1032,7 @@ const dbService = {
         db.games = db.games.filter(g => g.id !== id);
         db.products = db.products.filter(p => p.gameId !== id);
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseDelete('games', 'id', id);
         }
         return true;
@@ -1088,7 +1088,7 @@ const dbService = {
             savedObj = newProduct;
         }
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('products', savedObj);
         }
         return { success: true };
@@ -1098,7 +1098,7 @@ const dbService = {
         const db = getDB();
         db.products = db.products.filter(p => p.id !== id);
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseDelete('products', 'id', id);
         }
         return true;
@@ -1129,7 +1129,7 @@ const dbService = {
             savedObj = newPM;
         }
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('payment_methods', savedObj);
         }
         return true;
@@ -1233,7 +1233,7 @@ const dbService = {
 
         db.transactions.push(newTx);
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('transactions', newTx);
         }
         return newTx;
@@ -1325,7 +1325,7 @@ const dbService = {
             }
 
             saveDB(db);
-            if (supabase) {
+            if (supabaseClient) {
                 supabaseUpsert('transactions', tx);
             }
             return tx;
@@ -1382,7 +1382,7 @@ const dbService = {
             db.vouchers.push(updatedVoucher);
         }
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('vouchers', updatedVoucher);
         }
         return { success: true, voucher: updatedVoucher };
@@ -1392,7 +1392,7 @@ const dbService = {
         const db = getDB();
         db.vouchers = db.vouchers.filter(v => v.id !== id);
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseDelete('vouchers', 'id', id);
         }
         return true;
@@ -1452,7 +1452,7 @@ const dbService = {
         const db = getDB();
         db.apiConfig = { ...db.apiConfig, ...config };
         saveDB(db);
-        if (supabase) {
+        if (supabaseClient) {
             supabaseUpsert('api_config', db.apiConfig);
         }
         return true;
