@@ -184,18 +184,6 @@ const settingsView = {
                     </div>
                 </div>
 
-                <!-- Tampilan & Tema Section -->
-                <div class="card-glass settings-section">
-                    <div class="settings-section-title">
-                        <i data-lucide="palette" style="width: 18px; height: 18px; color: var(--primary);"></i>
-                        ${texts.theme_title}
-                    </div>
-                    <button class="btn-grad" id="btn-toggle-theme-settings" style="width: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; font-size: 13px;">
-                        <i data-lucide="sun" id="settings-theme-icon" style="width: 16px; height: 16px;"></i>
-                        <span id="settings-theme-text">${window.getCurrentTheme() === 'light' ? texts.theme_btn_dark : texts.theme_btn_light}</span>
-                    </button>
-                </div>
-
                 <!-- Order History Section -->
                 <div class="card-glass settings-section" style="grid-column: 1 / -1; width: 100%;">
                     <div class="settings-section-title" style="justify-content: space-between;">
@@ -593,39 +581,6 @@ const settingsView = {
             txDetailModal.classList.add('active');
             if (window.lucide) window.lucide.createIcons();
         };
-
-        // --- Theme Toggle Logic inside Settings ---
-        const themeBtn = document.getElementById('btn-toggle-theme-settings');
-        const themeIcon = document.getElementById('settings-theme-icon');
-        const themeText = document.getElementById('settings-theme-text');
-
-        const updateThemeBtnUI = () => {
-            if (!themeBtn || !themeIcon || !themeText) return;
-            const currentTheme = window.getCurrentTheme();
-            if (currentTheme === 'light') {
-                themeIcon.setAttribute('data-lucide', 'moon');
-                themeText.textContent = 'Ubah ke Mode Gelap';
-            } else {
-                themeIcon.setAttribute('data-lucide', 'sun');
-                themeText.textContent = 'Ubah ke Mode Terang';
-            }
-            if (window.lucide) window.lucide.createIcons();
-        };
-
-        if (themeBtn) {
-            themeBtn.addEventListener('click', () => {
-                window.toggleTheme();
-            });
-        }
-
-        // Listen to theme changed event
-        const handleThemeChanged = () => {
-            updateThemeBtnUI();
-        };
-        window.addEventListener('themeChanged', handleThemeChanged);
-
-        // Initial theme button state
-        updateThemeBtnUI();
 
         // --- Transaction History Filtering Logic ---
         const searchInput = document.getElementById('input-search-product');
