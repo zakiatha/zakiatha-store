@@ -184,29 +184,57 @@
     color: var(--text-muted);
 }
 
-/* === LIGHT MODE: Hero banner overlay === */
-.light-theme .hero-overlay {
-    background: linear-gradient(90deg, rgba(240, 244, 255, 0.95) 10%, rgba(240, 244, 255, 0.75) 50%, rgba(240, 244, 255, 0) 100%);
+/* === LIGHT MODE: Hero banner & carousel === */
+.light-theme .hero-banner,
+.light-theme .hero-carousel {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%) !important;
+    border-color: rgba(109, 40, 217, 0.15) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* === LIGHT MODE: Game card overlay (gradient over image) === */
+.light-theme .hero-overlay {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.94) 20%, rgba(245, 243, 255, 0.78) 100%) !important;
+}
+
+.light-theme .hero-content p {
+    color: var(--text-secondary) !important;
+}
+
+/* === LIGHT MODE: Game card overlay & clean light card styling === */
 .light-theme .game-card-overlay {
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.08) 40%, rgba(15, 23, 42, 0.85) 90%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.95) 85%) !important;
 }
 
 .light-theme .game-card {
-    border-color: rgba(109, 40, 217, 0.1);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: #ffffff !important;
+    border-color: rgba(109, 40, 217, 0.12) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .game-card-title {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+}
+
+.light-theme .game-card-category {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+}
+
+.light-theme .game-card-logo-badge {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(109, 40, 217, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.15) !important;
 }
 
 .light-theme .game-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 8px 28px rgba(109, 40, 217, 0.2);
+    border-color: var(--primary) !important;
+    box-shadow: 0 8px 28px rgba(109, 40, 217, 0.18) !important;
 }
 
 /* === LIGHT MODE: Category tabs === */
 .light-theme .tab-btn {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     border-color: rgba(109, 40, 217, 0.12);
     color: var(--text-secondary);
 }

@@ -319,6 +319,38 @@ function initTheme() {
         return document.documentElement.classList.contains('light-theme') ? 'light' : 'dark';
     };
     
+    const updateThemeUI = () => {
+        const isLight = window.getCurrentTheme() === 'light';
+        const navBtn = document.getElementById('nav-theme-toggle');
+        const navIcon = document.getElementById('nav-theme-icon');
+        const navText = document.getElementById('nav-theme-text');
+        
+        if (navIcon && navText) {
+            if (isLight) {
+                navIcon.setAttribute('data-lucide', 'moon');
+                navText.textContent = 'Mode Gelap';
+            } else {
+                navIcon.setAttribute('data-lucide', 'sun');
+                navText.textContent = 'Mode Terang';
+            }
+        }
+        
+        // Also update settings theme button if present
+        const settingsIcon = document.getElementById('settings-theme-icon');
+        const settingsText = document.getElementById('settings-theme-text');
+        if (settingsIcon && settingsText) {
+            if (isLight) {
+                settingsIcon.setAttribute('data-lucide', 'moon');
+                settingsText.textContent = 'Ubah ke Mode Gelap';
+            } else {
+                settingsIcon.setAttribute('data-lucide', 'sun');
+                settingsText.textContent = 'Ubah ke Mode Terang';
+            }
+        }
+        
+        if (window.lucide) window.lucide.createIcons();
+    };
+    
     window.toggleTheme = function() {
         const isCurrentLight = document.documentElement.classList.contains('light-theme');
         if (isCurrentLight) {
@@ -328,8 +360,22 @@ function initTheme() {
             document.documentElement.classList.add('light-theme');
             localStorage.setItem('topup_store_theme', 'light');
         }
+        updateThemeUI();
         window.dispatchEvent(new CustomEvent('themeChanged'));
     };
+
+    window.addEventListener('themeChanged', updateThemeUI);
+    
+    // Bind click event to navbar theme toggle
+    document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('.theme-toggle-btn') || e.target.closest('#nav-theme-toggle');
+        if (toggleBtn) {
+            window.toggleTheme();
+        }
+    });
+
+    // Initial UI sync
+    setTimeout(updateThemeUI, 100);
 }
 
 // Application Initialization
