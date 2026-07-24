@@ -143,62 +143,54 @@ const settingsView = {
                     </form>
                 </div>
 
-                <!-- Points Section -->
+                <!-- Points Section (Compact Bar) -->
                 <div class="card-glass settings-section">
-                    <div class="settings-section-title">
-                        <i data-lucide="award" style="width: 20px; height: 20px; color: var(--success);"></i>
-                        ${texts.points_title}
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(16, 185, 129, 0.05); border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.2);">
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">${texts.points_balance}</div>
-                            <div style="font-size: 28px; font-weight: 800; color: var(--success);">${user.points.toLocaleString('id-ID')} <span style="font-size: 14px;">Pts</span></div>
+                    <div class="settings-points-bar">
+                        <div class="pts-left">
+                            <div class="pts-icon">
+                                <i data-lucide="coins" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div>
+                                <div class="pts-label">${texts.points_title}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 1px;">Cashback 1% tiap transaksi</div>
+                            </div>
                         </div>
-                        <i data-lucide="coins" style="width: 40px; height: 40px; color: var(--success); opacity: 0.5;"></i>
+                        <div style="text-align: right;">
+                            <span class="pts-value">${user.points.toLocaleString('id-ID')}</span>
+                            <span class="pts-unit">Pts</span>
+                        </div>
                     </div>
-                    <p style="margin-top: 12px; font-size: 13px; color: var(--text-secondary);">
-                        ${texts.points_desc}
-                    </p>
                 </div>
 
-                <!-- Transaction Summary -->
+                <!-- Transaction Summary (Compact Stats Row) -->
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
-                        <i data-lucide="receipt" style="width: 20px; height: 20px; color: var(--secondary);"></i>
+                        <i data-lucide="receipt" style="width: 18px; height: 18px; color: var(--secondary);"></i>
                         ${texts.summary_title}
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
-                        <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
-                            <div style="font-size: 24px; font-weight: 800; color: var(--secondary);">${userTx.length}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_total}</div>
+                    <div class="settings-stats-row">
+                        <div class="stat-cell">
+                            <div class="stat-num" style="color: var(--secondary);">${userTx.length}</div>
+                            <div class="stat-lbl">${texts.summary_total}</div>
                         </div>
-                        <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
-                            <div style="font-size: 24px; font-weight: 800; color: var(--success);">${successTx.length}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_success}</div>
+                        <div class="stat-cell">
+                            <div class="stat-num" style="color: var(--success);">${successTx.length}</div>
+                            <div class="stat-lbl">${texts.summary_success}</div>
                         </div>
-                        <div style="padding: 16px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-color); text-align: center;">
-                            <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">${window.formatRupiah(totalSpent)}</div>
-                            <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">${texts.summary_spent}</div>
+                        <div class="stat-cell">
+                            <div class="stat-num" style="color: var(--text-primary); font-size: 16px;">${window.formatRupiah(totalSpent)}</div>
+                            <div class="stat-lbl">${texts.summary_spent}</div>
                         </div>
-                    </div>
-                    <div style="margin-top: 16px;">
-                        <a href="#track" class="btn-grad" style="width: 100%; padding: 12px; text-align: center;">
-                            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                            <span>${texts.summary_track}</span>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Tampilan & Tema Section -->
                 <div class="card-glass settings-section">
                     <div class="settings-section-title">
-                        <i data-lucide="palette" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                        <i data-lucide="palette" style="width: 18px; height: 18px; color: var(--primary);"></i>
                         ${texts.theme_title}
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5;">
-                        ${texts.theme_desc}
-                    </p>
-                    <button class="btn-grad" id="btn-toggle-theme-settings" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0;">
+                    <button class="btn-grad" id="btn-toggle-theme-settings" style="width: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; font-size: 13px;">
                         <i data-lucide="sun" id="settings-theme-icon" style="width: 16px; height: 16px;"></i>
                         <span id="settings-theme-text">${window.getCurrentTheme() === 'light' ? texts.theme_btn_dark : texts.theme_btn_light}</span>
                     </button>
@@ -206,44 +198,53 @@ const settingsView = {
 
                 <!-- Order History Section -->
                 <div class="card-glass settings-section" style="grid-column: 1 / -1; width: 100%;">
-                    <div class="settings-section-title">
-                        <i data-lucide="history" style="width: 20px; height: 20px; color: var(--primary);"></i>
-                        ${texts.tx_history_title}
+                    <div class="settings-section-title" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="history" style="width: 18px; height: 18px; color: var(--primary);"></i>
+                            ${texts.tx_history_title}
+                        </div>
+                        <button class="filter-toggle-btn" id="btn-toggle-filter" style="width: auto; padding: 6px 14px; font-size: 12px; border-radius: var(--radius-sm);">
+                            <i data-lucide="filter" style="width: 14px; height: 14px; margin-right: 4px;"></i>
+                            <span>Filter Pesanan</span>
+                            <i data-lucide="chevron-down" class="chevron-icon" style="width: 14px; height: 14px; margin-left: 4px;"></i>
+                        </button>
                     </div>
                     
-                    <!-- Filter & Search Bar -->
-                    <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-color); padding: 16px; border-radius: var(--radius-md);">
-                        <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_search_label}</label>
-                            <div style="position: relative;">
-                                <input type="text" id="input-search-product" class="form-input" placeholder="${texts.filter_search_placeholder}" style="padding-left: 36px; height: 42px; font-size: 13px;">
-                                <i data-lucide="search" style="position: absolute; left: 12px; top: 13px; width: 16px; height: 16px; color: var(--text-muted);"></i>
+                    <!-- Filter & Search Bar (Collapsible) -->
+                    <div class="filter-collapsible" id="filter-collapsible-wrapper">
+                        <div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md); margin-top: 8px;">
+                            <div class="form-group" style="margin-bottom: 0; flex: 2; min-width: 200px;">
+                                <label style="font-size: 10px; margin-bottom: 4px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_search_label}</label>
+                                <div style="position: relative;">
+                                    <input type="text" id="input-search-product" class="form-input" placeholder="${texts.filter_search_placeholder}" style="padding-left: 34px; height: 38px; font-size: 12px;">
+                                    <i data-lucide="search" style="position: absolute; left: 10px; top: 11px; width: 15px; height: 15px; color: var(--text-muted);"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_start_date}</label>
-                            <input type="date" id="input-filter-start-date" class="form-input" style="height: 42px; font-size: 13px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 130px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_end_date}</label>
-                            <input type="date" id="input-filter-end-date" class="form-input" style="height: 42px; font-size: 13px;">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 150px;">
-                            <label style="font-size: 11px; margin-bottom: 6px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_status_label}</label>
-                            <div style="position: relative;">
-                                <select id="select-filter-status" class="form-input form-select" style="height: 42px; font-size: 13px; padding-right: 32px;">
-                                    <option value="ALL">${texts.filter_status_all}</option>
-                                    <option value="PENDING">${texts.filter_status_pending}</option>
-                                    <option value="SUCCESS">${texts.filter_status_success}</option>
-                                    <option value="FAILED">${texts.filter_status_failed}</option>
-                                </select>
+                            <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 120px;">
+                                <label style="font-size: 10px; margin-bottom: 4px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_start_date}</label>
+                                <input type="date" id="input-filter-start-date" class="form-input" style="height: 38px; font-size: 12px;">
                             </div>
-                        </div>
-                        <div style="display: flex; align-items: flex-end;">
-                            <button id="btn-reset-filters" class="btn-grad" style="height: 42px; padding: 0 20px; margin: 0; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-                                <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
-                                <span>${texts.filter_reset}</span>
-                            </button>
+                            <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 120px;">
+                                <label style="font-size: 10px; margin-bottom: 4px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_end_date}</label>
+                                <input type="date" id="input-filter-end-date" class="form-input" style="height: 38px; font-size: 12px;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 140px;">
+                                <label style="font-size: 10px; margin-bottom: 4px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">${texts.filter_status_label}</label>
+                                <div style="position: relative;">
+                                    <select id="select-filter-status" class="form-input form-select" style="height: 38px; font-size: 12px; padding-right: 28px;">
+                                        <option value="ALL">${texts.filter_status_all}</option>
+                                        <option value="PENDING">${texts.filter_status_pending}</option>
+                                        <option value="SUCCESS">${texts.filter_status_success}</option>
+                                        <option value="FAILED">${texts.filter_status_failed}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-end;">
+                                <button id="btn-reset-filters" class="btn-grad" style="height: 38px; padding: 0 16px; margin: 0; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                                    <i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i>
+                                    <span>${texts.filter_reset}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -483,6 +484,16 @@ const settingsView = {
             });
         }
 
+        // Collapsible Filter Toggle Logic
+        const filterToggleBtn = document.getElementById('btn-toggle-filter');
+        const filterWrapper = document.getElementById('filter-collapsible-wrapper');
+        if (filterToggleBtn && filterWrapper) {
+            filterToggleBtn.addEventListener('click', () => {
+                filterToggleBtn.classList.toggle('open');
+                filterWrapper.classList.toggle('open');
+            });
+        }
+
         const showTxDetail = (tx) => {
             if (!txDetailModal || !txDetailBody) return;
 
@@ -495,110 +506,87 @@ const settingsView = {
             });
 
             let statusBadge = '';
-            let statusClass = 'status-pending';
             if (tx.status === 'PENDING') {
                 statusBadge = '<span class="badge status-pending">PENDING</span>';
-                statusClass = 'status-pending';
             } else if (tx.status === 'SUCCESS') {
                 const game = window.dbService.getGameById(tx.gameId);
                 const isVoucher = game && game.category === 'voucher';
                 const label = isVoucher ? 'PEMBAYARAN SUKSES' : 'PESANAN DI PROSES';
                 statusBadge = `<span class="badge status-success">${label}</span>`;
-                statusClass = 'status-success';
             } else {
                 statusBadge = '<span class="badge status-failed">PESANAN GAGAL</span>';
-                statusClass = 'status-failed';
             }
 
             let targetDetails = '';
             if (tx.accountData) {
                 targetDetails = Object.entries(tx.accountData)
-                    .map(([key, val]) => `<div style="font-size: 13px; color: var(--text-secondary);"><strong style="text-transform: capitalize;">${key}:</strong> ${val}</div>`)
-                    .join('');
+                    .map(([key, val]) => `${key.toUpperCase()}: ${val}`)
+                    .join(' | ');
             }
 
             txDetailBody.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <!-- Invoice Info -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted);">Invoice ID</div>
-                            <div style="font-weight: 800; font-family: monospace; font-size: 16px; color: var(--secondary);">${tx.invoiceId}</div>
+                <div class="invoice-mini">
+                    <div class="invoice-mini-header">
+                        <div class="inv-brand">
+                            <i data-lucide="zap" class="inv-logo" style="width: 20px; height: 20px;"></i>
+                            <span>ZakiTopup Invoice</span>
                         </div>
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted); text-align: right;">Status</div>
-                            <div style="text-align: right;">${statusBadge}</div>
-                        </div>
+                        <div class="inv-number">${tx.invoiceId}</div>
                     </div>
-
-                    <!-- Order Info -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: rgba(255,255,255,0.01); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Layanan</div>
-                            <div style="font-weight: 700; font-size: 14px;">${tx.gameName}</div>
+                    
+                    <div class="invoice-mini-body">
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Status Pesanan</span>
+                            <span class="inv-value">${statusBadge}</span>
                         </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Produk</div>
-                            <div style="font-weight: 700; font-size: 14px;">${tx.productName}</div>
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Waktu Transaksi</span>
+                            <span class="inv-value">${txDate}</span>
                         </div>
-                        <div style="grid-column: 1 / -1;">
-                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Data Akun Tujuan</div>
-                            ${targetDetails}
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Layanan / Game</span>
+                            <span class="inv-value">${window.sanitizeHTML(tx.gameName)}</span>
                         </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Metode Pembayaran</div>
-                            <div style="font-size: 13px;">${tx.paymentMethodName}</div>
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Item / Produk</span>
+                            <span class="inv-value">${window.sanitizeHTML(tx.productName)}</span>
                         </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Total Pembayaran</div>
-                            <div style="font-weight: 800; color: var(--secondary); font-size: 14px;">${window.formatRupiah(tx.totalAmount)}</div>
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Tujuan / Akun</span>
+                            <span class="inv-value" style="font-family: monospace;">${window.sanitizeHTML(targetDetails || '-')}</span>
+                        </div>
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Metode Pembayaran</span>
+                            <span class="inv-value">${window.sanitizeHTML(tx.paymentMethodName || '-')}</span>
                         </div>
                         ${tx.voucherCode ? `
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-muted);">Kupon Diskon</div>
-                            <div style="font-size: 13px; color: var(--success); font-weight: 700;">${tx.voucherCode} (-${window.formatRupiah(tx.discountAmount)})</div>
+                        <div class="invoice-mini-row">
+                            <span class="inv-label">Voucher Diskon</span>
+                            <span class="inv-value" style="color: var(--success);">${window.sanitizeHTML(tx.voucherCode)} (-${window.formatRupiah(tx.discountAmount)})</span>
+                        </div>` : ''}
+                        
+                        <div class="invoice-mini-row total-row">
+                            <span class="inv-label">Total Pembayaran</span>
+                            <span class="inv-value">${window.formatRupiah(tx.totalAmount)}</span>
+                        </div>
+
+                        ${tx.purchaseNote ? `
+                        <div style="margin-top: 14px; padding: 12px; background: rgba(6, 182, 212, 0.05); border: 1px solid var(--secondary); border-radius: var(--radius-sm);">
+                            <div style="font-size: 11px; color: var(--secondary); font-weight: 800; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="key" style="width: 14px; height: 14px;"></i>
+                                Nota Pembelian / SN / Token
+                            </div>
+                            <div style="font-family: monospace; font-size: 13px; color: var(--text-primary); white-space: pre-wrap; word-break: break-all;">${window.sanitizeHTML(tx.purchaseNote)}</div>
                         </div>` : ''}
                     </div>
 
-                    <!-- Timeline Status -->
-                    <div>
-                        <h4 style="color: var(--primary); margin-bottom: 12px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Log Status Transaksi</h4>
-                        <div style="display: flex; flex-direction: column; gap: 16px; border-left: 2px solid var(--border-color); padding-left: 16px; margin-left: 8px;">
-                            ${(tx.statusHistory || [
-                                { status: 'PENDING', date: tx.createdAt, note: 'Pesanan dibuat. Menunggu pembayaran.' }
-                            ]).map(history => {
-                                const hDate = new Date(history.date).toLocaleString('id-ID', { 
-                                    day: 'numeric', 
-                                    month: 'short', 
-                                    hour: '2-digit', 
-                                    minute: '2-digit' 
-                                });
-                                let dotClass = 'status-pending';
-                                if (history.status === 'SUCCESS') dotClass = 'status-success';
-                                if (history.status === 'FAILED') dotClass = 'status-failed';
-                                return `
-                                    <div style="position: relative;">
-                                        <div class="timeline-dot ${dotClass}" style="position: absolute; left: -21px; top: 6px; width: 8px; height: 8px; border-radius: 50%;"></div>
-                                        <div style="font-size: 11px; color: var(--text-muted);">${hDate}</div>
-                                        <div style="font-weight: 700; font-size: 13px; color: var(--text-primary);">
-                                            Status: <span class="badge ${dotClass}" style="font-size: 9px; padding: 1px 4px; font-weight: 800;">${history.status}</span>
-                                        </div>
-                                        <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${history.note || ''}</div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
+                    <div class="invoice-mini-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <span>Simpan invoice ini sebagai bukti transaksi resmi.</span>
+                        <a href="#invoice/${tx.invoiceId}" class="btn-grad" style="padding: 6px 14px; font-size: 11px; border-radius: var(--radius-sm); text-decoration: none; white-space: nowrap; margin: 0;">
+                            <span>Buka Halaman Invoice</span>
+                            <i data-lucide="external-link" style="width: 12px; height: 12px; margin-left: 4px;"></i>
+                        </a>
                     </div>
-
-                    <!-- Purchase Note / Nota Pembelian -->
-                    ${tx.purchaseNote ? `
-                    <div style="padding: 16px; background: rgba(6, 182, 212, 0.05); border: 1px solid var(--secondary); border-radius: var(--radius-md); margin-top: 8px;">
-                        <h4 style="color: var(--secondary); margin-bottom: 8px; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
-                            Nota Pembelian / Token / SN
-                        </h4>
-                        <div style="font-family: monospace; font-size: 14px; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; background: rgba(0,0,0,0.2); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.03);">${tx.purchaseNote}</div>
-                    </div>` : ''}
                 </div>
             `;
             

@@ -469,7 +469,7 @@ const homeView = {
                                             <div class="game-card-overlay"></div>
                                             
                                             <!-- Cyber Glow Floating Logo -->
-                                            <div style="position: absolute; top: 16px; left: 16px; z-index: 3; background: rgba(15, 19, 34, 0.9); backdrop-filter: blur(8px); padding: 8px; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); width: 64px; height: 64px;">
+                                            <div class="game-card-logo-badge" style="position: absolute; top: 12px; left: 12px; z-index: 3; background: rgba(15, 19, 34, 0.9); backdrop-filter: blur(8px); padding: 6px; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow);">
                                                 ${logoHtml}
                                             </div>
                                             
