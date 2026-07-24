@@ -45,6 +45,10 @@
 
             <!-- Desktop Nav + Mobile Drawer -->
             <nav class="nav-links" id="main-nav-links">
+                <!-- Theme Toggle Button (Icon Only, Left of Home) -->
+                <button class="nav-btn secondary theme-toggle-btn icon-only" id="nav-theme-toggle" aria-label="Ubah Tema Tampilan" title="Ubah Tema (Dark/Light)">
+                    <i data-lucide="sun" id="nav-theme-icon" style="width: 18px; height: 18px;"></i>
+                </button>
                 <a href="#home" class="nav-btn secondary" id="nav-home-link">
                     <i data-lucide="home" style="width: 16px; height: 16px;"></i>
                     <span>Home</span>
@@ -61,11 +65,6 @@
                     <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
                     <span>Dashboard Admin</span>
                 </a>
-                <!-- Theme Toggle Button in Navbar -->
-                <button class="nav-btn secondary theme-toggle-btn" id="nav-theme-toggle" aria-label="Ubah Tema Tampilan">
-                    <i data-lucide="sun" id="nav-theme-icon" style="width: 16px; height: 16px;"></i>
-                    <span id="nav-theme-text">Mode Terang</span>
-                </button>
                 <div id="auth-nav-container" style="display: flex; gap: 12px; align-items: center;">
                     <!-- Dynamically populated buttons -->
                 </div>

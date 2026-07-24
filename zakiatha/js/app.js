@@ -325,13 +325,15 @@ function initTheme() {
         const navIcon = document.getElementById('nav-theme-icon');
         const navText = document.getElementById('nav-theme-text');
         
-        if (navIcon && navText) {
+        if (navIcon) {
             if (isLight) {
                 navIcon.setAttribute('data-lucide', 'moon');
-                navText.textContent = 'Mode Gelap';
+                if (navText) navText.textContent = 'Mode Gelap';
+                if (navBtn) navBtn.setAttribute('title', 'Ubah ke Mode Gelap');
             } else {
                 navIcon.setAttribute('data-lucide', 'sun');
-                navText.textContent = 'Mode Terang';
+                if (navText) navText.textContent = 'Mode Terang';
+                if (navBtn) navBtn.setAttribute('title', 'Ubah ke Mode Terang');
             }
         }
         

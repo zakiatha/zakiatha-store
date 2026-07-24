@@ -2952,6 +2952,18 @@ input:checked + .slider-switch:before {
     cursor: pointer;
     transition: all var(--transition-fast);
 }
+
+.theme-toggle-btn.icon-only {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0;
+}
 .theme-toggle-btn:hover {
     background: rgba(124, 58, 237, 0.15);
     border-color: var(--primary);
