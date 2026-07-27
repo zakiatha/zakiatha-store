@@ -3734,16 +3734,31 @@ input:checked + .slider-switch:before {
 }
 
 /* ==========================================================================
-   Print CSS for PDF Invoice Receipt
+   Print CSS for Minimalist 1-Page PDF Receipt
    ========================================================================== */
 @media print {
-    body {
-        background: #ffffff !important;
-        color: #1e293b !important;
-        padding: 0 !important;
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
     }
 
-    header, footer, .mobile-bottom-nav, .simulation-panel, .btn-grad, .btn-sim, .modal-close-btn, #galaxy-stars, #galaxy-nebula {
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        font-size: 11px !important;
+    }
+
+    /* Hide non-receipt UI elements */
+    header, footer, nav, .mobile-bottom-nav, .simulation-panel, 
+    .btn-grad, .btn-sim, .modal-close-btn, #galaxy-stars, #galaxy-nebula,
+    .payment-instructions-box, .qris-code-container, .va-copy-box,
+    .btn-cs-link, #toast-container, .help-box,
+    .invoice-layout > div:first-child {
         display: none !important;
     }
 
@@ -3754,20 +3769,86 @@ input:checked + .slider-switch:before {
         margin: 0 !important;
     }
 
-    .card-glass {
+    .invoice-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Compact Minimal Banner */
+    .invoice-status-banner {
+        padding: 8px 14px !important;
+        border-radius: 6px !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-bottom: 0 !important;
+    }
+
+    .invoice-status-banner svg, .invoice-status-banner i {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .invoice-status-title {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+    }
+
+    .invoice-timer {
+        font-size: 13px !important;
+    }
+
+    /* Minimal Card Details */
+    .card-glass, .invoice-details {
         background: #ffffff !important;
         border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
         box-shadow: none !important;
-        color: #1e293b !important;
+        color: #0f172a !important;
+        padding: 14px 18px !important;
+        page-break-inside: avoid !important;
     }
 
     .invoice-details {
-        border: 1px solid #94a3b8 !important;
-        padding: 24px !important;
+        border-color: #94a3b8 !important;
     }
 
-    .invoice-row, .invoice-row-total {
+    .invoice-details > div:first-child {
+        margin-bottom: 10px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .invoice-details h3 {
+        font-size: 14px !important;
+        margin: 0 !important;
         color: #0f172a !important;
+    }
+
+    .invoice-row {
+        padding: 4px 0 !important;
+        font-size: 11px !important;
+        border-bottom: 1px dashed #e2e8f0 !important;
+        color: #334155 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    .invoice-row-total {
+        padding: 8px 0 4px 0 !important;
+        margin-top: 6px !important;
+        border-top: 2px solid #0f172a !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+        display: flex !important;
+        justify-content: space-between !important;
     }
 
     .gradient-text {
@@ -3775,6 +3856,31 @@ input:checked + .slider-switch:before {
         -webkit-background-clip: unset !important;
         -webkit-text-fill-color: #0f172a !important;
         color: #0f172a !important;
+    }
+
+    /* Add minimal print receipt header branding */
+    .invoice-details::before {
+        content: 'ZAKITOPUP • STRUK BUKTI TRANSAKSI RESMI';
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #475569;
+        border-bottom: 2px solid #cbd5e1;
+        padding-bottom: 6px;
+        margin-bottom: 10px;
+    }
+
+    /* Add print receipt footer disclaimer */
+    .invoice-details::after {
+        content: 'Terima kasih telah bertransaksi di ZakiTopup. Simpan struk ini sebagai bukti pembayaran yang sah. CS WA: +62 812-3456-7890';
+        display: block;
+        font-size: 9px;
+        color: #64748b;
+        text-align: center;
+        margin-top: 12px;
+        padding-top: 6px;
+        border-top: 1px dashed #cbd5e1;
     }
 }
 
