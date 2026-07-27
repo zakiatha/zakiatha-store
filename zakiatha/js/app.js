@@ -253,7 +253,7 @@ function router() {
     }, 150);
 }
 
-// Helper: Highlight active nav link
+// Helper: Highlight active nav link (Header & Mobile Bottom Nav)
 function updateActiveNav(activeId) {
     const navLinks = ['nav-home-link', 'nav-track-link', 'nav-admin-link', 'nav-settings-link'];
     navLinks.forEach(id => {
@@ -272,6 +272,15 @@ function updateActiveNav(activeId) {
             }
         }
     });
+
+    // Mobile bottom nav active synchronization
+    const mbHome = document.getElementById('mb-nav-home');
+    const mbTrack = document.getElementById('mb-nav-track');
+    const mbAccount = document.getElementById('mb-nav-account');
+
+    if (mbHome) mbHome.classList.toggle('active', activeId === 'nav-home-link');
+    if (mbTrack) mbTrack.classList.toggle('active', activeId === 'nav-track-link');
+    if (mbAccount) mbAccount.classList.toggle('active', activeId === 'nav-settings-link');
 }
 
 // Helper: Render 404 Page

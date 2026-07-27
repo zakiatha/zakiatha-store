@@ -84,19 +84,41 @@ const trackView = {
                     });
 
                     return `
-                        <div class="card-glass track-item" data-invoice-id="${tx.invoiceId}">
+                        <div class="card-glass track-item" data-invoice-id="${tx.invoiceId}" style="cursor: pointer; position: relative;">
                             <div class="track-item-left">
-                                <div class="track-item-inv">${tx.invoiceId}</div>
+                                <div class="track-item-inv" style="display: flex; align-items: center; gap: 8px;">
+                                    <span>${tx.invoiceId}</span>
+                                    <button class="btn-copy-inv" data-inv="${tx.invoiceId}" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 2px 6px; border-radius: 4px;" title="Salin No. Invoice">
+                                        <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                                    </button>
+                                </div>
                                 <div class="track-item-meta">${tx.gameName} &bull; ${tx.productName}</div>
                                 <div class="track-item-meta" style="font-size: 11px;">${txDate}</div>
                             </div>
-                            <div class="track-item-right">
+                            <div class="track-item-right" style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                                 <div class="track-item-amount">${window.formatRupiah(tx.totalAmount)}</div>
                                 <div>${statusBadge}</div>
+                                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20ZakiTopup,%20saya%20butuh%20bantuan%20terkait%20pesanan%20dengan%20Invoice:%20${tx.invoiceId}" target="_blank" rel="noopener noreferrer" class="btn-cs-link" onclick="event.stopPropagation();" style="font-size: 11px; color: #22c55e; text-decoration: none; display: flex; align-items: center; gap: 4px; font-weight: 600; margin-top: 4px;">
+                                    <i data-lucide="message-circle" style="width: 13px; height: 13px;"></i>
+                                    <span>Bantuan CS</span>
+                                </a>
                             </div>
                         </div>
                     `;
                 }).join('');
+
+                // Add click listener to copy buttons
+                document.querySelectorAll('.btn-copy-inv').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const inv = btn.getAttribute('data-inv');
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(inv);
+                            btn.style.color = 'var(--success)';
+                            setTimeout(() => { btn.style.color = 'var(--text-muted)'; }, 1500);
+                        }
+                    });
+                });
 
                 // Add click listener to history items
                 document.querySelectorAll('.track-item').forEach(item => {

@@ -1,0 +1,35 @@
+# Root .gitignore for zakiatha personal project
+
+# Ignore root directories and non-zakiatha contents
+.agents/
+agents/
+maestroparfum/
+network-testbed/
+refrensi-UI-desain/
+skripsi/
+user.md
+migrate-supabase.js
+skills-lock.json
+
+# Sensitive & Key Files
+.env
+*.env
+*.env.*
+chat.md
+supabase.schema.sql
+migrate-supabase.js
+test-again.js
+check-conn.js
+
+# Exclude package manager files for zakiatha (only keep in trading if needed)
+zakiatha/package.json
+zakiatha/package-lock.json
+package.json
+package-lock.json
+node_modules/
+
+# OS & IDE
+.vscode/
+Thumbs.db
+.DS_Store
+*.log

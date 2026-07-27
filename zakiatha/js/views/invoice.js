@@ -242,9 +242,15 @@ const invoiceView = {
                 
                 <!-- Details Invoice Table -->
                 <div class="card-glass invoice-details">
-                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;" class="gradient-text">
-                        Rincian Transaksi
-                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+                        <h3 style="font-size: 18px; font-weight: 800; margin: 0;" class="gradient-text">
+                            Rincian Transaksi
+                        </h3>
+                        <button id="btn-print-pdf" class="btn-grad" style="padding: 6px 14px; font-size: 12px; height: auto; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                            <span>Cetak Struk / PDF</span>
+                        </button>
+                    </div>
                     
                     <div class="invoice-row">
                         <div style="color: var(--text-secondary);">No. Invoice</div>
@@ -380,6 +386,13 @@ const invoiceView = {
                 console.error('Gagal menyalin: ', err);
             });
         };
+
+        const btnPrintPdf = document.getElementById('btn-print-pdf');
+        if (btnPrintPdf) {
+            btnPrintPdf.addEventListener('click', () => {
+                window.print();
+            });
+        }
 
         const btnCopyVa = document.getElementById('btn-copy-va');
         if (btnCopyVa) {

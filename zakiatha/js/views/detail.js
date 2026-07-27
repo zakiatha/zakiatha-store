@@ -213,9 +213,15 @@ const detailView = {
                     
                     <!-- Step 1: Account Fields -->
                     <div class="card-glass step-card" id="step-account">
-                        <div class="step-header">
-                            <div class="step-num">1</div>
-                            <h2 class="step-title">${texts.step1}</h2>
+                        <div class="step-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="step-num">1</div>
+                                <h2 class="step-title" style="margin: 0;">${texts.step1}</h2>
+                            </div>
+                            <button id="btn-show-id-guide" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); color: var(--primary); font-size: 11px; padding: 4px 10px; border-radius: var(--radius-full); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; transition: var(--transition-fast);">
+                                <i data-lucide="help-circle" style="width: 14px; height: 14px;"></i>
+                                <span>Petunjuk User ID</span>
+                            </button>
                         </div>
                         <div class="step-content">
                             <div id="dynamic-fields-container">
@@ -411,48 +417,93 @@ const detailView = {
         }).join('');
         
         // ----------------------------------------------------
-        // 2. DYNAMIC NOMINALS GENERATION
+        // 2. DYNAMIC NOMINALS GENERATION & CATEGORY FILTER TABS
         // ----------------------------------------------------
         if (products.length === 0) {
             productsContainer.innerHTML = `<p style="color: var(--text-secondary); padding: 20px; text-align: center;">Tidak ada produk tersedia.</p>`;
         } else {
-            productsContainer.innerHTML = products.map((prod, idx) => {
-                const hasDiscount = prod.originalPrice > prod.price;
-                const delay = (idx * 0.04).toFixed(2);
-                return `
-                    <div class="product-card stagger-card" data-id="${prod.id}" style="animation-delay: ${delay}s;">
-                        ${prod.isPopular ? `<div class="product-card-badge-container"><span class="badge popular">Populer</span></div>` : ''}
-                        <div class="product-card-title">${prod.name}</div>
-                        <div class="product-card-price-wrapper">
-                            ${hasDiscount ? `<div class="product-card-original-price">${window.formatRupiah(prod.originalPrice)}</div>` : ''}
-                            <div class="product-card-price">${window.formatRupiah(prod.price)}</div>
+            // Render Filter Tabs above product grid
+            let tabsContainer = document.getElementById('nominal-tabs-wrapper');
+            if (!tabsContainer) {
+                tabsContainer = document.createElement('div');
+                tabsContainer.id = 'nominal-tabs-wrapper';
+                tabsContainer.className = 'nominal-filter-tabs';
+                productsContainer.parentNode.insertBefore(tabsContainer, productsContainer);
+            }
+
+            tabsContainer.innerHTML = `
+                <button class="nominal-tab-btn active" data-cat="all">Semua Nominal</button>
+                <button class="nominal-tab-btn" data-cat="pass">Pass / Membership</button>
+                <button class="nominal-tab-btn" data-cat="reguler">Diamond / Cash</button>
+            `;
+
+            const renderFilteredProducts = (categoryFilter = 'all') => {
+                const filtered = products.filter(prod => {
+                    if (categoryFilter === 'all') return true;
+                    const lname = prod.name.toLowerCase();
+                    if (categoryFilter === 'pass') {
+                        return lname.includes('pass') || lname.includes('membership') || lname.includes('weekly') || lname.includes('starlight');
+                    }
+                    if (categoryFilter === 'reguler') {
+                        return !lname.includes('pass') && !lname.includes('membership') && !lname.includes('weekly');
+                    }
+                    return true;
+                });
+
+                const displayProducts = filtered.length > 0 ? filtered : products;
+
+                productsContainer.innerHTML = displayProducts.map((prod, idx) => {
+                    const hasDiscount = prod.originalPrice > prod.price;
+                    const isBestValue = hasDiscount && (prod.originalPrice - prod.price > 5000);
+                    const delay = (idx * 0.04).toFixed(2);
+                    const isSelected = selectedProduct && selectedProduct.id === prod.id;
+                    return `
+                        <div class="product-card stagger-card ${isSelected ? 'selected' : ''}" data-id="${prod.id}" style="animation-delay: ${delay}s;">
+                            ${prod.isPopular ? `<div class="product-card-badge-container"><span class="badge popular">Populer</span></div>` : ''}
+                            ${isBestValue && !prod.isPopular ? `<div class="product-card-badge-container"><span class="badge best-value">Best Value</span></div>` : ''}
+                            <div class="product-card-title">${prod.name}</div>
+                            <div class="product-card-price-wrapper">
+                                ${hasDiscount ? `<div class="product-card-original-price">${window.formatRupiah(prod.originalPrice)}</div>` : ''}
+                                <div class="product-card-price">${window.formatRupiah(prod.price)}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
-            
-            // Add click listeners to product cards
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
-                    
-                    const prodId = card.getAttribute('data-id');
-                    selectedProduct = products.find(p => p.id === prodId);
-                    
-                    recalculateVoucherDiscount();
-                    renderPayments();
-                    validateForm();
-                    
-                    // Re-evaluate borders on click/select
-                    document.querySelectorAll('.product-card').forEach(c => {
-                        if (c !== card) {
-                            c.style.borderColor = 'var(--border-color)';
-                            c.style.boxShadow = '';
-                        }
+                    `;
+                }).join('');
+
+                // Add click listeners to product cards
+                document.querySelectorAll('.product-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        
+                        const prodId = card.getAttribute('data-id');
+                        selectedProduct = products.find(p => p.id === prodId);
+                        
+                        recalculateVoucherDiscount();
+                        renderPayments();
+                        validateForm();
+                        
+                        document.querySelectorAll('.product-card').forEach(c => {
+                            if (c !== card) {
+                                c.style.borderColor = 'var(--border-color)';
+                                c.style.boxShadow = '';
+                            }
+                        });
+                        card.style.borderColor = 'var(--primary)';
+                        card.style.boxShadow = 'var(--shadow-glow)';
                     });
-                    card.style.borderColor = 'var(--primary)';
-                    card.style.boxShadow = 'var(--shadow-glow)';
+                });
+            };
+
+            renderFilteredProducts('all');
+
+            // Tab click handlers
+            tabsContainer.querySelectorAll('.nominal-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabsContainer.querySelectorAll('.nominal-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const cat = btn.getAttribute('data-cat');
+                    renderFilteredProducts(cat);
                 });
             });
 
@@ -712,6 +763,13 @@ const detailView = {
         fieldsContainer.addEventListener('input', validateForm);
         fieldsContainer.addEventListener('change', validateForm);
         whatsappInput.addEventListener('input', validateForm);
+        
+        const btnShowIdGuide = document.getElementById('btn-show-id-guide');
+        if (btnShowIdGuide) {
+            btnShowIdGuide.addEventListener('click', () => {
+                showWarningModal(this.getGameInstructions(game.slug));
+            });
+        }
         
         // ----------------------------------------------------
         // 5. SUBMIT ORDER & CHECKOUT MODAL
