@@ -459,6 +459,13 @@ const homeView = {
                                 } else {
                                     logoHtml = this.logos[game.logo] || `<div style="width:48px; height:48px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">${game.name.substring(0,2)}</div>`;
                                 }
+                                
+                                const prods = window.dbService.getProducts(game.id);
+                                let minPrice = 0;
+                                if (prods && prods.length > 0) {
+                                    minPrice = Math.min(...prods.map(p => p.price));
+                                }
+
                                 const delay = (idx * 0.05).toFixed(2);
                                 return `
                                     <div class="game-card-wrapper stagger-card" style="animation-delay: ${delay}s;">
@@ -475,7 +482,10 @@ const homeView = {
                                             
                                             <div class="game-card-info">
                                                 <h3 class="game-card-title">${game.name}</h3>
-                                                <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                                                    <span class="game-card-category" style="color: var(--secondary);">${game.category === 'mobile' ? 'Mobile' : game.category === 'pc' ? 'PC' : game.category === 'voucher' ? 'Voucher' : game.category === 'ewallet' ? 'E-Wallet' : 'Isi Pulsa'}</span>
+                                                    ${minPrice > 0 ? `<span style="font-size: 10px; color: var(--success); font-weight: 700; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">Mulai ${window.formatRupiah(minPrice)}</span>` : ''}
+                                                </div>
                                             </div>
                                         </a>
                                     </div>

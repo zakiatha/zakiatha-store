@@ -210,6 +210,28 @@ const detailView = {
                 
                 <!-- Right Column: Step by Step Process -->
                 <div class="detail-steps">
+                    <!-- Step Progress Wizard Bar -->
+                    <div class="card-glass step-wizard-bar" style="margin-bottom: 20px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <div class="step-wizard-item active" id="wizard-step-1">
+                            <span class="wizard-circle">1</span>
+                            <span class="wizard-label">Akun</span>
+                        </div>
+                        <div class="wizard-connector"></div>
+                        <div class="step-wizard-item" id="wizard-step-2">
+                            <span class="wizard-circle">2</span>
+                            <span class="wizard-label">Nominal</span>
+                        </div>
+                        <div class="wizard-connector"></div>
+                        <div class="step-wizard-item" id="wizard-step-3">
+                            <span class="wizard-circle">3</span>
+                            <span class="wizard-label">Metode</span>
+                        </div>
+                        <div class="wizard-connector"></div>
+                        <div class="step-wizard-item" id="wizard-step-4">
+                            <span class="wizard-circle">4</span>
+                            <span class="wizard-label">Beli</span>
+                        </div>
+                    </div>
                     
                     <!-- Step 1: Account Fields -->
                     <div class="card-glass step-card" id="step-account">
@@ -290,6 +312,17 @@ const detailView = {
                             <button id="btn-submit-order" class="btn-grad" style="width: 100%; padding: 16px;">
                                 <span>${texts.submit_btn}</span>
                             </button>
+
+                            <!-- Trust Badges & Guarantee Banner -->
+                            <div class="trust-guarantee-box" style="margin-top: 8px; padding: 12px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: var(--radius-md); text-align: center;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--success); margin-bottom: 6px;">
+                                    <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+                                    <span>🔒 Transaksi 100% Aman &amp; Terenkripsi</span>
+                                </div>
+                                <p style="font-size: 10px; color: var(--text-muted); margin: 0;">
+                                    Didukung oleh mitra pembayaran resmi: QRIS, DANA, OVO, GoPay, ShopeePay, Virtual Account Bank &amp; Retail.
+                                </p>
+                            </div>
                         </div>
                     </div>
                     
@@ -756,6 +789,17 @@ const detailView = {
                 }
             }
             
+            // Update Wizard Steps Highlight
+            const ws1 = document.getElementById('wizard-step-1');
+            const ws2 = document.getElementById('wizard-step-2');
+            const ws3 = document.getElementById('wizard-step-3');
+            const ws4 = document.getElementById('wizard-step-4');
+
+            if (ws1) ws1.classList.toggle('active', true);
+            if (ws2) ws2.classList.toggle('active', allInputsFilled);
+            if (ws3) ws3.classList.toggle('active', allInputsFilled && selectedProduct !== null);
+            if (ws4) ws4.classList.toggle('active', allInputsFilled && selectedProduct !== null && selectedPayment !== null);
+
             // Update real-time summary
             updateCheckoutSummary();
         };

@@ -412,6 +412,33 @@ function initTheme() {
     setTimeout(updateThemeUI, 100);
 }
 
+// Global Toast Notification Helper
+function showToast(message, type = 'success') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    const iconName = type === 'error' ? 'alert-circle' : 'check-circle';
+    toast.innerHTML = `
+        <i data-lucide="${iconName}" style="width: 18px; height: 18px;"></i>
+        <span>${message}</span>
+    `;
+    container.appendChild(toast);
+    if (window.lucide) window.lucide.createIcons();
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
 // Application Initialization
 function init() {
     // Set global helper on window so views can access it
@@ -419,6 +446,7 @@ function init() {
     window.getSession = getSession;
     window.refreshAuthHeader = refreshAuthHeader;
     window.sanitizeHTML = sanitizeHTML;
+    window.showToast = showToast;
     
     // Initialize hamburger menu
     initHamburger();
