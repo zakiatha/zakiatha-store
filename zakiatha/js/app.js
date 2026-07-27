@@ -88,14 +88,15 @@ function toggleMenu(open) {
 // Dynamic Auth Navbar Header updater
 function refreshAuthHeader() {
     const container = document.getElementById('auth-nav-container');
-    const adminLink = document.getElementById('nav-admin-link');
-    const footerAdminLink = document.getElementById('footer-admin-link');
+    const mainNavLinks = document.getElementById('main-nav-links');
+    const footerLinksContainer = document.getElementById('footer-links-container');
+    let adminLink = document.getElementById('nav-admin-link');
+    let footerAdminLink = document.getElementById('footer-admin-link');
     const settingsLink = document.getElementById('nav-settings-link');
     if (!settingsLink) return;
 
     const session = getSession();
     
-    // As requested, completely remove login, register, and logout/profile badge from the header.
     if (container) {
         container.innerHTML = '';
     }
@@ -109,13 +110,35 @@ function refreshAuthHeader() {
         `;
         settingsLink.style.display = 'flex';
 
-        // Show Admin link if user is admin
+        // Dynamically inject Admin links ONLY if authenticated user has 'admin' role
         if (session.role === 'admin') {
-            if (adminLink) adminLink.style.display = 'flex';
-            if (footerAdminLink) footerAdminLink.style.display = 'inline-block';
+            if (!adminLink && mainNavLinks) {
+                adminLink = document.createElement('a');
+                adminLink.href = '#admin';
+                adminLink.className = 'nav-btn primary';
+                adminLink.id = 'nav-admin-link';
+                adminLink.style.display = 'flex';
+                adminLink.innerHTML = `
+                    <i data-lucide="layout-dashboard" style="width: 16px; height: 16px;"></i>
+                    <span>Dashboard Admin</span>
+                `;
+                mainNavLinks.appendChild(adminLink);
+            } else if (adminLink) {
+                adminLink.style.display = 'flex';
+            }
+
+            if (!footerAdminLink && footerLinksContainer) {
+                footerAdminLink = document.createElement('a');
+                footerAdminLink.href = '#admin';
+                footerAdminLink.id = 'footer-admin-link';
+                footerAdminLink.textContent = 'Dashboard Admin';
+                footerLinksContainer.appendChild(footerAdminLink);
+            } else if (footerAdminLink) {
+                footerAdminLink.style.display = 'inline-block';
+            }
         } else {
-            if (adminLink) adminLink.style.display = 'none';
-            if (footerAdminLink) footerAdminLink.style.display = 'none';
+            if (adminLink) adminLink.remove();
+            if (footerAdminLink) footerAdminLink.remove();
         }
     } else {
         // Guest: change Settings button to "Masuk / Daftar" linking to #login
@@ -126,8 +149,8 @@ function refreshAuthHeader() {
         `;
         settingsLink.style.display = 'flex';
 
-        if (adminLink) adminLink.style.display = 'none';
-        if (footerAdminLink) footerAdminLink.style.display = 'none';
+        if (adminLink) adminLink.remove();
+        if (footerAdminLink) footerAdminLink.remove();
     }
 
     if (window.lucide) {
