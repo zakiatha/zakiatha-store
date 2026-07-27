@@ -310,7 +310,10 @@ const homeView = {
                         <img src="img/mobilelgendsbangbang.jpg" alt="Mobile Legends Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
                         <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(139, 92, 246, 0.15) 100%); z-index: 2;"></div>
                         <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content;">MOBILE LEGENDS</span>
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                                <span class="badge popular" style="font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px;">MOBILE LEGENDS</span>
+                                <span class="badge success" style="font-weight: 800; padding: 6px 12px; font-size: 12px; background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4);">⚡ 10.000+ Transaksi Sukses</span>
+                            </div>
                             <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(139,92,246,0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Isi Diamond MLBB Instan</h1>
                             <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
                                 Top-up Diamond Mobile Legends: Bang Bang instan, murah, dan aman. Masukkan data akun Anda, pilih nominal, selesaikan pembayaran!
@@ -327,7 +330,10 @@ const homeView = {
                         <img src="img/freefire.jpg" alt="Free Fire Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
                         <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(249, 115, 22, 0.15) 100%); z-index: 2;"></div>
                         <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content; background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">FREE FIRE</span>
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                                <span class="badge popular" style="font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);">FREE FIRE</span>
+                                <span class="badge success" style="font-weight: 800; padding: 6px 12px; font-size: 12px; background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4);">⚡ 10.000+ Transaksi Sukses</span>
+                            </div>
                             <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(249, 115, 22, 0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Top Up Free Fire Murah</h1>
                             <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
                                 Cukup masukkan Player ID Free Fire Anda, pilih nominal Diamond, dan dapatkan harga promo mingguan terendah otomatis 24 Jam!
@@ -344,7 +350,10 @@ const homeView = {
                         <img src="img/valorant.jpg" alt="Valorant Banner" class="hero-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; transition: transform 0.5s ease;">
                         <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(7, 10, 19, 0.95) 20%, rgba(239, 68, 68, 0.15) 100%); z-index: 2;"></div>
                         <div class="hero-content" style="position: relative; z-index: 3; max-width: 600px; padding: 48px; display: flex; flex-direction: column; justify-content: center; height: 100%;">
-                            <span class="badge popular" style="margin-bottom: 12px; font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; width: fit-content; background: linear-gradient(135deg, var(--danger) 0%, var(--accent) 100%);">VALORANT</span>
+                            <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                                <span class="badge popular" style="font-weight: 800; padding: 6px 12px; font-size: 12px; letter-spacing: 1px; background: linear-gradient(135deg, var(--danger) 0%, var(--accent) 100%);">VALORANT</span>
+                                <span class="badge success" style="font-weight: 800; padding: 6px 12px; font-size: 12px; background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4);">⚡ 10.000+ Transaksi Sukses</span>
+                            </div>
                             <h1 class="gradient-text" style="font-size: clamp(28px, 4vw, 42px); text-shadow: 0 0 20px rgba(239, 68, 68, 0.3); font-family: var(--font-heading); font-weight: 800; margin-bottom: 16px; line-height: 1.2;">Beli Valorant Points</h1>
                             <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 24px;">
                                 Masukkan Riot ID + Tagline Anda, pilih nominal VP, dan VP akan langsung dikirim ke akun Anda secara instan 24 Jam.

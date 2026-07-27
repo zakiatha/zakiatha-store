@@ -246,10 +246,16 @@ const invoiceView = {
                         <h3 style="font-size: 18px; font-weight: 800; margin: 0;" class="gradient-text">
                             Rincian Transaksi
                         </h3>
-                        <button id="btn-print-pdf" class="btn-grad" style="padding: 6px 14px; font-size: 12px; height: auto; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
-                            <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
-                            <span>Cetak Struk / PDF</span>
-                        </button>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="https://wa.me/?text=Halo,%20berikut%20bukti%20transaksi%20ZakiTopup%20saya:%20No.%20Invoice%20${tx.invoiceId}%20-%20Total:%20${window.formatRupiah(tx.totalAmount)}" target="_blank" rel="noopener noreferrer" class="btn-grad" style="padding: 6px 14px; font-size: 12px; height: auto; margin: 0; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #16a34a, #15803d); text-decoration: none;">
+                                <i data-lucide="message-circle" style="width: 14px; height: 14px;"></i>
+                                <span>Bagikan ke WA</span>
+                            </a>
+                            <button id="btn-print-pdf" class="btn-grad" style="padding: 6px 14px; font-size: 12px; height: auto; margin: 0; display: inline-flex; align-items: center; gap: 6px;">
+                                <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                                <span>Cetak Struk / PDF</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="invoice-row">
