@@ -1152,8 +1152,21 @@ const dbService = {
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2, '0');
         const dd = String(now.getDate()).padStart(2, '0');
-        const randomHex = Math.floor(1000 + Math.random() * 9000);
-        const invoiceId = `INV-${yyyy}${mm}${dd}-${randomHex}`;
+        // Secure non-enumerable random 8-character token
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let randomToken = '';
+        if (window.crypto && window.crypto.getRandomValues) {
+            const bytes = new Uint8Array(8);
+            window.crypto.getRandomValues(bytes);
+            for (let i = 0; i < 8; i++) {
+                randomToken += chars[bytes[i] % chars.length];
+            }
+        } else {
+            for (let i = 0; i < 8; i++) {
+                randomToken += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+        }
+        const invoiceId = `INV-${yyyy}${mm}${dd}-${randomToken}`;
 
         const newTx = {
             id: 'tx-' + Math.random().toString(36).substring(2, 11),
